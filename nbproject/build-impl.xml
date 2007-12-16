@@ -183,26 +183,25 @@
             <istrue value="${ricoh.dalp.display-mode.color}"/>
         </condition>
         <property name="xml.dir" value="${build.dir}/dalp"/>
-        <property name="xlet.dalp" value="RICOH.dalp"/>
-        <property name="xlet.dalp.name-only" value="RICOH.dalp"/>
+        <property name="xlet.dalp" value="${application.name}.dalp"/>
+        <property name="xlet.dalp.name-only" value="${application.name}.dalp"/>
         <property name="deploy.dir" value="${dist.dir}/deploy"/>
-        <property name="signed.jar" value="${dist.dir}/RICOH.jar"/>
-        <property name="rideploy.zip" value="${dist.dir}/RICOH.zip"/>
+        <property name="rideploy.zip" value="${dist.dir}/${application.name}.zip"/>
         <property name="ricoh.dalp.is-managed" value="true"/>
         <property name="ricoh.dalp.information.is-icon-used" value="true"/>
         <property name="ricoh.platform.target.version" value="2.0"/>
-        <property name="ricoh.dalp.version" value=""/>
+        <property name="ricoh.dalp.version" value="${deployment.number}"/>
         <property name="ricoh.dalp.application-desc.visible" value="true"/>
         <property name="ricoh.dalp.install.destination" value="hdd"/>
         <property name="ricoh.dalp.install.work-dir" value="hdd"/>
         <property name="ricoh.dalp.information.abbreviation" value="RICOH"/>
         <taskdef name="taskIf" classname="ricoh.ant.ConditionalTask" classpath="${libs.ricoh-ant-utils.classpath}"/>
         <taskdef name="dalp" classname="org.netbeans.modules.j2me.cdc.project.ricoh.DalpBuilder" classpath="${libs.ricoh-ant-utils.classpath}"/>
-        <property name="dalp.dist" value="${build.dir}/dalp/RICOH.dalp"/>
+        <property name="dalp.dist" value="${build.dir}/dalp/${application.name}.dalp"/>
         <property name="deployment.dir" location="${dist.dir}"/>
         <patternset id="deployment.patternset">
             <include name="${dist.jar}"/>
-            <include name="RICOH.dalp"/>
+            <include name="${application.name}.dalp"/>
             <include name="lib/*"/>
         </patternset>
     </target>
@@ -328,11 +327,7 @@
         <antcall target="do-clean" inheritall="true" inheritrefs="true"/>
     </target>
     <!--deps-jar-->
-    <target name="deps-jar" depends="conditional-clean" unless="no.deps">
-        <ant target="jar" inheritall="false" antfile="${project.SubstanceUtils}/build.xml">
-            <property name="config.active" value=""/>
-        </ant>
-    </target>
+    <target name="deps-jar" depends="conditional-clean" unless="no.deps"/>
     <!--preprocess-->
     <target name="pre-preprocess"/>
     <target name="do-preprocess" unless="no.preprocess">
@@ -396,8 +391,15 @@
                 </uptodate>
             </or>
         </condition>
+        <uptodate property="obfuscation.up-to-date" targetfile="${obfuscator.destjar}">
+            <srcfiles dir="${buildsystem.baton}"/>
+        </uptodate>
     </target>
-    <target name="proguard" depends="proguard-init" description="Obfuscate project classes." unless="no.obfusc">
+    <target name="skip-obfuscation" depends="proguard-init" if="obfuscation.up-to-date">
+        <fail unless="obfuscated.classes.dir">Must set obfuscated.classes.dir</fail>
+        <nb-overrideproperty name="buildsystem.baton" value="${obfuscated.classes.dir}"/>
+    </target>
+    <target name="proguard" depends="skip-obfuscation" description="Obfuscate project classes." unless="no.obfusc">
         <fail unless="obfuscated.classes.dir">Must set obfuscated.classes.dir</fail>
         <fail unless="obfuscator.srcjar">Must set obfuscator.srcjar</fail>
         <fail unless="obfuscator.destjar">Must set obfuscator.destjar</fail>
@@ -624,11 +626,11 @@
             <and>
                 <isfalse value="${ricoh.dalp.is-managed}"/>
                 <not>
-                    <available file="./RICOH.dalp"/>
+                    <available file="./${application.name}.dalp"/>
                 </not>
             </and>
         </condition>
-        <fail if="no.unmanaged.dalp" message="Dalp file RICOH.dalp is required in project directory when DALP management is set to off."/>
+        <fail if="no.unmanaged.dalp" message="Dalp file ${application.name}.dalp is required in project directory when DALP management is set to off."/>
         <condition property="no.vendor.name" value="true">
             <equals arg1="${application.vendor}" arg2="" trim="true"/>
         </condition>
@@ -664,7 +666,7 @@
         </taskIf>
         <taskIf if="ricoh.dalp.is-managed" value="false">
             <copy tofile="${dalp.dist}">
-                <fileset file="./RICOH.dalp"/>
+                <fileset file="./${application.name}.dalp"/>
             </copy>
             <echo message="Non-managed dalp file ${dalp.dist} w/ icon imported"/>
         </taskIf>
@@ -680,7 +682,7 @@
         </taskIf>
         <taskIf if="ricoh.dalp.is-managed" value="false">
             <copy tofile="${dalp.dist}">
-                <fileset file="./RICOH.dalp"/>
+                <fileset file="./${application.name}.dalp"/>
             </copy>
             <echo message="Non-managed dalp file ${dalp.dist} w/o icon imported"/>
         </taskIf>
@@ -886,7 +888,6 @@
     </target>
     <!--nsicom-run-->
     <target name="nsicom-run" if="nsicom-platform.trigger">
-        <taskdef name="nsicomExecDeploy" classname="org.netbeans.modules.j2me.cdc.project.nsicom.NSIcomExecDeployTask" classpath="${libs.nsicom-ant-utils.classpath}:${libs.ActiveSync.classpath}:"/>
         <nsicomExecDeploy home="${platform.home}" mainclass="${main.class}" args="${application.args}" jvmargs="${run.jvmargs}" device="${platform.device}" profile="${platform.profile}" xlet="${main.class.xlet}" applet="${main.class.applet}" verbose="${nsicom.application.runverbose}" hostip="${nsicom.application.monitorhost}" runondevice="${nsicom.application.runremote}" remotevmlocation="${nsicom.remotevm.location}" remoteDataLocation="${nsicom.remoteapp.location}">
             <fileset dir="${dist.dir}">
                 <exclude name="javadoc/**"/>
@@ -1003,7 +1004,7 @@
     <target name="javadoc" depends="preprocess">
         <fail unless="dist.javadoc.dir">Must set dist.javadoc.dir</fail>
         <mkdir dir="${dist.javadoc.dir}"/>
-        <javadoc source="${javac.source}" destdir="${dist.javadoc.dir}" bootclasspath="${platform.bootclasspath}" notree="${javadoc.notree}" use="${javadoc.use}" nonavbar="${javadoc.nonavbar}" noindex="${javadoc.noindex}" splitindex="${javadoc.splitindex}" author="${javadoc.author}" version="${javadoc.version}" windowtitle="${javadoc.windowtitle}" private="${javadoc.private}" encoding="${javac.encoding}">
+        <javadoc source="${javac.source}" destdir="${dist.javadoc.dir}" bootclasspath="${platform.bootclasspath}" notree="${javadoc.notree}" use="${javadoc.use}" nonavbar="${javadoc.nonavbar}" noindex="${javadoc.noindex}" splitindex="${javadoc.splitindex}" author="${javadoc.author}" version="${javadoc.version}" windowtitle="${javadoc.windowtitle}" private="${javadoc.private}" encoding="${javac.encoding}" docencoding="${javac.encoding}" charset="${javac.encoding}">
             <classpath>
                 <path path="${libs.classpath}"/>
             </classpath>
@@ -1051,7 +1052,7 @@
     <target name="clean-ricoh" if="ricoh-platform.trigger">
         <delete dir="${platform.home}/mnt/sd3/sdk/dsdk/dist/${ricoh.application.uid}"/>
         <delete dir="${build.dir}/dalp"/>
-        <delete file="${dist.dir}/RICOH.dalp"/>
+        <delete file="${dist.dir}/$.dalp"/>
         <delete dir="${dist.dir}/lib"/>
     </target>
     <target name="clean-semc" if="semc-platform.trigger">
