@@ -28,7 +28,7 @@ import java.io.InputStream;
 public interface ResultParser {
     
     /** 
-     * Parse given input
+     * Parse given input and return parsed length
      * @param is Input stream.
      */
     public void parse(InputStream is);

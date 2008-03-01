@@ -41,7 +41,8 @@ public class RequestTimelineTask extends AbstractTask {
     /** 
      * Creates a new instance of RequestFriendsTimelineTask.
      * @param controller 
-     * @param api 
+     * @param api
+     * @param feedType 
      */
     public RequestTimelineTask(
             TwitterController controller,

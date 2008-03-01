@@ -59,6 +59,7 @@ public class XmlParser {
     /** 
      * Parse next element
      * @return Element type or end-of-document.
+     * @throws java.io.IOException 
      */
     public int parse() throws IOException {
         StringBuffer inputBuffer = new StringBuffer();

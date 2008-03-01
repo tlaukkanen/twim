@@ -79,7 +79,9 @@ public class TwitterApi {
     public Status updateStatus(String status) {
         try {
             StatusFeedParser parser = new StatusFeedParser();
-            String url = STATUS_UPDATE_URL + "?status=" + StringUtil.urlEncode(status);
+            String url = STATUS_UPDATE_URL + 
+                    "?status=" + StringUtil.urlEncode(status) +
+                    "&source=twim";
             HttpUtil.doPost( url, parser );
             Vector statuses = parser.getStatuses();
             if(status.length()==1) {

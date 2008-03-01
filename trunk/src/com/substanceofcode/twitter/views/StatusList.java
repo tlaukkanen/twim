@@ -21,6 +21,7 @@ package com.substanceofcode.twitter.views;
 
 import com.substanceofcode.twitter.model.Status;
 import com.substanceofcode.utils.StringUtil;
+import com.substanceofcode.utils.TimeUtil;
 import java.util.Enumeration;
 import java.util.Vector;
 import javax.microedition.lcdui.Font;
@@ -72,7 +73,12 @@ public class StatusList {
     }
     
     private int drawStatus(Graphics g, int row, Status status) {
-        talkBalloon.draw(g, status.getText(), status.getScreenName(), row);
+        
+        /** Parse the text below the talk balloon */
+        String time = TimeUtil.getTimeInterval(status.getDate());
+        String infoText = status.getScreenName() + ", " + time + " ago";        
+        
+        talkBalloon.draw(g, status.getText(), infoText, row);
         
         String[] originalText = { status.getText() };
         String[] textLines = StringUtil.formatMessage(originalText, screenWidth-4, textFont);// .opStrings(status.getText(), "\n", textFont, width-4);
