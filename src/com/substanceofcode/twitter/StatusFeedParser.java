@@ -69,7 +69,7 @@ http://assets2.twitter.com/system/user/profile_image/13348/normal/861009_f126471
 <protected>false</protected>
 </user>
 </status>
-     */ 
+     */
     
     public Vector getStatuses() {
         return statuses;

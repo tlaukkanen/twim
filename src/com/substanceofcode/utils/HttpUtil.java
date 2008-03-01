@@ -31,6 +31,9 @@ import javax.microedition.io.HttpConnection;
  */
 public class HttpUtil extends HttpAbstractUtil {
 
+    /** Total bytes transfered */
+    private static long totalBytes = 0;
+    
     /** Creates a new instance of HttpUtil */
     public HttpUtil() {
     }
@@ -107,8 +110,6 @@ public class HttpUtil extends HttpAbstractUtil {
             }
 
             if (parser == null) {
-//            if(true) {
-                // DEBUG_START
                 // Prepare buffer for input data
                 StringBuffer inputBuffer = new StringBuffer();
 
@@ -124,6 +125,7 @@ public class HttpUtil extends HttpAbstractUtil {
 
                 // Split buffer string by each new line
                 response = inputBuffer.toString();
+                totalBytes += response.length();
             } else {
                 parser.parse(is);
             }
