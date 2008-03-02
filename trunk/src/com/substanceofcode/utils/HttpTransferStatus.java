@@ -1,6 +1,6 @@
 /*
- * Log.java
- *
+ * HttpTranferStatus.java
+ * 
  * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
@@ -20,30 +20,32 @@
 package com.substanceofcode.utils;
 
 /**
- * Log
- * 
+ * This class is a container for transferred bytes count information.
  * @author Tommi Laukkanen (tlaukkanen at gmail dot com)
  */
-public class Log {
+public class HttpTransferStatus {
+
+    private static long totalBytesReceived = 0;
+    private static long totalBytesSent = 0;
     
-    private static String errors = "";
-    
-    public static String getErrors() {
-        return errors;
+    public static long getTotalBytesReceived() {
+        return totalBytesReceived;
     }
     
-    public static void add(String entry) {
-        System.out.println("LOG: " + entry);
+    public static long getTotalBytesSent() {
+        return totalBytesSent;
     }
     
-    public static void debug(String entry) {
-        System.out.println(entry);
-        errors += entry + "\r\n";
+    public static long getTotalBytesTransfered() {
+        return totalBytesReceived + totalBytesSent;
     }
     
-    public static void error(String entry) {
-        System.out.println("ERR: " + entry);
-        errors += entry + "\r\n";
+    public static void addReceivedBytes(long byteCount) {
+        totalBytesReceived += byteCount;
+    }
+    
+    public static void addSentBytes(long byteCount) {
+        totalBytesSent += byteCount;
     }
     
 }

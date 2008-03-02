@@ -1,7 +1,7 @@
 /*
  * StatusList.java
  *
- * Copyright (C) 2005-2007 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -83,23 +83,7 @@ public class StatusList {
         String[] originalText = { status.getText() };
         String[] textLines = StringUtil.formatMessage(originalText, screenWidth-4, textFont);// .opStrings(status.getText(), "\n", textFont, width-4);
         int height = (textLines.length) * textFont.getHeight();
-        /*
-        g.setColor(0xffffff);
-        g.fillRect(1, row, screenWidth-2, height);
         
-        int triSize = textFont.getHeight()/2;
-        g.fillTriangle(triSize, row+height, textFont.getHeight(), row+height+triSize, textFont.getHeight(), row+height);
-        
-        g.setColor(0x000000);
-        g.setFont(textFont);
-        int textRow = row + textFont.getHeight();
-        for(int line=0; line<textLines.length; line++) {
-            g.drawString(textLines[line], 2, textRow, Graphics.LEFT|Graphics.BOTTOM);
-            textRow += textFont.getHeight();
-        }        
-        g.drawString(status.getScreenName(), textFont.getHeight() + 2, textRow, Graphics.LEFT|Graphics.BOTTOM);
-        //g.drawString(status.getDate(), width-2, textRow, Graphics.RIGHT|Graphics.BOTTOM);
-        */
         return height + textFont.getHeight();
          
     }

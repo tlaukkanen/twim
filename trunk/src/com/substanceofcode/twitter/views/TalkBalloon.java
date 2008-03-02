@@ -1,7 +1,7 @@
 /*
  * TalkBalloon.java
  * 
- * Copyright (C) 2005-2007 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,7 +46,7 @@ public class TalkBalloon {
      * @param talkerText    Text below balloon.
      * @param y             Y coordinate of balloon.
      */
-    public void draw(Graphics g, String text, String talkerText, int y) {
+    public int draw(Graphics g, String text, String talkerText, int y) {
         
         // Calculate text dimensions
         String[] originalText = { text };
@@ -90,6 +90,7 @@ public class TalkBalloon {
         g.setColor(0x0000aa);
         g.drawString(talkerText, x+triSize * 2 + 2, textRow, Graphics.LEFT|Graphics.BOTTOM);
         
+        return (int)((textLines.length+1)*Font.getDefaultFont().getHeight() + 4);
     }
     
 }

@@ -1,6 +1,6 @@
 Twim - Mobile Twitter Client
 
-Copyright (c) 2006-2007 Tommi Laukkanen
+Copyright (c) 2006-2008 Tommi Laukkanen
 http://www.substanceofcode.com
 
 Contributors:
@@ -8,6 +8,11 @@ Tommi Laukkanen
 
 
 Release Notes:
+
+v1.0 (March 2nd 2008)
++ Transferred byte count
++ Status age (..3 hours ago)
++ About page
 
 v0.5 (September 24th 2007)
 + First public release

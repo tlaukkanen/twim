@@ -1,7 +1,7 @@
 /*
  * HttpUtil.java
  *
- * Copyright (C) 2005-2007 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -97,7 +97,8 @@ public class HttpUtil extends HttpAbstractUtil {
              * Get a DataInputStream from the HttpConnection
              * and forward it to XML parser
              */
-            InputStream is = hc.openInputStream();
+            InputStream his = hc.openInputStream();
+            CustomInputStream is = new CustomInputStream(his);
 
             /** Check for the cookie */
             String sessionCookie = hc.getHeaderField("Set-cookie");

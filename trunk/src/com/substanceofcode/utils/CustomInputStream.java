@@ -1,6 +1,6 @@
 /*
- * Theme.java
- *
+ * CustomInputStream.java
+ * 
  * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
@@ -17,19 +17,31 @@
  * limitations under the License.
  */
 
-package com.substanceofcode.twitter.views;
+package com.substanceofcode.utils;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
- * Theme
- * 
+ * InputStream wrapper so that we can get the total amount of bytes transferred
+ * count.
  * @author Tommi Laukkanen (tlaukkanen at gmail dot com)
  */
-public class Theme {
+public class CustomInputStream {
 
-    public static final int TWITTER_BLUE_COLOR = 0x9ae4e8;
+    private InputStream stream;
     
-    /** Creates a new instance of Theme */
-    private Theme() {
+    public CustomInputStream(InputStream stream) {
+        this.stream = stream;
     }
-
+    
+    public int read() throws IOException {
+        HttpTransferStatus.addReceivedBytes(1);
+        return stream.read();        
+    }
+    
+    public void close() throws IOException {
+        stream.close();
+    }
+    
 }

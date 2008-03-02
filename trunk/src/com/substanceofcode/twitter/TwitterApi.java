@@ -1,7 +1,7 @@
 /*
  * TwitterApi.java
  *
- * Copyright (C) 2005-2007 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -84,7 +84,7 @@ public class TwitterApi {
                     "&source=twim";
             HttpUtil.doPost( url, parser );
             Vector statuses = parser.getStatuses();
-            if(status.length()==1) {
+            if(statuses!=null && statuses.isEmpty()==false) {
                 return (Status)statuses.elementAt(0);
             }
         } catch(Exception ex) {
