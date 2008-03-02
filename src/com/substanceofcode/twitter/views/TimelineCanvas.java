@@ -1,7 +1,7 @@
 /*
  * TimelineCanvas.java
  *
- * Copyright (C) 2005-2007 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,9 +23,6 @@ import com.substanceofcode.infrastructure.Device;
 import com.substanceofcode.twitter.TwitterController;
 import java.util.Vector;
 import javax.microedition.lcdui.Canvas;
-import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
-import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
 
 /**
@@ -55,7 +52,7 @@ public class TimelineCanvas extends Canvas {
         menuBar = new TabBar(2, labels, getWidth());
         
         /** Menu */
-        String[] menuLabels = {"Update status", "Settings", "Exit"};
+        String[] menuLabels = {"Update status", "Settings", "About", "Exit", "Cancel"};
         menu = new Menu(menuLabels, getWidth(), getHeight());
         
         /** Status list control */
@@ -119,6 +116,22 @@ public class TimelineCanvas extends Canvas {
         }        
     }
     
+    public void activateMenuItem() {
+        int selectedIndex = menu.getSelectedIndex();
+        if(selectedIndex==0) {
+            controller.showStatusView();
+        } else if(selectedIndex==1) {
+            controller.showLoginForm();
+        } else if(selectedIndex==2) {
+            controller.about();
+        } else if(selectedIndex==3) {
+            controller.exit();
+        } else if(selectedIndex==4) {
+            /** Cancel = Do nothing */
+        }
+    }
+    
+    
     public void keyPressed(int keyCode) {
         int gameAction = this.getGameAction(keyCode);
         String keyName = this.getKeyName(keyCode);
@@ -131,14 +144,7 @@ public class TimelineCanvas extends Canvas {
         } else if(gameAction == Canvas.FIRE) {
             if(menu.isActive()) {
                 menu.deactivate();
-                int selectedIndex = menu.getSelectedIndex();
-                if(selectedIndex==0) {
-                    controller.showStatusView();
-                } else if(selectedIndex==1) {
-                    controller.showLoginForm();
-                } else if(selectedIndex==2) {
-                    controller.exit();
-                }
+                activateMenuItem();
             } else {
                 menu.activate();
             }
@@ -149,6 +155,7 @@ public class TimelineCanvas extends Canvas {
             /** Left soft key pressed */
             if(menu.isActive()) {
                 menu.deactivate();
+                activateMenuItem();                
             } else {
                 menu.activate();
             }
@@ -158,6 +165,7 @@ public class TimelineCanvas extends Canvas {
             /** Right soft key pressed */
             if(menu.isActive()) {
                 menu.deactivate();
+                activateMenuItem();                
             } else {
                 menu.activate();
             }

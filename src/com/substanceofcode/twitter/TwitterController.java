@@ -1,7 +1,7 @@
 /*
  * TwitterController.java
  *
- * Copyright (C) 2005-2007 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,7 @@ package com.substanceofcode.twitter;
 import com.substanceofcode.twitter.model.Status;
 import com.substanceofcode.twitter.tasks.RequestTimelineTask;
 import com.substanceofcode.twitter.tasks.UpdateStatusTask;
+import com.substanceofcode.twitter.views.AboutCanvas;
 import com.substanceofcode.twitter.views.LoginForm;
 import com.substanceofcode.twitter.views.SplashCanvas;
 import com.substanceofcode.twitter.views.TimelineCanvas;
@@ -67,6 +68,11 @@ public class TwitterController {
         } catch (RecordStoreException ex) {
             ex.printStackTrace();
         }
+    }
+
+    public void about() {
+        AboutCanvas canvas = new AboutCanvas(this);
+        display.setCurrent(canvas);
     }
 
     public void addStatus(Status status) {

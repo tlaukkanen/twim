@@ -1,7 +1,7 @@
 /*
  * XmlParser.java
  *
- * Copyright (C) 2005-2007 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,7 +31,7 @@ import java.io.UnsupportedEncodingException;
  */
 public class XmlParser {
     
-    private InputStream m_inputStream = null;
+    private CustomInputStream m_inputStream = null;
     private static String encoding = "UTF-8";
     
     /** Current XML element name (eg. <title> = title) */
@@ -47,13 +47,14 @@ public class XmlParser {
      * Creates a new instance of XmlParser
      * @param inputStream   Stream containing XML document.
      */
-    public XmlParser(InputStream inputStream) {
+    public XmlParser(CustomInputStream inputStream) {
         m_inputStream = inputStream;
     }
     
     public XmlParser(String xmlDocument) {
         InputStream is = new ByteArrayInputStream(xmlDocument.getBytes());
-        m_inputStream = is;
+        CustomInputStream cis = new CustomInputStream(is);
+        m_inputStream = cis;
     }
     
     /** 

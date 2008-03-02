@@ -1,7 +1,7 @@
 /*
  * StatusFeedParser.java
  *
- * Copyright (C) 2005-2007 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,13 +20,14 @@
 package com.substanceofcode.twitter;
 
 import com.substanceofcode.twitter.model.Status;
+import com.substanceofcode.utils.CustomInputStream;
 import com.substanceofcode.utils.ResultParser;
 import com.substanceofcode.utils.StringUtil;
 import com.substanceofcode.utils.XmlParser;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.Vector;
 
 /**
@@ -75,7 +76,7 @@ http://assets2.twitter.com/system/user/profile_image/13348/normal/861009_f126471
         return statuses;
     }
     
-    public void parse(InputStream is) {
+    public void parse(CustomInputStream is) {
         try {
             XmlParser xml = new XmlParser(is);
             boolean doStatus = false;
@@ -95,13 +96,17 @@ http://assets2.twitter.com/system/user/profile_image/13348/normal/861009_f126471
                     date = null;
                 }
                 if (elementName.equals("text")) {
-                    text = xml.getText();
+                    text += xml.getText();
                 }
                 if(elementName.equals("screen_name")) {
                     screenName = xml.getText();
                 }
                 if(elementName.equals("created_at")) {
-                    date = parseDate( xml.getText() );
+                    String dateString = xml.getText();
+                    /** DEBUGGING */
+                    // text += dateString;
+                    
+                    date = parseDate( dateString );                    
                 }
                     
             }
@@ -184,7 +189,7 @@ http://assets2.twitter.com/system/user/profile_image/13348/normal/861009_f126471
             int hours = Integer.parseInt( timeValues[0] );
             int minutes = Integer.parseInt( timeValues[1] );
             int seconds = Integer.parseInt( timeValues[2] );
-            
+                        
             pubDate = getCal(dayOfMonth, month, year, hours, minutes, seconds);
             
         } catch(Exception ex) {
@@ -204,13 +209,14 @@ http://assets2.twitter.com/system/user/profile_image/13348/normal/861009_f126471
                                int minutes, int seconds) throws Exception {
             // Create calendar object from date values
             Calendar cal = Calendar.getInstance();
+            cal.setTimeZone( TimeZone.getTimeZone("GMT+0") );
             cal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
             cal.set(Calendar.MONTH, month);
             cal.set(Calendar.YEAR, year);
             cal.set(Calendar.HOUR_OF_DAY, hours);
             cal.set(Calendar.MINUTE, minutes);
             cal.set(Calendar.SECOND, seconds);
-
+                                    
             return cal.getTime();
     }    
 

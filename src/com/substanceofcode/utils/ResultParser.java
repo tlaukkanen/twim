@@ -1,7 +1,7 @@
 /*
  * ResultParser.java
  *
- * Copyright (C) 2005-2007 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,8 +19,6 @@
 
 package com.substanceofcode.utils;
 
-import java.io.InputStream;
-
 /**
  *
  * @author Tommi Laukkanen (tlaukkanen at gmail dot com)
@@ -31,6 +29,6 @@ public interface ResultParser {
      * Parse given input and return parsed length
      * @param is Input stream.
      */
-    public void parse(InputStream is);
+    public void parse(CustomInputStream is);
     
 }

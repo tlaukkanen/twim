@@ -1,7 +1,7 @@
 /*
  * Menu.java
  * 
- * Copyright (C) 2005-2007 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,7 @@ import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
 /**
- *
+ * Menu implementation that will render an overlay menu.
  * @author Tommi Laukkanen
  */
 public class Menu {
