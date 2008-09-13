@@ -48,7 +48,7 @@ public class TimelineCanvas extends Canvas {
         setFullScreenMode(true);
         
         /** Menu bar tabs */
-        String[] labels = {"Archive", "Replies", "Recent"};
+        String[] labels = {"Archive", "Replies", "Recent", "Public"};
         menuBar = new TabBar(2, labels, getWidth());
         
         /** Menu */
@@ -68,10 +68,13 @@ public class TimelineCanvas extends Canvas {
     protected void paint(Graphics g) {
         g.setColor(Theme.TWITTER_BLUE_COLOR);
         g.fillRect(0, 0, getWidth(), getHeight());
-        
-        statusList.draw(g, statuses, menuBar.getHeight() + verticalScroll);        
-        menuBar.draw(g, 0);
-        menu.draw(g);
+
+        if(menu.isActive()==false) {
+            statusList.draw(g, statuses, menuBar.getHeight() + verticalScroll + TalkBalloon.textFont.getHeight()/2);
+            menuBar.draw(g, 0);
+        } else {
+            menu.draw(g);
+        }
     }
 
     private void handleTabChange() {
@@ -86,6 +89,9 @@ public class TimelineCanvas extends Canvas {
         } else if(tabIndex==2) {
             /** Friends selected */
             controller.showFriendsTimeline();
+        } else if(tabIndex==3) {
+            /** Public selected */
+            controller.showPublicTimeline();
         }
 
     }
@@ -102,7 +108,7 @@ public class TimelineCanvas extends Canvas {
             if(menu.isActive()) {
                 menu.selectPrevious();
             } else {
-                verticalScroll += menuBar.getHeight();
+                verticalScroll += getHeight()/6;// menuBar.getHeight();
                 if(verticalScroll>0) {
                     verticalScroll = 0;
                 }            
@@ -111,7 +117,7 @@ public class TimelineCanvas extends Canvas {
             if(menu.isActive()) {
                 menu.selectNext();
             } else {
-                verticalScroll -= menuBar.getHeight();
+                verticalScroll -= getHeight()/6; //menuBar.getHeight();
             }
         }        
     }
@@ -137,10 +143,14 @@ public class TimelineCanvas extends Canvas {
         String keyName = this.getKeyName(keyCode);
         if(gameAction == Canvas.LEFT) {
             menuBar.selectPreviousTab();
-            handleTabChange();            
+            handleTabChange();
+            repaint();
+            return;
         } else if(gameAction == Canvas.RIGHT) {
             menuBar.selectNextTab();
             handleTabChange();
+            repaint();
+            return;
         } else if(gameAction == Canvas.FIRE) {
             if(menu.isActive()) {
                 menu.deactivate();
@@ -170,7 +180,7 @@ public class TimelineCanvas extends Canvas {
                 menu.activate();
             }
         }
-        handleUpAndDownKeys(keyCode);        
+        handleUpAndDownKeys(keyCode);
         repaint();
     }
     

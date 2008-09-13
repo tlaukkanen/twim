@@ -19,7 +19,9 @@
 
 package com.substanceofcode.twitter.model;
 
+import com.substanceofcode.utils.StringUtil;
 import java.util.Date;
+import javax.microedition.lcdui.Font;
 
 /**
  * StatusEntry
@@ -31,6 +33,10 @@ public class Status {
     private String screenName;
     private String statusText;
     private Date date;
+
+    /** For optimizations */
+    private int height;
+    private String[] textLines;
     
     /** Creates a new instance of StatusEntry 
      * @param screenName 
@@ -41,6 +47,12 @@ public class Status {
         this.screenName = screenName;
         this.statusText = statusText;
         this.date = date;
+        this.height = 0;
+    }
+
+    public void createTextLines(int textBoxWidth, Font textFont) {
+        String[] text = { statusText };
+        textLines = StringUtil.formatMessage(text, textBoxWidth, textFont);
     }
     
     public String getText() {
@@ -53,6 +65,18 @@ public class Status {
     
     public Date getDate() {
         return date;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public String[] getTextLines() {
+        return textLines;
+    }
+
+    public void setHeight(int h) {
+        height = h;
     }
 
 }

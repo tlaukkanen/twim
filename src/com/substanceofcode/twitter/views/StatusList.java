@@ -64,8 +64,20 @@ public class StatusList {
         int currentRow = row;
         while(statusEnum.hasMoreElements()) {
             Status status = (Status)statusEnum.nextElement();
-            currentRow += drawStatus(g, currentRow, status);
-            currentRow += 4;
+            int statusHeight = status.getHeight();
+            System.out.println("currow: " + currentRow + " height: " + statusHeight);
+
+            if(status.getTextLines()==null) {
+                status.createTextLines(screenWidth-textFont.getHeight()*2-textFont.getHeight()/2, textFont);
+            }
+
+            if( statusHeight==0 ||
+               (statusHeight>0 && (currentRow+statusHeight)>0) ) {
+                /** Draw status only when it is visible */
+                statusHeight = drawStatus(g, currentRow, status);
+                status.setHeight( statusHeight );
+            }
+            currentRow += statusHeight;
             if(currentRow>screenHeight) {
                 break;
             }
@@ -78,14 +90,7 @@ public class StatusList {
         String time = TimeUtil.getTimeInterval(status.getDate());
         String infoText = status.getScreenName() + ", " + time + " ago";        
         
-        talkBalloon.draw(g, status.getText(), infoText, row);
-        
-        String[] originalText = { status.getText() };
-        String[] textLines = StringUtil.formatMessage(originalText, screenWidth-4, textFont);// .opStrings(status.getText(), "\n", textFont, width-4);
-        int height = (textLines.length) * textFont.getHeight();
-        
-        return height + textFont.getHeight();
-         
+        return talkBalloon.draw(g, status.getTextLines(), infoText, row);
     }
     
 }

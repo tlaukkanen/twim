@@ -37,6 +37,7 @@ public class RequestTimelineTask extends AbstractTask {
     public final static int FEED_FRIENDS = 0;
     public final static int FEED_RESPONSES = 1;
     public final static int FEED_ARCHIVE = 2;
+    public final static int FEED_PUBLIC = 3;
     
     /** 
      * Creates a new instance of RequestFriendsTimelineTask.
@@ -66,6 +67,10 @@ public class RequestTimelineTask extends AbstractTask {
             Vector responsesTimeline = api.requestResponsesTimeline();
             controller.setResponsesTimeline( responsesTimeline );
             controller.showTimeline( responsesTimeline );
+        } else if(feedType==FEED_PUBLIC) {
+            Vector publicTimeline = api.requestEveryoneTimeline();
+            controller.setPublicTimeline( publicTimeline );
+            controller.showTimeline( publicTimeline );
         }
         
     }
