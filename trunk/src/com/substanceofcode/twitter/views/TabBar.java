@@ -36,11 +36,11 @@ public class TabBar {
     
     private static final int COLOR_BACKGROUND = 0x444444;
     private static final int COLOR_INACTIVE = 0xaaaaaa;
-    private static final int COLOR_ACTIVE = Theme.TWITTER_BLUE_COLOR;
+    private static final int COLOR_ACTIVE = 0xffffff; //Theme.TWITTER_BLUE_COLOR;
     private static final int COLOR_TEXT = 0x000000;
     
     private static final Font labelFont = Font.getFont(
-            Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_MEDIUM);
+            Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL);
     
     /** Creates a new instance of TabBar 
      * @param selectedTabIndex  Currently selected tab index
@@ -90,10 +90,11 @@ public class TabBar {
         // Black menu label text
         g.setColor(COLOR_BACKGROUND);
         g.fillRect(0, y, width, labelFont.getHeight()+2);        
-        
+        g.setFont(labelFont);
+
         for(int tab=0; tab<tabCount; tab++) {
             String tabLabel = menuLabels[tab];
-            int tabWidth = labelFont.stringWidth(tabLabel);
+            int tabWidth = labelFont.stringWidth(tabLabel)+2;
             
             // White background for selected tabs
             if(selectedTabIndex==tab) {

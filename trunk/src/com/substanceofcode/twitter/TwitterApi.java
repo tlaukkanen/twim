@@ -35,9 +35,10 @@ public class TwitterApi {
 
     private String username;
     private String password;
+    private static final String PUBLIC_TIMELINE_URL = "http://www.twitter.com/statuses/public_timeline.xml";
     private static final String FRIENDS_TIMELINE_URL = "http://www.twitter.com/statuses/friends_timeline.xml";
     private static final String USER_TIMELINE_URL = "http://www.twitter.com/statuses/user_timeline.xml";
-    private static final String RESPONSES_TIMELINE_URL = "http://twitter.com/statuses/replies.format";
+    private static final String RESPONSES_TIMELINE_URL = "http://twitter.com/statuses/replies.xml";
     private static final String STATUS_UPDATE_URL = "http://twitter.com/statuses/update.xml";
 
     /** Creates a new instance of TwitterApi */
@@ -66,7 +67,15 @@ public class TwitterApi {
      */
     public Vector requestUserTimeline() {
         return requestTimeline(USER_TIMELINE_URL);
-    }    
+    }
+
+    /**
+     * Request public timeline from Twitter API.
+     * @return Vector containing StatusEntry items.
+     */
+    public Vector requestEveryoneTimeline() {
+        return requestTimeline(PUBLIC_TIMELINE_URL);
+    }
 
     /**
      * Request responses timeline from Twitter API.{

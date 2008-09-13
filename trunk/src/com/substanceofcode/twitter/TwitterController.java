@@ -47,7 +47,8 @@ public class TwitterController {
     private TwitterApi api;
     private Settings settings;
     private TimelineCanvas timeline;
-    
+
+    private Vector publicTimeline;
     private Vector friendsTimeline;
     private Vector archiveTimeline;
     private Vector responsesTimeline;
@@ -116,12 +117,29 @@ public class TwitterController {
         display.setCurrent(wait);
     }
 
+    public void setPublicTimeline(Vector publicTimeline) {
+        this.publicTimeline = publicTimeline;
+    }
+
     public void setResponsesTimeline(Vector responsesTimeline) {
         this.responsesTimeline = responsesTimeline;
     }
 
     public void setUserTimeline(Vector archiveTimeline) {
         this.archiveTimeline = archiveTimeline;
+    }
+
+
+    public void showPublicTimeline() {
+        if(publicTimeline==null) {
+            RequestTimelineTask task = new RequestTimelineTask(
+                this, api, RequestTimelineTask.FEED_PUBLIC);
+            WaitCanvas wait = new WaitCanvas(this, task);
+            display.setCurrent(wait);
+        } else {
+            timeline.setTimeline(publicTimeline);
+            display.setCurrent(timeline);
+        }
     }
 
     public void showResponsesTimeline() {

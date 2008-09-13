@@ -32,13 +32,25 @@ public class TalkBalloon {
     public static final Font textFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL);
     public int screenWidth;
     public int screenHeight;
+    private static final int BG_COLOR = 0xFFFFFF;
+    private static final int BORDER_COLOR = 0xAAAAAA;
+    private int fontHeight;
+    private int textWidth;
     
     /** Create new instanc of TalkBalloon. */
     public TalkBalloon(int screenWidth, int screenHeight) {
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
+        this.fontHeight = textFont.getHeight();
+        this.textWidth = screenWidth-fontHeight*3;
     }
-    
+
+    public int draw(Graphics g, String text, String talkerText, int y) {
+        String[] originalText = { text };
+        String[] textLines = StringUtil.formatMessage(originalText, screenWidth-textFont.getHeight()*2-textFont.getHeight()/2, textFont);
+        return draw(g, textLines, talkerText, y);
+    }
+
     /**
      * Draw talk balloon in given coordinates and in given size.
      * @param g             Graphics.
@@ -46,51 +58,43 @@ public class TalkBalloon {
      * @param talkerText    Text below balloon.
      * @param y             Y coordinate of balloon.
      */
-    public int draw(Graphics g, String text, String talkerText, int y) {
-        
+    public int draw(Graphics g, String[] textLines, String talkerText, int y) {
+
         // Calculate text dimensions
-        String[] originalText = { text };
-        String[] textLines = StringUtil.formatMessage(originalText, screenWidth-6, textFont);
-        int textHeight = (textLines.length) * textFont.getHeight();
-        int textWidth;
-        if(textLines.length==1) {
-            textWidth = textFont.stringWidth(text);
-        } else {
-            textWidth = screenWidth-6;
-        }
-        
+        int textHeight = (textLines.length) * fontHeight + fontHeight;
+
         // Draw the main balloon box
-        g.setColor(0xffffff);
-        int x = screenWidth/2 - (textWidth+2)/2;
-        g.fillRect(x, y, textWidth+2, textHeight);
-        g.setColor(0x888888);
-        g.drawRect(x, y, textWidth+2, textHeight);
+        g.setColor(BG_COLOR);
+        int x = screenWidth/2 - (textWidth+fontHeight)/2;
+        g.fillRect(x, y, textWidth + fontHeight, textHeight);
+        g.setColor(BORDER_COLOR);
+        g.drawRect(x, y, textWidth + fontHeight, textHeight);
    
         // Draw the small triangle on the bottom of the balloon
-        g.setColor(0xffffff);
-        int triSize = Font.getDefaultFont().getHeight()/2;        
+        g.setColor(BG_COLOR);
+        int triSize = fontHeight/2;
         g.fillTriangle(
-            x+triSize, y + textHeight, 
-            x+triSize * 2, y + textHeight + triSize, 
-            x+triSize * 2, y + textHeight);
-        g.setColor(0x888888);
+            x+triSize, y + textHeight,
+            x+triSize * 2, y + textHeight + triSize,
+            x+triSize * 3, y + textHeight);
+        g.setColor(BORDER_COLOR);
         g.drawLine(x+triSize, y + textHeight, x+triSize * 2, y + textHeight + triSize);
-        g.drawLine(x+triSize * 2, y + textHeight + triSize, x+triSize * 2, y + textHeight);        
+        g.drawLine(x+triSize * 2, y + textHeight + triSize, x+triSize * 3, y + textHeight);
         
         // Draw text inside balloon
         g.setColor(0x000000);
         g.setFont(textFont);
-        int textRow = y + textFont.getHeight();
+        int textRow = y + fontHeight + fontHeight/2;
         for(int line=0; line<textLines.length; line++) {
-            g.drawString(textLines[line], x+2, textRow, Graphics.LEFT|Graphics.BOTTOM);
-            textRow += textFont.getHeight();
+            g.drawString(textLines[line], x+fontHeight/2, textRow, Graphics.LEFT|Graphics.BOTTOM);
+            textRow += fontHeight;
         }      
         
         // Draw talker text
         g.setColor(0x0000aa);
-        g.drawString(talkerText, x+triSize * 2 + 2, textRow, Graphics.LEFT|Graphics.BOTTOM);
+        g.drawString(talkerText, x+triSize * 4 + 2, textRow + fontHeight/2 + 2, Graphics.LEFT|Graphics.BOTTOM);
         
-        return (int)((textLines.length+1)*Font.getDefaultFont().getHeight() + 4);
+        return (int)((textLines.length)*fontHeight + fontHeight*2);
     }
     
 }
