@@ -48,7 +48,7 @@ public class TalkBalloon {
     public int draw(Graphics g, String text, String talkerText, int y) {
         String[] originalText = { text };
         String[] textLines = StringUtil.formatMessage(originalText, screenWidth-textFont.getHeight()*2-textFont.getHeight()/2, textFont);
-        return draw(g, textLines, talkerText, y);
+        return draw(g, textLines, talkerText, y, false);
     }
 
     /**
@@ -58,7 +58,7 @@ public class TalkBalloon {
      * @param talkerText    Text below balloon.
      * @param y             Y coordinate of balloon.
      */
-    public int draw(Graphics g, String[] textLines, String talkerText, int y) {
+    public int draw(Graphics g, String[] textLines, String talkerText, int y, boolean isSelected) {
 
         // Calculate text dimensions
         int textHeight = (textLines.length) * fontHeight + fontHeight;
@@ -69,6 +69,17 @@ public class TalkBalloon {
         g.fillRect(x, y, textWidth + fontHeight, textHeight);
         g.setColor(BORDER_COLOR);
         g.drawRect(x, y, textWidth + fontHeight, textHeight);
+
+        if(isSelected) {
+            g.setColor(0x0000aa);
+            g.drawRect(x-1, y-1, textWidth + fontHeight + 2, textHeight + 2);
+            /*int size = (fontHeight)/2;
+            g.fillTriangle(
+                x-size, y + textHeight/2 - size/2,
+                x,      y + textHeight/2,
+                x-size, y + textHeight/2 + size/2);
+             */
+        }
    
         // Draw the small triangle on the bottom of the balloon
         g.setColor(BG_COLOR);

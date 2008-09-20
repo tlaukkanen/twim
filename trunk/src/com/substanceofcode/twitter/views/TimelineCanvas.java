@@ -21,6 +21,7 @@ package com.substanceofcode.twitter.views;
 
 import com.substanceofcode.infrastructure.Device;
 import com.substanceofcode.twitter.TwitterController;
+import com.substanceofcode.twitter.model.Status;
 import java.util.Vector;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
@@ -37,6 +38,7 @@ public class TimelineCanvas extends Canvas {
     private StatusList statusList;
     private TabBar menuBar;
     private Menu menu;
+    private Menu statusMenu;
     private int verticalScroll;
     
     /** 
@@ -54,7 +56,11 @@ public class TimelineCanvas extends Canvas {
         /** Menu */
         String[] menuLabels = {"Update status", "Settings", "About", "Exit", "Cancel"};
         menu = new Menu(menuLabels, getWidth(), getHeight());
-        
+
+        /** Status menu */
+        String[] statusMenuLabels = {"Open in browser", "Open link in browser", "Reply", "Cancel"};
+        statusMenu = new Menu(statusMenuLabels, getWidth(), getHeight());
+
         /** Status list control */
         statusList = new StatusList(getWidth(), getHeight());        
         
@@ -69,11 +75,13 @@ public class TimelineCanvas extends Canvas {
         g.setColor(Theme.TWITTER_BLUE_COLOR);
         g.fillRect(0, 0, getWidth(), getHeight());
 
-        if(menu.isActive()==false) {
+        if(menu.isActive()==false && statusMenu.isActive()==false) {
             statusList.draw(g, statuses, menuBar.getHeight() + verticalScroll + TalkBalloon.textFont.getHeight()/2);
             menuBar.draw(g, 0);
-        } else {
+        } else if(menu.isActive()) {
             menu.draw(g);
+        } else if(statusMenu.isActive()) {
+            statusMenu.draw(g);
         }
     }
 
@@ -107,6 +115,8 @@ public class TimelineCanvas extends Canvas {
         if(gameAction == Canvas.UP) {
             if(menu.isActive()) {
                 menu.selectPrevious();
+            } else if(statusMenu.isActive()) {
+                statusMenu.selectPrevious();
             } else {
                 verticalScroll += getHeight()/6;// menuBar.getHeight();
                 if(verticalScroll>0) {
@@ -116,6 +126,8 @@ public class TimelineCanvas extends Canvas {
         } else if(gameAction == Canvas.DOWN) {
             if(menu.isActive()) {
                 menu.selectNext();
+            } else if(statusMenu.isActive()) {
+                statusMenu.selectNext();
             } else {
                 verticalScroll -= getHeight()/6; //menuBar.getHeight();
             }
@@ -125,7 +137,7 @@ public class TimelineCanvas extends Canvas {
     public void activateMenuItem() {
         int selectedIndex = menu.getSelectedIndex();
         if(selectedIndex==0) {
-            controller.showStatusView();
+            controller.showStatusView("");
         } else if(selectedIndex==1) {
             controller.showLoginForm();
         } else if(selectedIndex==2) {
@@ -136,7 +148,28 @@ public class TimelineCanvas extends Canvas {
             /** Cancel = Do nothing */
         }
     }
-    
+
+    public void activateStatusMenuItem() {
+        int selectedIndex = statusMenu.getSelectedIndex();
+        Status selectedStatus = statusList.getSelected();
+        if(selectedIndex==0) {
+            if(selectedStatus!=null) {
+                selectedStatus.openInBrowser(controller.getMIDlet());
+                return;
+            }
+        } else if(selectedIndex==1) {
+            if(selectedStatus!=null) {
+                selectedStatus.openIncludedLink(controller.getMIDlet());
+                return;
+            }
+        } else if(selectedIndex==2) {
+            if(selectedStatus!=null) {
+                controller.showStatusView("@" + selectedStatus.getScreenName() + " ");
+            }
+        }else if(selectedIndex==3) {
+            /** Cancel = Do nothing */
+        }
+    }
     
     public void keyPressed(int keyCode) {
         int gameAction = this.getGameAction(keyCode);
@@ -155,8 +188,11 @@ public class TimelineCanvas extends Canvas {
             if(menu.isActive()) {
                 menu.deactivate();
                 activateMenuItem();
-            } else {
-                menu.activate();
+            } else if(statusMenu.isActive()) {
+                statusMenu.deactivate();
+                activateStatusMenuItem();
+            } else if(statusList.getSelected()!=null){
+                statusMenu.activate();
             }
                 
         } else if( keyName.indexOf("SOFT")>=0 && keyName.indexOf("1")>0 ||

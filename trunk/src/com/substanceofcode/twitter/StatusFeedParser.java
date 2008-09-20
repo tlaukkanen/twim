@@ -82,26 +82,29 @@ http://assets2.twitter.com/system/user/profile_image/13348/normal/861009_f126471
             boolean doStatus = false;
             String text = "";
             String screenName = "";
+            String id = "";
             Date date = null;
             while (xml.parse() != XmlParser.END_DOCUMENT) {
                 String elementName = xml.getName();
                 
                 if (elementName.equals("status")) {
                     if(text.length()>0) {
-                        Status status = new Status(screenName, text, date);
+                        Status status = new Status(screenName, text, date, id );
                         statuses.addElement(status);
                     }
                     text = "";
                     screenName = "";
+                    id = "";
                     date = null;
-                }
-                if (elementName.equals("text")) {
+                } else if (elementName.equals("id") && id.equals("")) {
+
+                    id = xml.getText();
+                    System.out.println("iD:" + id);
+                } else if (elementName.equals("text")) {
                     text += xml.getText();
-                }
-                if(elementName.equals("screen_name")) {
+                } else if(elementName.equals("screen_name")) {
                     screenName = xml.getText();
-                }
-                if(elementName.equals("created_at")) {
+                } else if(elementName.equals("created_at")) {
                     String dateString = xml.getText();
                     /** DEBUGGING */
                     // text += dateString;
@@ -111,7 +114,7 @@ http://assets2.twitter.com/system/user/profile_image/13348/normal/861009_f126471
                     
             }
             if(text.length()>0) {
-                Status status = new Status(screenName, text, date);
+                Status status = new Status(screenName, text, date, id);
                 statuses.addElement(status);
             }            
         } catch (IOException ex) {
