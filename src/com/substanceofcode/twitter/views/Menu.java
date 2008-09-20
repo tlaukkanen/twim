@@ -121,6 +121,7 @@ public class Menu {
     
     public void activate() {
         active = true;
+        selectedIndex = 0;
     }
     
     public void deactivate() {

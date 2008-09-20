@@ -39,7 +39,7 @@ public class StatusList {
     private int screenWidth;
     private int screenHeight;
     private TalkBalloon talkBalloon;
-    
+    private Status selectedStatus;
     
     /** 
      * Creates a new instance of StatusList
@@ -62,6 +62,7 @@ public class StatusList {
         Enumeration statusEnum = statuses.elements();
         
         int currentRow = row;
+        selectedStatus = null;
         while(statusEnum.hasMoreElements()) {
             Status status = (Status)statusEnum.nextElement();
             int statusHeight = status.getHeight();
@@ -71,10 +72,17 @@ public class StatusList {
                 status.createTextLines(screenWidth-textFont.getHeight()*2-textFont.getHeight()/2, textFont);
             }
 
+            boolean isSelected = false;
+            if(currentRow>=0&&selectedStatus==null) {
+                selectedStatus = status;
+                isSelected = true;
+            }
+
             if( statusHeight==0 ||
                (statusHeight>0 && (currentRow+statusHeight)>0) ) {
                 /** Draw status only when it is visible */
-                statusHeight = drawStatus(g, currentRow, status);
+
+                statusHeight = drawStatus(g, currentRow, status, isSelected);
                 status.setHeight( statusHeight );
             }
             currentRow += statusHeight;
@@ -84,13 +92,15 @@ public class StatusList {
         }
     }
     
-    private int drawStatus(Graphics g, int row, Status status) {
-        
+    private int drawStatus(Graphics g, int row, Status status, boolean isSelected) {
         /** Parse the text below the talk balloon */
         String time = TimeUtil.getTimeInterval(status.getDate());
-        String infoText = status.getScreenName() + ", " + time + " ago";        
-        
-        return talkBalloon.draw(g, status.getTextLines(), infoText, row);
+        String infoText = status.getScreenName() + ", " + time + " ago";
+        return talkBalloon.draw(g, status.getTextLines(), infoText, row, isSelected);
+    }
+
+    public Status getSelected() {
+        return selectedStatus;
     }
     
 }

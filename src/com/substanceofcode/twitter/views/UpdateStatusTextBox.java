@@ -36,8 +36,8 @@ public class UpdateStatusTextBox extends TextBox implements CommandListener {
     private Command okCommand;
     private Command cancelCommand;
     
-    public UpdateStatusTextBox(TwitterController controller) {
-        super("Status", "", 140, TextField.ANY);
+    public UpdateStatusTextBox(TwitterController controller, String prefix) {
+        super("Status", prefix, 140, TextField.ANY);
         this.controller = controller;
         
         okCommand = new Command("OK", Command.OK, 1);

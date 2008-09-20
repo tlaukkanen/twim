@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.Vector;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.midlet.MIDlet;
 import javax.microedition.rms.RecordStoreException;
 
 /**
@@ -83,6 +84,10 @@ public class TwitterController {
         if(archiveTimeline!=null) {
             archiveTimeline.insertElementAt(status, 0);
         }
+    }
+
+    public MIDlet getMIDlet() {
+        return midlet;
     }
     
     public Settings getSettings() {
@@ -155,8 +160,8 @@ public class TwitterController {
     }
 
     /** Show status updating view. */
-    public void showStatusView() {
-        UpdateStatusTextBox statusView = new UpdateStatusTextBox(this);
+    public void showStatusView(String prefix) {
+        UpdateStatusTextBox statusView = new UpdateStatusTextBox(this, prefix);
         display.setCurrent(statusView);
     }
 
