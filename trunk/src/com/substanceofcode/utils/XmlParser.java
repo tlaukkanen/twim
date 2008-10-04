@@ -229,6 +229,7 @@ public class XmlParser {
         text = StringUtil.replace(text, "&lt;", "<");
         text = StringUtil.replace(text, "&gt;", ">");
         text = StringUtil.replace(text, "&nbsp;", " ");
+        text = StringUtil.replace(text, "&quot;", "\"");
         text = StringUtil.replace(text, "&amp;", "&");
         text = StringUtil.replace(text, "&auml;", "ä");
         text = StringUtil.replace(text, "&ouml;", "ö");
@@ -245,6 +246,30 @@ public class XmlParser {
         text = StringUtil.replace(text, String.valueOf((char)226) + String.valueOf((char)128) + String.valueOf((char)166), "..."); 
         text = StringUtil.replace(text, String.valueOf((char)226) + String.valueOf((char)128) + String.valueOf((char)156), "\""); 
         text = StringUtil.replace(text, String.valueOf((char)226) + String.valueOf((char)128) + String.valueOf((char)157), "\""); 
+        boolean foundEscape = text.indexOf("&#")>=0;
+        int startIndex = 0;
+        while(foundEscape) {
+            int entityStart = text.indexOf("&#");
+            int entityEnd = text.indexOf(";",entityStart);
+            if(entityStart>0 && entityEnd>0) {
+                String character = text.substring(entityStart+2, entityEnd);
+                try {
+                    int charValue = 0;
+                    charValue = Integer.parseInt(character);
+                    if(charValue>0 && charValue<255) {
+                        text = StringUtil.replace(text, "&#" + charValue + ";", String.valueOf((char)charValue));    
+                    }                    
+                } catch(Exception ex) {
+                    // Do nothing...
+                }
+            }
+            startIndex++;
+            if(startIndex<text.length()) {
+                foundEscape = text.indexOf("&#", startIndex)>=0;
+            } else {
+                foundEscape = false;
+            }
+        }
         return text;
     }
     
