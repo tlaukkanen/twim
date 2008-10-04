@@ -65,8 +65,8 @@ public class StatusList {
         selectedStatus = null;
         while(statusEnum.hasMoreElements()) {
             Status status = (Status)statusEnum.nextElement();
+            System.out.println("Status: " + status.getText());
             int statusHeight = status.getHeight();
-            System.out.println("currow: " + currentRow + " height: " + statusHeight);
 
             if(status.getTextLines()==null) {
                 status.createTextLines(screenWidth-textFont.getHeight()*2-textFont.getHeight()/2, textFont);
