@@ -86,6 +86,13 @@ public class TwitterController {
         }
     }
 
+    public void clearTimelines() {
+        setFriendsTimeline(null);
+        setPublicTimeline(null);
+        setResponsesTimeline(null);
+        setUserTimeline(null);
+    }
+
     public MIDlet getMIDlet() {
         return midlet;
     }
@@ -115,11 +122,7 @@ public class TwitterController {
     public void login(String username, String password) {
         api.setUsername(username);
         api.setPassword(password);
-        RequestTimelineTask task = new RequestTimelineTask(
-            this, api, RequestTimelineTask.FEED_FRIENDS);
-        WaitCanvas wait = new WaitCanvas(this, task);
-        wait.setWaitText("Loading your timeline...");
-        display.setCurrent(wait);
+        showFriendsTimeline();
     }
 
     public void setPublicTimeline(Vector publicTimeline) {
@@ -152,6 +155,7 @@ public class TwitterController {
             RequestTimelineTask task = new RequestTimelineTask(
                 this, api, RequestTimelineTask.FEED_RESPONSES);
             WaitCanvas wait = new WaitCanvas(this, task);
+            wait.setWaitText("Loading responses...");
             display.setCurrent(wait);
         } else {
             timeline.setTimeline(responsesTimeline);
@@ -172,6 +176,7 @@ public class TwitterController {
     public void updateStatus(String status) {
         UpdateStatusTask task = new UpdateStatusTask( this, api, status );
         WaitCanvas wait = new WaitCanvas(this, task);
+        wait.setWaitText("Updating status...");
         display.setCurrent(wait);
     }
     
@@ -188,6 +193,7 @@ public class TwitterController {
             RequestTimelineTask task = new RequestTimelineTask(
                 this, api, RequestTimelineTask.FEED_ARCHIVE);
             WaitCanvas wait = new WaitCanvas(this, task);
+            wait.setWaitText("Loading tweets...");
             display.setCurrent(wait);
         } else {
             timeline.setTimeline(archiveTimeline);
@@ -209,9 +215,17 @@ public class TwitterController {
         display.setCurrent( loginForm );
     }
 
-    public void showFriendsTimeline() {        
-        timeline.setTimeline( friendsTimeline );
-        display.setCurrent( timeline );
+    public void showFriendsTimeline() {
+        if( friendsTimeline==null) {
+            RequestTimelineTask task = new RequestTimelineTask(
+                this, api, RequestTimelineTask.FEED_FRIENDS);
+            WaitCanvas wait = new WaitCanvas(this, task);
+            wait.setWaitText("Loading your timeline...");
+            display.setCurrent(wait);
+        } else {
+            timeline.setTimeline( friendsTimeline );
+            display.setCurrent( timeline );
+        }
     }    
     
     public void showTimeline(Vector timelineFeed ) {        

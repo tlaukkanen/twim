@@ -21,6 +21,8 @@ package com.substanceofcode.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 
 /**
  * InputStream wrapper so that we can get the total amount of bytes transferred
@@ -30,14 +32,20 @@ import java.io.InputStream;
 public class CustomInputStream {
 
     private InputStream stream;
+    private InputStreamReader reader;
     
     public CustomInputStream(InputStream stream) {
         this.stream = stream;
+        try {
+            reader = new InputStreamReader(stream, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            reader = new InputStreamReader(stream);
+        }
     }
     
     public int read() throws IOException {
         HttpTransferStatus.addReceivedBytes(1);
-        return stream.read();        
+        return reader.read();
     }
     
     public void close() throws IOException {
