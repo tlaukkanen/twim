@@ -256,7 +256,7 @@ public class XmlParser {
                 try {
                     int charValue = 0;
                     charValue = Integer.parseInt(character);
-                    if(charValue>0 && charValue<255) {
+                    if(charValue>0) {
                         text = StringUtil.replace(text, "&#" + charValue + ";", String.valueOf((char)charValue));    
                     }                    
                 } catch(Exception ex) {

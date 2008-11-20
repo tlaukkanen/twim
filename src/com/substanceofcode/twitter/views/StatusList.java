@@ -59,6 +59,9 @@ public class StatusList {
      * @param row       Row where drawing is started.
      */
     public void draw(Graphics g, Vector statuses, int row) {
+        if(statuses==null) {
+            return;
+        }
         Enumeration statusEnum = statuses.elements();
         
         int currentRow = row;
