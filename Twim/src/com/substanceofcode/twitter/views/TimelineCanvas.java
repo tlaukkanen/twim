@@ -233,9 +233,10 @@ public class TimelineCanvas extends Canvas {
                 statusMenu.activate();
             }
                 
-        } else if( keyName.indexOf("SOFT")>=0 && keyName.indexOf("1")>0 ||
+        } else if( (keyName.indexOf("SOFT")>=0 && keyName.indexOf("1")>0) ||
             (Device.isNokia() && keyCode==-6) ||
-            keyCode == TimelineCanvas.KEY_STAR) {
+            keyCode == TimelineCanvas.KEY_STAR ||
+            keyCode == Canvas.KEY_NUM0) {
             /** Left soft key pressed */
             if(menu.isActive()) {
                 menu.deactivate();
@@ -244,9 +245,10 @@ public class TimelineCanvas extends Canvas {
             } else {
                 menu.activate();
             }
-        } else if( ((keyName.indexOf("SOFT")>=0 && keyName.indexOf("2")>0) ||
+        } else if( (keyName.indexOf("SOFT")>=0 && keyName.indexOf("2")>0) ||
             (Device.isNokia() && keyCode==-7) ||
-            keyCode == TimelineCanvas.KEY_POUND) ) {
+            keyCode == TimelineCanvas.KEY_POUND ||
+            keyCode == Canvas.KEY_NUM0) {
             /** Right soft key pressed */
             if(menu.isActive()) {
                 menu.deactivate();
