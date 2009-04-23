@@ -35,6 +35,7 @@ public class Menu {
     private int height;
     private int selectedIndex;
     private boolean active;
+    private String title;
 
     private static final Font TITLE_FONT = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_MEDIUM);
     private static final Font LABEL_FONT = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_MEDIUM);
@@ -54,6 +55,7 @@ public class Menu {
         this.screenHeight = screenHeight;
         this.selectedIndex = 0;
         this.active = false;
+        this.title = "Menu";
         
         int rowHeight = LABEL_FONT.getHeight();
         this.height = (labels.length+1) * rowHeight;
@@ -79,8 +81,8 @@ public class Menu {
         g.setFont(TITLE_FONT);
         
         g.drawString(
-            "Menu", 
-            screenWidth/2 - LABEL_FONT.stringWidth("Menu")/2, 
+            title,
+            screenWidth/2 - LABEL_FONT.stringWidth(title)/2,
             top + LABEL_FONT.getHeight(),
             Graphics.LEFT|Graphics.BOTTOM);
             
@@ -126,6 +128,10 @@ public class Menu {
     
     public void deactivate() {
         active = false;
+    }
+
+    void setTitle(String title) {
+        this.title = title;
     }
     
 }

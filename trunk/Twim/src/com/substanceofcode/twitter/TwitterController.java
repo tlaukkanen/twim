@@ -56,6 +56,7 @@ public class TwitterController {
     TwitterApi api;
     Settings settings;
     TimelineCanvas timeline;
+    PhotoService activePhotoService;
 
     Vector publicTimeline;
     Vector recentTimeline;
@@ -158,10 +159,18 @@ public class TwitterController {
     public void sendPhoto(String comment, byte[] photo) {
         String username = api.getUsername();
         String password = api.getPassword();
-        SendPhotoTask task = new SendPhotoTask(photo, comment, username, password);
+        SendPhotoTask task = new SendPhotoTask(photo, comment, username, password, activePhotoService);
         WaitCanvas wait = new WaitCanvas(this, task);
         wait.setWaitText("Sending photo...");
         display.setCurrent(wait);    }
+
+    public void setTwitgooAsCurrentPhotoService() {
+        this.activePhotoService = (PhotoService) Twitgoo.getInstance();
+    }
+
+    public void setTwitPicAsCurrentPhotoService() {
+        this.activePhotoService = TwitPic.getInstance();
+    }
 
     public void setPublicTimeline(Vector publicTimeline) {
         this.publicTimeline = publicTimeline;
