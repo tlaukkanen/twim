@@ -39,6 +39,7 @@ public class TimelineCanvas extends Canvas {
     private TabBar menuBar;
     private Menu menu;
     private Menu statusMenu;
+    private Menu photoServiceMenu;
     private int verticalScroll;
     
     /** 
@@ -54,12 +55,19 @@ public class TimelineCanvas extends Canvas {
         menuBar = new TabBar(2, labels, getWidth());
         
         /** Menu */
-        String[] menuLabels = {"Update status", "TwitPic", "Reload tweets", "Settings", "About", "Exit", "Cancel"};
+        String[] menuLabels = {"Update status", "Send photo",
+            "Reload tweets", "Settings", "About", "Exit", "Cancel"};
         menu = new Menu(menuLabels, getWidth(), getHeight());
 
+        String[] photoServiceLabels = {"Twitgoo", "TinyPic", "Cancel"};
+        photoServiceMenu = new Menu(photoServiceLabels, getWidth(), getHeight());
+        photoServiceMenu.setTitle("Select service");
+
         /** Status menu */
-        String[] statusMenuLabels = {"Open in browser", "Open link in browser", "Reply", "Send direct message", "Cancel"};
+        String[] statusMenuLabels = {"Open in browser", "Open link in browser",
+            "Reply", "Send direct message", "Cancel"};
         statusMenu = new Menu(statusMenuLabels, getWidth(), getHeight());
+        statusMenu.setTitle("Status menu");
 
         /** Status list control */
         statusList = new StatusList(getWidth(), getHeight());        
@@ -75,7 +83,9 @@ public class TimelineCanvas extends Canvas {
         g.setColor(Theme.TWITTER_BLUE_COLOR);
         g.fillRect(0, 0, getWidth(), getHeight());
 
-        if(menu.isActive()==false && statusMenu.isActive()==false) {
+        if( menu.isActive()==false &&
+                statusMenu.isActive()==false &&
+                photoServiceMenu.isActive()==false) {
             boolean drawSelectionBox = menuBar.isSelectedActive();
             statusList.draw(
                     g, statuses,
@@ -86,6 +96,8 @@ public class TimelineCanvas extends Canvas {
             menu.draw(g);
         } else if(statusMenu.isActive()) {
             statusMenu.draw(g);
+        } else if(photoServiceMenu.isActive()) {
+            photoServiceMenu.draw(g);
         }
     }
 
@@ -111,7 +123,6 @@ public class TimelineCanvas extends Canvas {
             /** Public selected */
             controller.showPublicTimeline();
         }
-
     }
     
     /** Handle repeated key presses. */
@@ -128,6 +139,8 @@ public class TimelineCanvas extends Canvas {
                 menu.selectPrevious();
             } else if(statusMenu.isActive()) {
                 statusMenu.selectPrevious();
+            } else if(photoServiceMenu.isActive()) {
+                photoServiceMenu.selectPrevious();
             } else {
                 verticalScroll += getHeight()/6;
                 if(verticalScroll>0) {
@@ -140,6 +153,8 @@ public class TimelineCanvas extends Canvas {
                 menu.selectNext();
             } else if(statusMenu.isActive()) {
                 statusMenu.selectNext();
+            } else if(photoServiceMenu.isActive()) {
+                photoServiceMenu.selectNext();
             } else {
                 verticalScroll -= getHeight()/6; 
             }
@@ -151,8 +166,10 @@ public class TimelineCanvas extends Canvas {
         if(selectedIndex==0) {
             controller.showStatusView("");
         } else if(selectedIndex==1) {
-            /** TwitPic */
-            controller.showCamera();
+            /** Photo service */
+            menu.deactivate();
+            photoServiceMenu.activate();
+            repaint();
         } else if(selectedIndex==2) {
             controller.clearTimelines();
             handleTabChange();
@@ -166,6 +183,29 @@ public class TimelineCanvas extends Canvas {
             /** Cancel = Do nothing */
             repaint();
         }
+    }
+
+    public void activatePhotoServiceMenuIten() {
+        int selectedIndex = photoServiceMenu.getSelectedIndex();
+        switch(selectedIndex) {
+            case(0):
+                /** Twitgoo */
+                controller.setTwitgooAsCurrentPhotoService();
+                controller.showCamera();
+                break;
+            case(1):
+                /** TinyPic */
+                controller.setTwitPicAsCurrentPhotoService();
+                controller.showCamera();
+                break;
+            case(2):
+                /** Cancel */
+                menu.activate();
+                repaint();
+                break;
+            default:
+        }
+        photoServiceMenu.deactivate();
     }
 
     public void activateStatusMenuItem() {
@@ -229,6 +269,10 @@ public class TimelineCanvas extends Canvas {
                 statusMenu.deactivate();
                 activateStatusMenuItem();
                 return;
+            } else if(photoServiceMenu.isActive()) {
+                photoServiceMenu.deactivate();
+                activatePhotoServiceMenuIten();
+                return;
             } else if(statusList.getSelected()!=null){
                 statusMenu.activate();
             }
@@ -236,7 +280,8 @@ public class TimelineCanvas extends Canvas {
         } else if( (keyName.indexOf("SOFT")>=0 && keyName.indexOf("1")>0) ||
             (Device.isNokia() && keyCode==-6) ||
             keyCode == TimelineCanvas.KEY_STAR ||
-            keyCode == Canvas.KEY_NUM0) {
+            keyCode == Canvas.KEY_NUM0 ||
+            keyCode == ' ') {
             /** Left soft key pressed */
             if(menu.isActive()) {
                 menu.deactivate();
@@ -248,7 +293,8 @@ public class TimelineCanvas extends Canvas {
         } else if( (keyName.indexOf("SOFT")>=0 && keyName.indexOf("2")>0) ||
             (Device.isNokia() && keyCode==-7) ||
             keyCode == TimelineCanvas.KEY_POUND ||
-            keyCode == Canvas.KEY_NUM0) {
+            keyCode == Canvas.KEY_NUM0 ||
+            keyCode == ' ') {
             /** Right soft key pressed */
             if(menu.isActive()) {
                 menu.deactivate();

@@ -1,12 +1,25 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * TwitgooApi.java
+ *
+ * Copyright (C) 2005-2009 Tommi Laukkanen
+ * http://www.substanceofcode.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.substanceofcode.twitter;
 
 import com.substanceofcode.twitter.model.Status;
-import com.substanceofcode.utils.Base64;
 import com.substanceofcode.utils.CustomInputStream;
 import com.substanceofcode.utils.XmlParser;
 import java.io.DataOutputStream;
@@ -19,26 +32,37 @@ import javax.microedition.io.HttpConnection;
 
 /**
  *
- * @author tommi
+ * @author Tommi Laukkanen
  */
-public class TwitPicApi {
+public class Twitgoo implements PhotoService {
 
-    private final static String TWIT_PIC_URL = "http://twitpic.com/api/uploadAndPost";
-    private static long totalBytes = 0;
+    private final static String TWITGOO_URL = "http://twitgoo.com/api/uploadAndPost";
     private static String response = "";
-    
-    public static String getResponse() {
+
+    private static Twitgoo instance;
+
+    private Twitgoo() {
+    }
+
+    public static Twitgoo getInstance() {
+        if(instance==null) {
+            instance = new Twitgoo();
+        }
+        return instance;
+    }
+
+    public String getResponse() {
         return response;
     }
 
-    public static Status sendPhoto(
+    public Status sendPhoto(
             byte[] photo,
             String comment,
             String username,
             String password) throws IOException, Exception {
         HttpConnection connection = null;
         try {
-            connection = (HttpConnection) Connector.open(TWIT_PIC_URL);
+            connection = (HttpConnection) Connector.open(TWITGOO_URL);
             connection.setRequestMethod( HttpConnection.POST );
             String boundary = "BoUnDaRy888";
             connection.setRequestProperty("Content-Type", "multipart/form-data; charset=UTF-8; boundary=" + boundary);
@@ -51,7 +75,7 @@ public class TwitPicApi {
             writeString(dos, "\r\n");
             dos.write(photo,0,photo.length);
             writeString(dos, "\r\n");
-            
+
             // Username
             writeString(dos, "--" + boundary + "\r\n");
             writeString(dos, "Content-Disposition: form-data; name=\"username\"\r\n");
@@ -73,7 +97,7 @@ public class TwitPicApi {
             // Message
             writeString(dos, "--" + boundary + "\r\n");
             writeString(dos, "Content-Disposition: form-data; name=\"message\"\r\n");
-            
+
             writeString(dos, "\r\n");
             writeString(dos, comment + "\r\n");
 
@@ -96,7 +120,7 @@ public class TwitPicApi {
             } catch (IOException ex) {
                 return null;
             }
-            totalBytes += response.length();
+            //totalBytes += response.length();
             if(his!=null) {
                 his.close();
             }
@@ -135,7 +159,7 @@ public class TwitPicApi {
                 stat = new Status("TwitPic", err, now, "");
             }
             return stat;
-            
+
         } catch (IOException e) {
             throw new IOException("IOException: " + e.toString());
         } catch (Exception e) {
