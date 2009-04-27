@@ -271,14 +271,14 @@ public class XmlParser {
                 try {
                     int charValue = 0;
                     charValue = Integer.parseInt(character);
-                    System.out.println("char-val:" + charValue);
+                    //System.out.println("char-val:" + charValue);
                     
                     if(charValue>0) {
                         text = StringUtil.replace(text, "&#" + character + ";", String.valueOf((char)charValue));
                     }                    
                 } catch(Exception ex) {
                     // Do nothing...
-                    System.out.println("char ex:" + ex.toString());
+                    //System.out.println("char ex:" + ex.toString());
                 }
             }
             startIndex++;

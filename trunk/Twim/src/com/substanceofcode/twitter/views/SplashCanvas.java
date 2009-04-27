@@ -59,7 +59,7 @@ public class SplashCanvas extends Canvas implements Runnable {
         
         g.drawImage(logoImage, getWidth()/2, getHeight()/2, Graphics.HCENTER|Graphics.VCENTER);
         
-        g.setColor(0xABABAB);
+        g.setColor(0xAAAAAA);
         Font font = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL );
         g.setFont( font );
         int fontHeight = font.getHeight();

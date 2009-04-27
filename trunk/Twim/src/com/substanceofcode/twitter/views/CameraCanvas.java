@@ -20,7 +20,6 @@
 package com.substanceofcode.twitter.views;
 
 import com.substanceofcode.twitter.TwitterController;
-import java.io.IOException;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;

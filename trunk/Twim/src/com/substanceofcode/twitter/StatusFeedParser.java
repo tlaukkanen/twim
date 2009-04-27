@@ -37,10 +37,12 @@ import java.util.Vector;
 public class StatusFeedParser implements ResultParser {
 
     private Vector statuses;
+    private boolean isDirect;
 
     /** Creates a new instance of StatusFeedParser */
     public StatusFeedParser() {
         statuses = new Vector();
+        isDirect = false;
     }
 
     /**
@@ -95,6 +97,7 @@ public class StatusFeedParser implements ResultParser {
                     // Parse normal status
                     if (text.length() > 0) {
                         Status status = new Status(screenName, text, date, id);
+                        status.setDirect(isDirect);
                         statuses.addElement(status);
                     }
                     text = "";
@@ -104,6 +107,7 @@ public class StatusFeedParser implements ResultParser {
                 } else if (elementName.equals("direct_message")) {
                     if (text.length() > 0) {
                         Status status = new Status(screenName, text, date, id);
+                        status.setDirect(isDirect);
                         statuses.addElement(status);
                     }
                     text = "";
@@ -136,6 +140,7 @@ public class StatusFeedParser implements ResultParser {
             }
             if (text.length() > 0) {
                 Status status = new Status(screenName, text, date, id);
+                status.setDirect(isDirect);
                 statuses.addElement(status);
             }
         } catch (Exception ex) {
@@ -245,5 +250,9 @@ public class StatusFeedParser implements ResultParser {
         cal.set(Calendar.SECOND, seconds);
 
         return cal.getTime();
+    }
+
+    void setDirect(boolean value) {
+        this.isDirect = value;
     }
 }

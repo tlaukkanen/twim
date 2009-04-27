@@ -51,7 +51,7 @@ public class TimelineCanvas extends Canvas {
         setFullScreenMode(true);
         
         /** Menu bar tabs */
-        String[] labels = {"Archive", "Replies", "Recent", "Direct", "Friends", "Public"};
+        String[] labels = {"Archive", "Replies", "Recent", "Direct", "Favorites", "Friends", "Public"};
         menuBar = new TabBar(2, labels, getWidth());
         
         /** Menu */
@@ -65,13 +65,17 @@ public class TimelineCanvas extends Canvas {
 
         /** Status menu */
         String[] statusMenuLabels = {"Open in browser", "Open link in browser",
-            "Reply", "Send direct message", "Cancel"};
+            "Reply", "Retweet", "Mark as favorite", "Send direct message", "Cancel"};
         statusMenu = new Menu(statusMenuLabels, getWidth(), getHeight());
         statusMenu.setTitle("Status menu");
 
         /** Status list control */
         statusList = new StatusList(getWidth(), getHeight());        
         
+        verticalScroll = 0;
+    }
+
+    public void resetScrolling() {
         verticalScroll = 0;
     }
 
@@ -117,9 +121,12 @@ public class TimelineCanvas extends Canvas {
             /** Direct messages */
             controller.showDirectMessages();
         } else if(tabIndex==4) {
+            /** Favorites */
+            controller.showFavouriteTimeline();
+        } else if(tabIndex==5) {
             /** Friends */
             controller.showFriends();
-        } else if(tabIndex==5) {
+        } else if(tabIndex==6) {
             /** Public selected */
             controller.showPublicTimeline();
         }
@@ -226,14 +233,28 @@ public class TimelineCanvas extends Canvas {
         } else if(selectedIndex==2) {
             /** Reply to tweet */
             if(selectedStatus!=null) {
-                controller.showStatusView("@" + selectedStatus.getScreenName() + " ");
+                if(selectedStatus.isDirect()) {
+                    controller.showStatusView("d " + selectedStatus.getScreenName() + " ");
+                } else {
+                    controller.showStatusView("@" + selectedStatus.getScreenName() + " ");
+                }
             }
         } else if(selectedIndex==3) {
+            /** Retweet */
+            if(selectedStatus!=null) {
+                controller.showStatusView("RT @" + selectedStatus.getScreenName() + " \"" + selectedStatus.getText() + "\"");
+            }
+        } else if(selectedIndex==4) {
+            /** Mark as favorite */
+            if(selectedStatus!=null) {
+                controller.markAsFavorite(selectedStatus);
+            }
+        } else if(selectedIndex==5) {
             /** Send direct message */
             if(selectedStatus!=null) {
                 controller.showStatusView("d " + selectedStatus.getScreenName() + " ");
             }
-        }else if(selectedIndex==4) {
+        }else if(selectedIndex==6) {
             /** Cancel = Do nothing */
             repaint();
         }
