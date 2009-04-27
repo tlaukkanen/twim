@@ -106,7 +106,7 @@ public class TabBar {
             if(selectedTabIndex==textIndex) {
                 label = menuLabels[textIndex];
             } else {
-                label = menuLabels[textIndex].substring(0,3);
+                label = menuLabels[textIndex].substring(0,2);
             }
             textWidth += labelFont.stringWidth(label) + 3;
         }
@@ -142,7 +142,7 @@ public class TabBar {
             if( tab==selectedTabIndex ) {
                 tabLabel = menuLabels[tab];
             } else {
-                tabLabel = menuLabels[tab].substring(0,3);
+                tabLabel = menuLabels[tab].substring(0,2);
             }
 
             int tabWidth = labelFont.stringWidth(tabLabel)+2;

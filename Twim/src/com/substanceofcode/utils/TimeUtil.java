@@ -28,6 +28,15 @@ import java.util.Date;
  */
 public class TimeUtil {
 
+    public static String getCurrentTime() {
+        Calendar cal = Calendar.getInstance();
+        int hours = cal.get(Calendar.HOUR_OF_DAY);
+        int minutes = cal.get(Calendar.MINUTE);
+        String currentTime = (hours<10 ? "0" + hours : String.valueOf(hours) );
+        currentTime += ":" + (minutes<10 ? "0" + minutes : String.valueOf(minutes) );
+        return currentTime;
+    }
+
     public static String getTimeInterval(Date fromDate) {
         Calendar cal = Calendar.getInstance();
         Date currentDate = cal.getTime();        

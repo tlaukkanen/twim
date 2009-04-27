@@ -25,6 +25,7 @@ import com.substanceofcode.utils.Log;
 import com.substanceofcode.utils.URLUTF8Encoder;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Vector;
 
 /**
@@ -43,9 +44,30 @@ public class TwitterApi {
     private static final String STATUS_UPDATE_URL = "http://twitter.com/statuses/update.xml";
     private static final String DIRECT_TIMELINE_URL = "http://twitter.com/direct_messages.xml";
     private static final String FRIENDS_URL = "http://twitter.com/statuses/friends.xml";
+    private static final String FAVORITE_TIMELINE_URL = "http://twitter.com/favorites.xml";
+    private static final String FAVORITE_CREATE_URL = "http://twitter.com/favorites/create/";
 
     /** Creates a new instance of TwitterApi */
     public TwitterApi() {
+    }
+
+    public Status markAsFavorite(Status status) {
+        try {
+            StatusFeedParser parser = new StatusFeedParser();
+            String url = FAVORITE_CREATE_URL + status.getId() + ".xml";
+            HttpUtil.doPost( url, parser );
+            Vector statuses = parser.getStatuses();
+            if(statuses!=null && statuses.isEmpty()==false) {
+                return (Status)statuses.elementAt(0);
+            }
+        } catch(Exception ex) {
+            return new Status(
+                    "Twim",
+                    "Error while marking status as favorite: " + ex.getMessage(),
+                    Calendar.getInstance().getTime(),
+                    "0");
+        }
+        return null;
     }
 
     public void setUsername(String username) {
@@ -64,6 +86,13 @@ public class TwitterApi {
         return requestTimeline( DIRECT_TIMELINE_URL );
     }
 
+    /**
+     * Request favourite tweets from Twitter API.
+     * @return Vector containing favourite tweets.
+     */
+    public Vector requestFavouriteTimeline() {
+        return requestTimeline(FAVORITE_TIMELINE_URL);
+    }
 
     /**
      * Request public timeline from Twitter API.
@@ -109,7 +138,11 @@ public class TwitterApi {
                 return (Status)statuses.elementAt(0);
             }
         } catch(Exception ex) {
-            Log.error("Error while updating status: " + ex.getMessage());
+            return new Status(
+                    "Twim",
+                    "Error while updating status: " + ex.getMessage(),
+                    Calendar.getInstance().getTime(),
+                    "0");
         }
         return null;
     }
@@ -148,6 +181,9 @@ public class TwitterApi {
         try {
             HttpUtil.setBasicAuthentication(username, password);
             StatusFeedParser parser = new StatusFeedParser();
+            if(timelineUrl.equals(DIRECT_TIMELINE_URL)) {
+                parser.setDirect(true);
+            }
             HttpUtil.doGet(timelineUrl, parser);
             entries = parser.getStatuses();
         } catch (IOException ex) {

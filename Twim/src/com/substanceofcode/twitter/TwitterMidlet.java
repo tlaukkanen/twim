@@ -20,6 +20,7 @@
 package com.substanceofcode.twitter;
 
 import javax.microedition.midlet.MIDlet;
+import javax.microedition.midlet.MIDletStateChangeException;
 
 /**
  *
@@ -44,13 +45,12 @@ public class TwitterMidlet extends MIDlet {
     
     public void pauseApp() {
     }
-    
-    public void destroyApp(boolean unconditional) {
-        try{
-        }catch(Exception ex) {
-            // Do nothing as we are already exiting
-        }
+
+    void quit() {
         notifyDestroyed();
+    }
+
+    protected void destroyApp(boolean unconditional) throws MIDletStateChangeException {
     }
 
 }

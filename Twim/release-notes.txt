@@ -9,7 +9,12 @@ Tommi Laukkanen
 
 Release Notes:
 
-v2.0
+v1.11
++ Twitgoo support for photos
++ Retweet quote feature
++ Clock is shown in menu screen
+
+v1.10
 + "..from twim" is shown for TwitPic updates
 
 v1.9 (April 4th 2009)

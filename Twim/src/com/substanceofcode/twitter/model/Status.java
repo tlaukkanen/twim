@@ -1,7 +1,7 @@
 /*
  * StatusEntry.java
  *
- * Copyright (C) 2005-2008 Tommi Laukkanen
+ * Copyright (C) 2005-2009 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,6 +35,8 @@ public class Status {
     private String statusText;
     private Date date;
     private String id;
+    private boolean isDirect;
+    private boolean isFavorite;
     /** For optimizations */
     private int height;
     private String[] textLines;
@@ -50,6 +52,24 @@ public class Status {
         this.date = date;
         this.height = 0;
         this.id = id;
+        this.isDirect = false;
+        this.isFavorite = false;
+    }
+
+    public void setFavorite(boolean favorite) {
+        this.isFavorite = favorite;
+    }
+
+    public boolean isFavorite() {
+        return this.isFavorite;
+    }
+
+    public void setDirect(boolean isDirect) {
+        this.isDirect = isDirect;
+    }
+
+    public boolean isDirect() {
+        return this.isDirect;
     }
 
     public void createTextLines(int textBoxWidth, Font textFont) {
@@ -71,6 +91,10 @@ public class Status {
 
     public int getHeight() {
         return height;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String[] getTextLines() {

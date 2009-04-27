@@ -19,6 +19,8 @@
 
 package com.substanceofcode.twitter.views;
 
+import com.substanceofcode.utils.TimeUtil;
+import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
@@ -70,6 +72,7 @@ public class Menu {
         if(active==false) {
             return;
         }
+
         /** Draw background and borders */
         g.setColor(BACK_COLOR);
         g.fillRect(10, top-2, screenWidth-20, height+4);
@@ -85,8 +88,20 @@ public class Menu {
             screenWidth/2 - LABEL_FONT.stringWidth(title)/2,
             top + LABEL_FONT.getHeight(),
             Graphics.LEFT|Graphics.BOTTOM);
-            
         g.setFont(LABEL_FONT);
+
+        /** Draw time stamp */
+        g.setColor(0xAAAAAA);
+        String currentTime = TimeUtil.getCurrentTime();
+        if(currentTime!=null) {
+            g.drawString(
+                    currentTime,
+                    screenWidth/2 - LABEL_FONT.stringWidth(currentTime)/2,
+                    screenHeight-2,
+                    Graphics.BOTTOM|Graphics.LEFT);
+        }
+
+        g.setColor(FONT_COLOR);
         for(int menuIndex=0; menuIndex<labels.length; menuIndex++) {
             if(menuIndex==selectedIndex) {
                 g.setColor(SELECTED_COLOR);

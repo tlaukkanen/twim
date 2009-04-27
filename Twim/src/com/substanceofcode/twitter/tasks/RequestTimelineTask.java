@@ -39,6 +39,7 @@ public class RequestTimelineTask extends AbstractTask {
     public final static int FEED_ARCHIVE = 2;
     public final static int FEED_PUBLIC = 3;
     public final static int FEED_DIRECT = 4;
+    public final static int FEED_FAVOURITE = 5;
     
     /** 
      * Creates a new instance of RequestFriendsTimelineTask.
@@ -76,6 +77,10 @@ public class RequestTimelineTask extends AbstractTask {
             Vector directTimeline = api.requestDirectTimeline();
             controller.setDirectTimeline(directTimeline);
             controller.showTimeline( directTimeline );
+        } else if(feedType==FEED_FAVOURITE) {
+            Vector favouritesTimeline = api.requestFavouriteTimeline();
+            controller.setFavouriteTimeline(favouritesTimeline);
+            controller.showTimeline(favouritesTimeline);
         }
         
     }

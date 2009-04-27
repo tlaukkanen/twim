@@ -21,6 +21,7 @@ package com.substanceofcode.twitter;
 
 import com.substanceofcode.twitter.model.Status;
 import com.substanceofcode.twitter.model.User;
+import com.substanceofcode.twitter.tasks.MarkAsFavoriteTask;
 import com.substanceofcode.twitter.tasks.RequestFriendsTask;
 import com.substanceofcode.twitter.tasks.RequestTimelineTask;
 import com.substanceofcode.twitter.tasks.SendPhotoTask;
@@ -64,6 +65,7 @@ public class TwitterController {
     Vector responsesTimeline;
     Vector directTimeline;
     Vector friendsStatuses;
+    Vector favouriteTimeline;
 
     static TwitterController instance;
 
@@ -101,6 +103,12 @@ public class TwitterController {
         display.setCurrent(canvas);
     }
 
+    public void addFavoriteStatus(Status favoriteStatus) {
+        if(favouriteTimeline!=null) {
+            favouriteTimeline.addElement(favoriteStatus);
+        }
+    }
+
     public void addStatus(Status status) {
         if(recentTimeline!=null) {
             recentTimeline.insertElementAt(status, 0);
@@ -117,6 +125,7 @@ public class TwitterController {
         setUserTimeline(null);
         setDirectTimeline(null);
         setFriendsStatuses(null);
+        setFavouriteTimeline(null);
     }
 
     public MIDlet getMIDlet() {
@@ -129,8 +138,7 @@ public class TwitterController {
 
     public void exit() {
         try {
-            midlet.destroyApp(true);
-            midlet.notifyDestroyed();
+            midlet.quit();
         } catch(Exception ex) {
             Log.error("Exit: " + ex.toString());
         }
@@ -156,13 +164,21 @@ public class TwitterController {
         display.setCurrent(commentForm);
     }
 
+    public void markAsFavorite(Status selectedStatus) {
+        MarkAsFavoriteTask task = new MarkAsFavoriteTask(this, api, selectedStatus);
+        WaitCanvas wait = new WaitCanvas(this, task);
+        wait.setWaitText("Marking as favorite...");
+        display.setCurrent(wait);
+    }
+
     public void sendPhoto(String comment, byte[] photo) {
         String username = api.getUsername();
         String password = api.getPassword();
         SendPhotoTask task = new SendPhotoTask(photo, comment, username, password, activePhotoService);
         WaitCanvas wait = new WaitCanvas(this, task);
         wait.setWaitText("Sending photo...");
-        display.setCurrent(wait);    }
+        display.setCurrent(wait);
+    }
 
     public void setTwitgooAsCurrentPhotoService() {
         this.activePhotoService = (PhotoService) Twitgoo.getInstance();
@@ -338,6 +354,10 @@ public class TwitterController {
     public void setRecentTimeline(Vector friendsTimeline) {
         this.recentTimeline = friendsTimeline;
     }
+
+    public void setFavouriteTimeline(Vector timeline) {
+        this.favouriteTimeline = timeline;
+    }
     
     /** Show login form */
     public void showLoginForm() {
@@ -354,9 +374,24 @@ public class TwitterController {
             display.setCurrent(wait);
         } else {
             timeline.setTimeline( recentTimeline );
+            timeline.resetScrolling();
             display.setCurrent( timeline );
         }
-    }    
+    }
+
+    public void showFavouriteTimeline() {
+        if( favouriteTimeline==null) {
+            RequestTimelineTask task = new RequestTimelineTask(
+                this, api, RequestTimelineTask.FEED_FAVOURITE);
+            WaitCanvas wait = new WaitCanvas(this, task);
+            wait.setWaitText("Loading your timeline...");
+            display.setCurrent(wait);
+        } else {
+            timeline.setTimeline( favouriteTimeline );
+            timeline.resetScrolling();
+            display.setCurrent( timeline );
+        }
+    }
     
     public void showTimeline(Vector timelineFeed ) {        
         timeline.setTimeline( timelineFeed );
@@ -365,6 +400,7 @@ public class TwitterController {
 
     /** Show current timeline */
     public void showTimeline() {
+        timeline.resetScrolling();
         display.setCurrent(timeline);
     }
 
