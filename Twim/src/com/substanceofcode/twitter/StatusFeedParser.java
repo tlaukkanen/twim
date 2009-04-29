@@ -56,6 +56,7 @@ public class StatusFeedParser implements ResultParser {
     <source>
     <a href="http://iconfactory.com/software/twitterrific">twitterrific</a>
     </source>
+    <favorited>true</favorited>
     −
     <user>
     <id>13348</id>
@@ -85,6 +86,8 @@ public class StatusFeedParser implements ResultParser {
             Date date = null;
             boolean doSender = false;
             boolean doRecipient = false;
+            boolean isFavorite = false;
+            String inReplyToId = "";
             while (xml.parse() != XmlParser.END_DOCUMENT) {
                 String elementName = xml.getName();
 
@@ -98,16 +101,7 @@ public class StatusFeedParser implements ResultParser {
                     if (text.length() > 0) {
                         Status status = new Status(screenName, text, date, id);
                         status.setDirect(isDirect);
-                        statuses.addElement(status);
-                    }
-                    text = "";
-                    screenName = "";
-                    id = "";
-                    date = null;
-                } else if (elementName.equals("direct_message")) {
-                    if (text.length() > 0) {
-                        Status status = new Status(screenName, text, date, id);
-                        status.setDirect(isDirect);
+                        status.setInReplyToId(inReplyToId);
                         statuses.addElement(status);
                     }
                     text = "";
@@ -116,10 +110,35 @@ public class StatusFeedParser implements ResultParser {
                     date = null;
                     doSender = false;
                     doRecipient = false;
+                    isFavorite = false;
+                    inReplyToId = "";
+
+                } else if (elementName.equals("direct_message")) {
+                    if (text.length() > 0) {
+                        Status status = new Status(screenName, text, date, id);
+                        status.setDirect(isDirect);
+                        status.setFavorite(isFavorite);
+                        status.setInReplyToId(inReplyToId);
+                        statuses.addElement(status);
+                    }
+                    text = "";
+                    screenName = "";
+                    id = "";
+                    date = null;
+                    doSender = false;
+                    doRecipient = false;
+                    isFavorite = false;
+                    inReplyToId = "";
                 } else if (elementName.equals("id") && id.equals("")) {
                     id = xml.getText();
                 } else if (elementName.equals("text")) {
                     text += xml.getText();
+                } else if (elementName.equals("in_reply_to_status_id")) {
+                    inReplyToId = xml.getText();
+                } else if (elementName.equals("favorited")) {
+                    if(xml.getText().equals("true")) {
+                        isFavorite = true;
+                    }
                 } else if (elementName.equals("screen_name")) {
                     if (doSender || (!doSender && !doRecipient)) {
                         screenName = xml.getText();
@@ -141,6 +160,7 @@ public class StatusFeedParser implements ResultParser {
             if (text.length() > 0) {
                 Status status = new Status(screenName, text, date, id);
                 status.setDirect(isDirect);
+                status.setFavorite(isFavorite);
                 statuses.addElement(status);
             }
         } catch (Exception ex) {
