@@ -77,7 +77,7 @@ public class StatusList {
             }
 
             boolean isSelected = false;
-            if(currentRow>=0 && selectedStatus==null && drawSelectBox==true) {
+            if(currentRow - (textFont.getHeight()+2)>=0 && selectedStatus==null && drawSelectBox==true) {
                 selectedStatus = status;
                 isSelected = true;
             }

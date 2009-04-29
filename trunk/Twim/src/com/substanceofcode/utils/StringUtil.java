@@ -190,6 +190,8 @@ public class StringUtil {
         final Vector result = new Vector();
         final StringBuffer currentLine = new StringBuffer();
         String currentToken;
+        String sub1;
+        String sub2;
 
         int currentWidth = 0;
         for (int i = 0; i < words.length; i++) {
@@ -197,8 +199,25 @@ public class StringUtil {
 
             if (currentWidth == 0 || currentWidth + font.stringWidth(" " + currentToken) <= width) {
                 if (currentWidth == 0) {
-                    currentLine.append(currentToken);
-                    currentWidth += font.stringWidth(currentToken);
+                    if(font.stringWidth(currentToken)>width) {
+                        /** Chop lines longer then screen width */
+                        sub1 = currentToken;
+                        System.out.println("oversize: " + sub1);
+                        while(sub1.length()>0) {
+                            for(int j=sub1.length()-1; j>=0; j--) {
+                                sub2 = sub1.substring(0, j+1);
+                                if(font.stringWidth(sub2)<=width) {
+                                    System.out.println("Add: " + sub2);
+                                    result.addElement(sub2);
+                                    sub1 = sub1.substring(j+1);
+                                    break;
+                                }
+                            }
+                        }
+                    } else {
+                        currentLine.append(currentToken);
+                        currentWidth += font.stringWidth(currentToken);
+                    }
                 } else {
                     currentLine.append(' ').append(currentToken);
                     currentWidth += font.stringWidth(" " + currentToken);
@@ -206,8 +225,25 @@ public class StringUtil {
             } else {
                 result.addElement(currentLine.toString());
                 currentLine.delete(0, currentLine.length());
-                currentLine.append(currentToken);
-                currentWidth = font.stringWidth(currentToken);
+                if(font.stringWidth(" " + currentToken)>width) {
+                    /** Chop lines longer then screen width */
+                    sub1 = currentToken;
+                    //System.out.println("oversize: " + sub1);
+                    while(sub1.length()>0) {
+                        for(int j=sub1.length()-1; j>=0; j--) {
+                            sub2 = sub1.substring(0, j+1);
+                            if(font.stringWidth(sub2 + " ")<=width) {
+                                //System.out.println("Add: " + sub2);
+                                result.addElement(sub2);
+                                sub1 = sub1.substring(j+1);
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    currentLine.append(currentToken);
+                    currentWidth = font.stringWidth(currentToken);
+                }
             }
         }
         if (currentLine.length() != 0) {

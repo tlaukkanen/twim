@@ -35,6 +35,7 @@ public class Status {
     private String statusText;
     private Date date;
     private String id;
+    private String inReplyToId;
     private boolean isDirect;
     private boolean isFavorite;
     /** For optimizations */
@@ -54,6 +55,14 @@ public class Status {
         this.id = id;
         this.isDirect = false;
         this.isFavorite = false;
+    }
+
+    public void setInReplyToId(String replyToId) {
+        this.inReplyToId = replyToId;
+    }
+
+    public String getInReplyToId() {
+        return this.inReplyToId;
     }
 
     public void setFavorite(boolean favorite) {
