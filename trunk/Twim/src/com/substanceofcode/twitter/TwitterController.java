@@ -19,6 +19,8 @@
 
 package com.substanceofcode.twitter;
 
+import com.substanceofcode.twitter.model.FileSelect;
+import com.substanceofcode.twitter.model.PhotoFileSelect;
 import com.substanceofcode.twitter.model.Status;
 import com.substanceofcode.twitter.model.User;
 import com.substanceofcode.twitter.tasks.MarkAsFavoriteTask;
@@ -28,6 +30,7 @@ import com.substanceofcode.twitter.tasks.SendPhotoTask;
 import com.substanceofcode.twitter.tasks.UpdateStatusTask;
 import com.substanceofcode.twitter.views.AboutCanvas;
 import com.substanceofcode.twitter.views.CameraCanvas;
+import com.substanceofcode.twitter.views.FileBrowserCanvas;
 import com.substanceofcode.twitter.views.LoginForm;
 import com.substanceofcode.twitter.views.PhotoCommentForm;
 import com.substanceofcode.twitter.views.SplashCanvas;
@@ -58,6 +61,7 @@ public class TwitterController {
     Settings settings;
     TimelineCanvas timeline;
     PhotoService activePhotoService;
+    FileBrowserCanvas fileBrowser;
 
     Vector publicTimeline;
     Vector recentTimeline;
@@ -231,6 +235,14 @@ public class TwitterController {
         alert.setString(string);
         alert.setTimeout(Alert.FOREVER);
         display.setCurrent(alert, timeline);
+    }
+
+    public void showFileBrowser() {
+        if(fileBrowser==null) {
+            fileBrowser = new FileBrowserCanvas(new PhotoFileSelect());
+            fileBrowser.showRoots();
+        }
+        display.setCurrent(fileBrowser);
     }
 
     /** Show friends */
