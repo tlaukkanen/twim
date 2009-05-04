@@ -132,6 +132,13 @@ public class Menu {
         return selectedIndex;
     }
 
+    String getSelectedLabel() {
+        if(labels==null) {
+            return null;
+        }
+        return labels[selectedIndex];
+    }
+
     boolean isActive() {
         return active;
     }
@@ -143,6 +150,14 @@ public class Menu {
     
     public void deactivate() {
         active = false;
+    }
+
+    /**
+     * Set labels for the menu.
+     * @param labels
+     */
+    void setLabels(String[] labels) {
+        this.labels = labels;
     }
 
     void setTitle(String title) {

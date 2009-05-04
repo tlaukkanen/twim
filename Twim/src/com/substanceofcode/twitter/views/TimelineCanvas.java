@@ -40,6 +40,7 @@ public class TimelineCanvas extends Canvas {
     private Menu menu;
     private Menu statusMenu;
     private Menu photoServiceMenu;
+    private Menu photoSourceMenu;
     private int verticalScroll;
     
     /** 
@@ -59,7 +60,12 @@ public class TimelineCanvas extends Canvas {
             "Reload tweets", "Settings", "About", "Exit", "Cancel"};
         menu = new Menu(menuLabels, getWidth(), getHeight());
 
-        String[] photoServiceLabels = {"Twitgoo", "TinyPic", "Cancel"};
+        /** Photo source */
+        String[] photoSourceLabels = {"Camera", "File"};
+        photoSourceMenu = new Menu(photoSourceLabels, getWidth(), getHeight());
+        photoSourceMenu.setTitle("Select source");
+
+        String[] photoServiceLabels = {"Twitgoo", "TwitPic", "Cancel"};
         photoServiceMenu = new Menu(photoServiceLabels, getWidth(), getHeight());
         photoServiceMenu.setTitle("Select service");
 
@@ -89,7 +95,8 @@ public class TimelineCanvas extends Canvas {
 
         if( menu.isActive()==false &&
                 statusMenu.isActive()==false &&
-                photoServiceMenu.isActive()==false) {
+                photoServiceMenu.isActive()==false &&
+                photoSourceMenu.isActive()==false) {
             boolean drawSelectionBox = menuBar.isSelectedActive();
             statusList.draw(
                     g, statuses,
@@ -102,6 +109,8 @@ public class TimelineCanvas extends Canvas {
             statusMenu.draw(g);
         } else if(photoServiceMenu.isActive()) {
             photoServiceMenu.draw(g);
+        } else if(photoSourceMenu.isActive()) {
+            photoSourceMenu.draw(g);
         }
     }
 
@@ -148,6 +157,8 @@ public class TimelineCanvas extends Canvas {
                 statusMenu.selectPrevious();
             } else if(photoServiceMenu.isActive()) {
                 photoServiceMenu.selectPrevious();
+            } else if(photoSourceMenu.isActive()) {
+                photoSourceMenu.selectPrevious();
             } else {
                 verticalScroll += getHeight()/6;
                 if(verticalScroll>0) {
@@ -162,6 +173,8 @@ public class TimelineCanvas extends Canvas {
                 statusMenu.selectNext();
             } else if(photoServiceMenu.isActive()) {
                 photoServiceMenu.selectNext();
+            } else if(photoSourceMenu.isActive()) {
+                photoSourceMenu.selectNext();
             } else {
                 verticalScroll -= getHeight()/6; 
             }
@@ -198,12 +211,14 @@ public class TimelineCanvas extends Canvas {
             case(0):
                 /** Twitgoo */
                 controller.setTwitgooAsCurrentPhotoService();
-                controller.showCamera();
+                photoSourceMenu.activate();
+                repaint();
                 break;
             case(1):
                 /** TinyPic */
                 controller.setTwitPicAsCurrentPhotoService();
-                controller.showCamera();
+                photoSourceMenu.activate();
+                repaint();
                 break;
             case(2):
                 /** Cancel */
@@ -213,6 +228,16 @@ public class TimelineCanvas extends Canvas {
             default:
         }
         photoServiceMenu.deactivate();
+    }
+
+    public void activatePhotoSourceMenuItem() {
+        if(photoSourceMenu.getSelectedIndex()==0) {
+            /** Camera */
+            controller.showCamera();
+        } else {
+            /** File */
+            controller.showFileBrowser();
+        }
     }
 
     public void activateStatusMenuItem() {
@@ -293,6 +318,10 @@ public class TimelineCanvas extends Canvas {
             } else if(photoServiceMenu.isActive()) {
                 photoServiceMenu.deactivate();
                 activatePhotoServiceMenuIten();
+                return;
+            } else if(photoSourceMenu.isActive()) {
+                photoSourceMenu.deactivate();
+                activatePhotoSourceMenuItem();
                 return;
             } else if(statusList.getSelected()!=null){
                 statusMenu.activate();

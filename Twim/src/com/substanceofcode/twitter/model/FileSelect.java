@@ -1,7 +1,7 @@
 /*
- * FileBrowserMenu.java
+ * FileSelect.java
  *
- * Copyright (C) 2005-2009 Tommi Laukkanen
+ * Copyright (C) 2008-2009 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,20 +17,14 @@
  * limitations under the License.
  */
 
-package com.substanceofcode.twitter.views;
+package com.substanceofcode.twitter.model;
 
 /**
- *
+ * Interface for file selection.
  * @author Tommi Laukkanen
  */
-public class FileBrowserMenu extends Menu {
+public interface FileSelect {
 
-    int w, h;
-
-    FileBrowserMenu() {
-        super(null, 128, 128);
-
-
-    }
+    public void select(String path);
 
 }
