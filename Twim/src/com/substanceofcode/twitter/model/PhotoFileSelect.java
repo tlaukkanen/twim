@@ -38,6 +38,10 @@ public class PhotoFileSelect implements FileSelect {
             this.path = path;
             FileConnection fc = (FileConnection) Connector.open(path);
             int size = (int) fc.fileSize();
+            if(size<=0) {
+                TwitterController.getInstance().showError("Can't send selected image. File size is 0 bytes.");
+                return;
+            }
             byte[] photo = new byte[size];
             DataInputStream dis = fc.openDataInputStream();
             dis.readFully(photo);

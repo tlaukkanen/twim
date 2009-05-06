@@ -1,7 +1,7 @@
 /*
- * TwitgooApi.java
+ * YFrog.java
  *
- * Copyright (C) 2005-2009 Tommi Laukkanen
+ * Copyright (C) 2008-2009 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,19 +34,19 @@ import javax.microedition.io.HttpConnection;
  *
  * @author Tommi Laukkanen
  */
-public class Twitgoo implements PhotoService {
+public class Yfrog implements PhotoService {
 
-    private final static String TWITGOO_URL = "http://twitgoo.com/api/uploadAndPost";
+    private final static String TWITGOO_URL = "http://yfrog.com/api/uploadAndPost";
     private static String response = "";
 
-    private static Twitgoo instance;
+    private static Yfrog instance;
 
-    private Twitgoo() {
+    private Yfrog() {
     }
 
-    public static Twitgoo getInstance() {
+    public static Yfrog getInstance() {
         if(instance==null) {
-            instance = new Twitgoo();
+            instance = new Yfrog();
         }
         return instance;
     }
@@ -156,7 +156,7 @@ public class Twitgoo implements PhotoService {
             if(status) {
                 stat = new Status(username, mediaUrl + " - " + comment, now, "");
             } else {
-                stat = new Status("Twitgoo", err, now, "");
+                stat = new Status("yfrog", err, now, "");
             }
             return stat;
 

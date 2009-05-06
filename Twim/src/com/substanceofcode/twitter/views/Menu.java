@@ -38,6 +38,9 @@ public class Menu {
     private int selectedIndex;
     private boolean active;
     private String title;
+    private int rowHeight;
+    private boolean alignLeft;
+    private int rowsPerScreen;
 
     private static final Font TITLE_FONT = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_MEDIUM);
     private static final Font LABEL_FONT = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_MEDIUM);
@@ -55,14 +58,19 @@ public class Menu {
         this.labels = labels;
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
-        this.selectedIndex = 0;
-        this.active = false;
-        this.title = "Menu";
-        
-        int rowHeight = LABEL_FONT.getHeight();
-        this.height = (labels.length+1) * rowHeight;
-        this.top = screenHeight/2 - height/2;
+        selectedIndex = 0;
+        active = false;
+        title = "Menu";
+        alignLeft = false;
+        rowHeight = LABEL_FONT.getHeight();
+        rowsPerScreen = screenHeight/rowHeight;
+        calculateSize();
     }
+
+    public void alignLeft(boolean align) {
+        this.alignLeft = align;
+    }
+
     
     /** 
      * Draw menu
@@ -71,6 +79,13 @@ public class Menu {
     public void draw(Graphics g) {
         if(active==false) {
             return;
+        }
+
+        if(alignLeft==true) {
+            top = 11;
+            if(selectedIndex>(rowsPerScreen-3)) {
+                top -= (selectedIndex-(rowsPerScreen-3))*rowHeight;
+            }
         }
 
         /** Draw background and borders */
@@ -82,7 +97,7 @@ public class Menu {
         /** Draw menu items */
         g.setColor(FONT_COLOR);
         g.setFont(TITLE_FONT);
-        
+
         g.drawString(
             title,
             screenWidth/2 - LABEL_FONT.stringWidth(title)/2,
@@ -102,6 +117,7 @@ public class Menu {
         }
 
         g.setColor(FONT_COLOR);
+        int col = (alignLeft ? 13 : 0 );
         for(int menuIndex=0; menuIndex<labels.length; menuIndex++) {
             if(menuIndex==selectedIndex) {
                 g.setColor(SELECTED_COLOR);
@@ -110,7 +126,10 @@ public class Menu {
             }
             String label = labels[ menuIndex ];
             int labelWidth = LABEL_FONT.stringWidth(label);
-            g.drawString(labels[menuIndex], screenWidth/2 - labelWidth/2, top + (menuIndex+2)*LABEL_FONT.getHeight(), Graphics.LEFT|Graphics.BOTTOM);
+            if(alignLeft==false) {
+                col = screenWidth/2 - labelWidth/2;
+            }
+            g.drawString(labels[menuIndex], col, top + (menuIndex+2)*LABEL_FONT.getHeight(), Graphics.LEFT|Graphics.BOTTOM);
         }
     }
     
@@ -158,10 +177,19 @@ public class Menu {
      */
     void setLabels(String[] labels) {
         this.labels = labels;
+        calculateSize();
+        selectedIndex = 0;
     }
 
     void setTitle(String title) {
         this.title = title;
+    }
+
+    private void calculateSize() {
+        if(labels!=null) {
+            this.height = (labels.length+1) * rowHeight;
+            this.top = screenHeight/2 - height/2;
+        }
     }
     
 }

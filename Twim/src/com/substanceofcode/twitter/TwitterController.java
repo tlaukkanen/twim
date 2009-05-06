@@ -212,6 +212,11 @@ public class TwitterController {
         this.friendsStatuses = friendStatuses;
     }
 
+    /** Set yfrog service as current photo service */
+    public void setYfrogAsCurrentPhotoService() {
+        this.activePhotoService = (PhotoService) Yfrog.getInstance();
+    }
+
     public void showCamera() {
         CameraCanvas camCanvas = new CameraCanvas();
         display.setCurrent(camCanvas);
