@@ -43,20 +43,22 @@ public class FileBrowserCanvas extends Canvas implements FileSystemListener {
     private Vector rootFolders;
     private boolean showRoot;
     private FileSelect fileSelect;
-
+    String status;
 
     public FileBrowserCanvas(FileSelect select) {
         setFullScreenMode(true);
         width = getWidth();
         height = getHeight();
         folder = "";
+        status = "Please wait";
         this.fileSelect = select;
         fileMenu = new Menu(null, width, height);
+        fileMenu.alignLeft(true);
         FileSystemRegistry.addFileSystemListener(this);
         rootFolders = new Vector();
     }
 
-    public void showRoots() {
+    public void loadRoots() {
         Enumeration roots = FileSystemRegistry.listRoots();
         rootFolders.removeAllElements();
         while(roots.hasMoreElements()) {
@@ -70,6 +72,22 @@ public class FileBrowserCanvas extends Canvas implements FileSystemListener {
         }
         fileMenu.setLabels(folders);
         fileMenu.setTitle("Select device");
+        fileMenu.activate();
+        status = "Roots: " + folders.length;
+        repaint();
+    }
+
+    public void showRoots() {
+        status = "Loading roots";
+        repaint();
+        new Thread() {
+            public void run() {
+                super.run();
+                loadRoots();
+                status = "Roots loaded";
+                repaint();
+            }
+        }.start();
     }
 
     protected void paint(Graphics g) {
@@ -80,9 +98,31 @@ public class FileBrowserCanvas extends Canvas implements FileSystemListener {
         g.setColor(Theme.TWITTER_BLUE_COLOR);
         g.fillRect(0, 0, width, height);
 
+        g.setColor(0x000000);
+        //g.drawString(status, 0, getHeight()/2, Graphics.BASELINE|Graphics.LEFT);
+
         /** Draw the file directory */
         fileMenu.draw(g);
     }
+
+    protected void keyRepeated(int keyCode) {
+        int gameAction = getGameAction(keyCode);
+        switch(gameAction) {
+            case(Canvas.UP):
+                fileMenu.selectPrevious();
+                repaint();
+                break;
+            case(Canvas.DOWN):
+                fileMenu.selectNext();
+                repaint();
+                break;
+            default:
+                repaint();
+                break;
+        }
+    }
+
+
 
     protected void keyPressed(int keyCode) {
         int gameAction = getGameAction(keyCode);
@@ -113,16 +153,17 @@ public class FileBrowserCanvas extends Canvas implements FileSystemListener {
     }
 
     private void browseToDirectory(FileConnection fc) throws IOException {
-        Enumeration items = fc.list("*.jpg", false);
+        Enumeration items = fc.list();
         rootFolders.removeAllElements();
         while(items.hasMoreElements()) {
             String path = (String)items.nextElement();
             rootFolders.addElement(path);
         }
         showRoot = false;
-        String[] folders = new String[ rootFolders.size() ];
+        String[] folders = new String[ rootFolders.size()+1 ];
+        folders[0] = "..";
         for(int i=0; i<rootFolders.size(); i++) {
-            folders[i] = (String)rootFolders.elementAt(i);
+            folders[i+1] = (String)rootFolders.elementAt(i);
         }
         fileMenu.setLabels(folders);
         fileMenu.setTitle("Select photo");
@@ -134,9 +175,15 @@ public class FileBrowserCanvas extends Canvas implements FileSystemListener {
             if (label == null) {
                 return;
             }
-            FileConnection fc = (FileConnection) Connector.open("file:///" + label);
+            if(label.equals("..")) {
+                //int slashIndex = folder.indexOf(label)
+            } else if(folder.endsWith(label)==false) {
+                folder += label;
+            }
+            FileConnection fc = (FileConnection) Connector.open("file:///" + folder);
             if(fc.isDirectory()) {
                 /** move to directory */
+                
                 browseToDirectory(fc);
                 repaint();
             } else {

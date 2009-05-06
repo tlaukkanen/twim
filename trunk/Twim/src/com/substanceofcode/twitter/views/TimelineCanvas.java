@@ -65,7 +65,7 @@ public class TimelineCanvas extends Canvas {
         photoSourceMenu = new Menu(photoSourceLabels, getWidth(), getHeight());
         photoSourceMenu.setTitle("Select source");
 
-        String[] photoServiceLabels = {"Twitgoo", "TwitPic", "Cancel"};
+        String[] photoServiceLabels = {"Twitgoo", "TwitPic", "yfrog", "Cancel"};
         photoServiceMenu = new Menu(photoServiceLabels, getWidth(), getHeight());
         photoServiceMenu.setTitle("Select service");
 
@@ -221,6 +221,12 @@ public class TimelineCanvas extends Canvas {
                 repaint();
                 break;
             case(2):
+                /** yfrog */
+                controller.setYfrogAsCurrentPhotoService();
+                photoSourceMenu.activate();
+                repaint();
+                break;
+            case(3):
                 /** Cancel */
                 menu.activate();
                 repaint();
