@@ -52,7 +52,7 @@ public class TabBar {
      */
     public TabBar(int selectedTabIndex, String[] menuLabels, int width) {
         this.selectedTabIndex = selectedTabIndex;
-        this.activeTabIndex = selectedTabIndex;
+        activeTabIndex = -1;
         this.menuLabels = menuLabels;
         this.width = width;
         
@@ -62,7 +62,6 @@ public class TabBar {
         }
         
         this.x = width/2 - textWidth/2;
-        
     }
     
     public int getHeight() {

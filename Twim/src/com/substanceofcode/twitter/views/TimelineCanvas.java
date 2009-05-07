@@ -65,7 +65,7 @@ public class TimelineCanvas extends Canvas {
         photoSourceMenu = new Menu(photoSourceLabels, getWidth(), getHeight());
         photoSourceMenu.setTitle("Select source");
 
-        String[] photoServiceLabels = {"Twitgoo", "TwitPic", "yfrog", "Cancel"};
+        String[] photoServiceLabels = {"Twitgoo", "TwitPic", "yFrog", "Cancel"};
         photoServiceMenu = new Menu(photoServiceLabels, getWidth(), getHeight());
         photoServiceMenu.setTitle("Select service");
 
@@ -330,6 +330,13 @@ public class TimelineCanvas extends Canvas {
                 activatePhotoSourceMenuItem();
                 return;
             } else if(statusList.getSelected()!=null){
+                int selectedIndex = statusMenu.getSelectedIndex();
+                Status selectedStatus = statusList.getSelected();
+                if(selectedStatus.isFavorite()) {
+                    statusMenu.setLabel(4, "Unfavorite");
+                } else {
+                    statusMenu.setLabel(4, "Mark as favorite");
+                }
                 statusMenu.activate();
             }
                 

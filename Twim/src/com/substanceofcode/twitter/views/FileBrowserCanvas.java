@@ -19,6 +19,7 @@
 
 package com.substanceofcode.twitter.views;
 
+import com.substanceofcode.infrastructure.Device;
 import com.substanceofcode.twitter.TwitterController;
 import com.substanceofcode.twitter.model.FileSelect;
 import java.io.IOException;
@@ -142,6 +143,22 @@ public class FileBrowserCanvas extends Canvas implements FileSystemListener {
                 repaint();
                 break;
         }
+        String keyName = this.getKeyName(keyCode);
+        if( (keyName.indexOf("SOFT")>=0 && keyName.indexOf("1")>0) ||
+            (Device.isNokia() && keyCode==-6) ||
+            keyCode == TimelineCanvas.KEY_STAR ||
+            keyCode == Canvas.KEY_NUM0 ||
+            keyCode == ' ') {
+            /** Left soft key pressed */
+            TwitterController.getInstance().showTimeline();
+        } else if( (keyName.indexOf("SOFT")>=0 && keyName.indexOf("2")>0) ||
+            (Device.isNokia() && keyCode==-7) ||
+            keyCode == TimelineCanvas.KEY_POUND ||
+            keyCode == Canvas.KEY_NUM0 ||
+            keyCode == ' ') {
+            /** Right soft key pressed */
+            TwitterController.getInstance().showTimeline();
+        }
     }
 
     public void rootChanged(int state, String rootName) {
@@ -176,7 +193,15 @@ public class FileBrowserCanvas extends Canvas implements FileSystemListener {
                 return;
             }
             if(label.equals("..")) {
-                //int slashIndex = folder.indexOf(label)
+                final int slashIndex = folder.lastIndexOf('/', folder.length() - 2);
+                if(slashIndex == -1) {
+                    folder = null;
+                } else {
+                    folder = folder.substring(0, slashIndex);
+                    if(!folder.endsWith("/")) {
+                        folder += "/";
+                    }
+                }
             } else if(folder.endsWith(label)==false) {
                 folder += label;
             }
