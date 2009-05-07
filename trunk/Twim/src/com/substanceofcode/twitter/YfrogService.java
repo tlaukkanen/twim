@@ -34,19 +34,19 @@ import javax.microedition.io.HttpConnection;
  *
  * @author Tommi Laukkanen
  */
-public class Yfrog implements PhotoService {
+public class YfrogService implements PhotoService {
 
-    private final static String TWITGOO_URL = "http://yfrog.com/api/uploadAndPost";
+    private final static String YFROG_API_URL = "http://yfrog.com/api/uploadAndPost";
     private static String response = "";
 
-    private static Yfrog instance;
+    private static YfrogService instance;
 
-    private Yfrog() {
+    private YfrogService() {
     }
 
-    public static Yfrog getInstance() {
+    public static YfrogService getInstance() {
         if(instance==null) {
-            instance = new Yfrog();
+            instance = new YfrogService();
         }
         return instance;
     }
@@ -61,8 +61,9 @@ public class Yfrog implements PhotoService {
             String username,
             String password) throws IOException, Exception {
         HttpConnection connection = null;
+        String state = "Sending data";
         try {
-            connection = (HttpConnection) Connector.open(TWITGOO_URL);
+            connection = (HttpConnection) Connector.open(YFROG_API_URL);
             connection.setRequestMethod( HttpConnection.POST );
             String boundary = "BoUnDaRy888";
             connection.setRequestProperty("Content-Type", "multipart/form-data; charset=UTF-8; boundary=" + boundary);
@@ -70,8 +71,8 @@ public class Yfrog implements PhotoService {
 
             // Media
             writeString(dos, "--" + boundary + "\r\n");
-            writeString(dos, "Content-Disposition: form-data; name=\"media\"; filename=\"photo.jpg\"\r\n");
-            writeString(dos, "Content-Transfer-Encoding: binary\r\n");
+            writeString(dos, "Content-Disposition:form-data; name=\"media\"; filename=\"photo.jpg\"\r\n");
+            writeString(dos, "Content-Type: image/jpeg\r\n");
             writeString(dos, "\r\n");
             dos.write(photo,0,photo.length);
             writeString(dos, "\r\n");
@@ -88,12 +89,6 @@ public class Yfrog implements PhotoService {
             writeString(dos, "\r\n");
             writeString(dos, password + "\r\n");
 
-            // Password
-            writeString(dos, "--" + boundary + "\r\n");
-            writeString(dos, "Content-Disposition: form-data; name=\"source\"\r\n");
-            writeString(dos, "\r\n");
-            writeString(dos, "Twim\r\n");
-
             // Message
             writeString(dos, "--" + boundary + "\r\n");
             writeString(dos, "Content-Disposition: form-data; name=\"message\"\r\n");
@@ -104,6 +99,8 @@ public class Yfrog implements PhotoService {
             writeString(dos, "--" + boundary + "--\r\n");
             dos.flush();
             dos.close();
+
+            state = "Opening and reading input stream";
 
             InputStream his = connection.openInputStream();
             CustomInputStream is = new CustomInputStream(his);
@@ -118,7 +115,8 @@ public class Yfrog implements PhotoService {
                     inputBuffer.append((char) inputCharacter);
                 }
             } catch (IOException ex) {
-                return null;
+                throw new Exception("Error while reading input buffer: " +
+                        ex.toString() + " " + ex.getMessage());
             }
             //totalBytes += response.length();
             if(his!=null) {
@@ -132,25 +130,32 @@ public class Yfrog implements PhotoService {
             response = inputBuffer.toString();
 
             // Parse response
+            state = "Parsing response:" + response;
             boolean status = false;
             String mediaUrl = "";
             String err = "";
-            XmlParser parser = new XmlParser(response);
-            while(parser.parse()!=XmlParser.END_DOCUMENT) {
-                String elementName = parser.getName();
-                if(elementName.equals("rsp")) {
-                    String statusValue = parser.getAttributeValue("status");
-                    if(statusValue.equals("ok")) {
-                        status = true;
+            if(response.indexOf("<?xml")>=0) {
+                XmlParser parser = new XmlParser(response);
+                while(parser.parse()!=XmlParser.END_DOCUMENT) {
+                    String elementName = parser.getName();
+                    if(elementName.equals("rsp")) {
+                        String statusValue = parser.getAttributeValue("status");
+                        if(statusValue.equals("ok")) {
+                            status = true;
+                        }
+                    } else if(elementName.equals("mediaurl")) {
+                        mediaUrl = parser.getText();
+                    } else if(elementName.equals("err")) {
+                        err = parser.getAttributeValue("msg");
                     }
-                } else if(elementName.equals("mediaurl")) {
-                    mediaUrl = parser.getText();
-                } else if(elementName.equals("err")) {
-                    err = parser.getAttributeValue("msg");
                 }
+            } else {
+                status = false;
+                err = response;
             }
 
             // Create status based on response
+            state = "Creating status";
             Status stat = null;
             Date now = Calendar.getInstance().getTime();
             if(status) {
@@ -161,9 +166,9 @@ public class Yfrog implements PhotoService {
             return stat;
 
         } catch (IOException e) {
-            throw new IOException("IOException: " + e.toString());
+            throw new IOException("IOException: " + e.toString() + " " + e.getMessage() + " state: " + state);
         } catch (Exception e) {
-            throw new Exception("Error while posting: " + e.toString());
+            throw new Exception("Error while posting: " + e.toString() + " " + e.getMessage() + " state: " + state);
         } finally {
             if (connection != null) {
                 connection.close();

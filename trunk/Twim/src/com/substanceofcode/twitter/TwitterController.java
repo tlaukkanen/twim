@@ -39,6 +39,7 @@ import com.substanceofcode.twitter.views.UpdateStatusTextBox;
 import com.substanceofcode.twitter.views.WaitCanvas;
 import com.substanceofcode.utils.Log;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.Vector;
 import javax.microedition.lcdui.Alert;
@@ -160,7 +161,7 @@ public class TwitterController {
     public void login(String username, String password) {
         api.setUsername(username);
         api.setPassword(password);
-        showRecentTimeline();
+        showEmptyTimeline();
     }
 
     public void commentPhoto(byte[] photo) {
@@ -214,7 +215,7 @@ public class TwitterController {
 
     /** Set yfrog service as current photo service */
     public void setYfrogAsCurrentPhotoService() {
-        this.activePhotoService = (PhotoService) Yfrog.getInstance();
+        this.activePhotoService = (PhotoService) YfrogService.getInstance();
     }
 
     public void showCamera() {
@@ -425,6 +426,19 @@ public class TwitterController {
     void showSplash() {
         SplashCanvas splash = new SplashCanvas(this);
         display.setCurrent(splash);
+    }
+
+    /** Show empty timeline view */
+    private void showEmptyTimeline() {
+        Vector empty = new Vector();
+        empty.addElement(
+                new Status(
+                "Twim", "Select what tweets you'd like to see",
+                Calendar.getInstance().getTime(),
+                "0")
+            );
+        timeline.setTimeline(empty);
+        display.setCurrent(timeline);
     }
 
 }

@@ -181,6 +181,10 @@ public class Menu {
         selectedIndex = 0;
     }
 
+    void setLabel(int index, String label) {
+        labels[index] = label;
+    }
+
     void setTitle(String title) {
         this.title = title;
     }
