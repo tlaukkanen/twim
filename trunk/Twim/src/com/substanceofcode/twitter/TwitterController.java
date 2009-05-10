@@ -23,7 +23,7 @@ import com.substanceofcode.twitter.model.FileSelect;
 import com.substanceofcode.twitter.model.PhotoFileSelect;
 import com.substanceofcode.twitter.model.Status;
 import com.substanceofcode.twitter.model.User;
-import com.substanceofcode.twitter.tasks.MarkAsFavoriteTask;
+import com.substanceofcode.twitter.tasks.ToggleFavoriteTask;
 import com.substanceofcode.twitter.tasks.RequestFriendsTask;
 import com.substanceofcode.twitter.tasks.RequestTimelineTask;
 import com.substanceofcode.twitter.tasks.SendPhotoTask;
@@ -169,10 +169,14 @@ public class TwitterController {
         display.setCurrent(commentForm);
     }
 
-    public void markAsFavorite(Status selectedStatus) {
-        MarkAsFavoriteTask task = new MarkAsFavoriteTask(this, api, selectedStatus);
+    public void toggleFavorite(Status selectedStatus) {
+        ToggleFavoriteTask task = new ToggleFavoriteTask(this, api, selectedStatus);
         WaitCanvas wait = new WaitCanvas(this, task);
-        wait.setWaitText("Marking as favorite...");
+        if(selectedStatus.isFavorite()) {
+            wait.setWaitText("Unfavorite status...");
+        } else {
+            wait.setWaitText("Marking as favorite...");
+        }
         display.setCurrent(wait);
     }
 
@@ -439,6 +443,20 @@ public class TwitterController {
             );
         timeline.setTimeline(empty);
         display.setCurrent(timeline);
+    }
+
+    /**
+     * Remove specified status from favorite timeline
+     * @param unfavoriteStatus Status that have been unfavorited.
+     */
+    public void removeFavoriteStatus(Status unfavoriteStatus) {
+        Enumeration enu = favouriteTimeline.elements();
+        while(enu.hasMoreElements()) {
+            Status stat = (Status) enu.nextElement();
+            if(stat.getId().equals(unfavoriteStatus.getId())) {
+                favouriteTimeline.removeElement(stat);
+            }
+        }
     }
 
 }

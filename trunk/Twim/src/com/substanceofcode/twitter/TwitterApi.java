@@ -46,6 +46,7 @@ public class TwitterApi {
     private static final String FRIENDS_URL = "http://twitter.com/statuses/friends.xml";
     private static final String FAVORITE_TIMELINE_URL = "http://twitter.com/favorites.xml";
     private static final String FAVORITE_CREATE_URL = "http://twitter.com/favorites/create/";
+    private static final String FAVORITE_DESTROY_URL = "http://twitter.com/favorites/destroy/";
 
     /** Creates a new instance of TwitterApi */
     public TwitterApi() {
@@ -201,6 +202,25 @@ public class TwitterApi {
             ex.printStackTrace();
         }
         return entries;
+    }
+
+    public Status markAsUnfavorite(Status status) {
+        try {
+            StatusFeedParser parser = new StatusFeedParser();
+            String url = FAVORITE_DESTROY_URL + status.getId() + ".xml";
+            HttpUtil.doPost( url, parser );
+            Vector statuses = parser.getStatuses();
+            if(statuses!=null && statuses.isEmpty()==false) {
+                return (Status)statuses.elementAt(0);
+            }
+        } catch(Exception ex) {
+            return new Status(
+                    "Twim",
+                    "Error while marking status as unfavorite: " + ex.getMessage(),
+                    Calendar.getInstance().getTime(),
+                    "0");
+        }
+        return null;
     }
     
     

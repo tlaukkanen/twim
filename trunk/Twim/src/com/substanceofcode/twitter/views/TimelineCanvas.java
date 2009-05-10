@@ -278,7 +278,7 @@ public class TimelineCanvas extends Canvas {
         } else if(selectedIndex==4) {
             /** Mark as favorite */
             if(selectedStatus!=null) {
-                controller.markAsFavorite(selectedStatus);
+                controller.toggleFavorite(selectedStatus);
             }
         } else if(selectedIndex==5) {
             /** Send direct message */
@@ -330,7 +330,6 @@ public class TimelineCanvas extends Canvas {
                 activatePhotoSourceMenuItem();
                 return;
             } else if(statusList.getSelected()!=null){
-                int selectedIndex = statusMenu.getSelectedIndex();
                 Status selectedStatus = statusList.getSelected();
                 if(selectedStatus.isFavorite()) {
                     statusMenu.setLabel(4, "Unfavorite");

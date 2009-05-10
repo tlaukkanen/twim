@@ -102,6 +102,7 @@ public class StatusFeedParser implements ResultParser {
                         Status status = new Status(screenName, text, date, id);
                         status.setDirect(isDirect);
                         status.setInReplyToId(inReplyToId);
+                        status.setFavorite(isFavorite);
                         statuses.addElement(status);
                     }
                     text = "";
@@ -136,7 +137,8 @@ public class StatusFeedParser implements ResultParser {
                 } else if (elementName.equals("in_reply_to_status_id")) {
                     inReplyToId = xml.getText();
                 } else if (elementName.equals("favorited")) {
-                    if(xml.getText().equals("true")) {
+                    String favorited = xml.getText();
+                    if(favorited.startsWith("true")) {
                         isFavorite = true;
                     }
                 } else if (elementName.equals("screen_name")) {
@@ -161,6 +163,7 @@ public class StatusFeedParser implements ResultParser {
                 Status status = new Status(screenName, text, date, id);
                 status.setDirect(isDirect);
                 status.setFavorite(isFavorite);
+                status.setInReplyToId(inReplyToId);
                 statuses.addElement(status);
             }
         } catch (Exception ex) {

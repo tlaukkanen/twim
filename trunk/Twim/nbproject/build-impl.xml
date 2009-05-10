@@ -285,6 +285,13 @@
         </condition>
     </target>
     <target name="sjmc-init" depends="sjmc-pre-init" if="sjmc-platform.trigger"/>
+    <!--cdc-hi-init-->
+    <target name="cdc-hi-pre-init" if="cdc-platform.trigger">
+        <condition property="cdc-hi-platform.trigger">
+            <equals arg1="cdc-hi" arg2="${platform.type}" casesensitive="false"/>
+        </condition>
+    </target>
+    <target name="cdc-hi-init" depends="cdc-hi-pre-init" if="cdc-hi-platform.trigger"/>
     <!--nokiaS80-init-->
     <target name="nokiaS80-pre-init" if="cdc-platform.trigger">
         <condition property="nokiaS80-platform.trigger">
@@ -346,7 +353,7 @@
                 <equals arg1="${bdj.deployment.dir}" arg2="" trim="true"/>
             </or>
         </condition>
-        <fail if="bdj.deployment.dir.invalid">Deployment directory is set!</fail>
+        <fail if="bdj.deployment.dir.invalid">Deployment directory is not set!</fail>
         <property name="deployment.dir" location="${dist.dir}"/>
         <patternset id="deployment.patternset">
             <include name="${dist.jar}"/>
@@ -357,7 +364,7 @@
     <!--init-->
     <target name="pre-init"/>
     <target name="post-init"/>
-    <target name="init" depends="pre-init,load-properties,basic-init,cldc-init,cdc-init,ricoh-init,semc-init,savaje-init,sjmc-init,nokiaS80-init,nsicom-init,bdj-init,post-init"/>
+    <target name="init" depends="pre-init,load-properties,basic-init,cldc-init,cdc-init,ricoh-init,semc-init,savaje-init,sjmc-init,cdc-hi-init,nokiaS80-init,nsicom-init,bdj-init,post-init"/>
     <!--conditional clean-->
     <target name="conditional-clean-init">
         <uptodate property="no.clean.before.build" targetfile="${build.dir}/.timestamp">
@@ -738,6 +745,7 @@
         <property name="bdj.deployment.bdmv.backup.dir" value="${bdj.deployment.bdmv.dir}/BACKUP"/>
         <property name="bdj.deployment.certificate.dir" value="${bdj.deployment.dir}/CERTIFICATE"/>
         <property name="bdj.deployment.certificate.backup.dir" value="${bdj.deployment.certificate.dir}/BACKUP"/>
+        <mkdir dir="${bdj.deployment.dir}"/>
         <mkdir dir="${bdj.deployment.bdmv.dir}"/>
         <mkdir dir="${bdj.deployment.bdmv.dir}/AUXDATA"/>
         <mkdir dir="${bdj.deployment.bdmv.dir}/BDJO"/>
@@ -1093,10 +1101,24 @@
     </target>
     <target name="-post-bdj-run" if="bdj-platform.trigger"/>
     <target name="bdj-run" if="bdj-platform.trigger" depends="-pre-bdj-run, -bdj-run, -post-bdj-run"/>
+    <!--cdc-hi-run-->
+    <target name="-pre-cdc-hi-run" if="cdc-hi-platform.trigger"/>
+    <target name="-cdc-hi-run" if="cdc-hi-platform.trigger">
+        <exec executable="${platform.home}/bin/emulator">
+            <arg value="-cp"/>
+            <arg value="${basedir}/${dist.dir}/${dist.jar}"/>
+            <arg value="-Xdevice:${platform.device}"/>
+            <arg value="${run.cmd.options}"/>
+            <arg value="-Xmain:${main.class}"/>
+            <arg value="${application.args}"/>
+        </exec>
+    </target>
+    <target name="-post-cdc-hi-run" if="cdc-hi-platform.trigger"/>
+    <target name="cdc-hi-run" if="cdc-hi-platform.trigger" depends="-pre-cdc-hi-run, -cdc-hi-run, -post-cdc-hi-run"/>
     <!--run-->
     <target name="pre-run"/>
-    <target name="run" depends="jar,pre-run,cldc-run,ricoh-run,semc-run,savaje-run,sjmc-run,nokiaS80-run,nsicom-run,bdj-run" description="Run MIDlet suite."/>
-    <target name="run-no-build" depends="init,pre-run,cldc-run,ricoh-run,semc-run,savaje-run,sjmc-run,nokiaS80-run,nsicom-run,bdj-run" description="Quick Run already built MIDlet suite."/>
+    <target name="run" depends="jar,pre-run,cldc-run,ricoh-run,semc-run,savaje-run,sjmc-run,nokiaS80-run,nsicom-run,bdj-run,cdc-hi-run" description="Run MIDlet suite."/>
+    <target name="run-no-build" depends="init,pre-run,cldc-run,ricoh-run,semc-run,savaje-run,sjmc-run,nokiaS80-run,nsicom-run,bdj-run,cdc-hi-run" description="Quick Run already built MIDlet suite."/>
     <!--cldc-debug-->
     <target name="cldc-debug" if="cldc-platform.trigger">
         <parallel>
@@ -1179,6 +1201,26 @@
             </sequential>
         </parallel>
     </target>
+    <!--cdc-hi-debug-->
+    <target name="-pre-cdc-hi-debug" if="cdc-hi-platform.trigger"/>
+    <target name="-cdc-hi-debug" if="cdc-hi-platform.trigger">
+        <taskdef name="freePortRetriever" classname="org.netbeans.modules.j2me.cdc.project.savaje.FreePortRetriever" classpath="${libs.savaje-ant-utils.classpath}"/>
+        <freePortRetriever debuggerPortProperty="active.debug.port"/>
+        <parallel>
+            <exec executable="${platform.home}/bin/emulator">
+                <arg value="-cp"/>
+                <arg value="${basedir}/${dist.dir}/${dist.jar}"/>
+                <arg value="-Xdevice:${platform.device}"/>
+                <arg value="-Xmain:${main.class}"/>
+                <arg value="-Xrunjdwp:transport=dt_socket,address=${active.debug.port},server=y,suspend=y"/>
+                <arg value="-Xdebug"/>
+            </exec>
+            <property name="debug.delay" value="500"/>
+            <nb-mobility-debug address="${active.debug.port}" name="${app.codename}" delay="${debug.delay}" timeout="30000" period="2000"/>
+        </parallel>
+    </target>
+    <target name="-post-cdc-hi-debug" if="cdc-hi-platform.trigger"/>
+    <target name="cdc-hi-debug" if="cdc-hi-platform.trigger" depends="-pre-cdc-hi-debug, -cdc-hi-debug, -post-cdc-hi-debug"/>
     <!--nokiaS80-debug-->
     <target name="nokiaS80-debug" if="nokiaS80-platform.trigger">
         <taskdef name="j9builder" classname="org.netbeans.modules.j2me.cdc.project.J9Builder" classpath="${libs.cdc-ant-utils.classpath}"/>
@@ -1220,7 +1262,7 @@
         <delete file="$/.timestamp"/>
     </target>
     <target name="pre-debug"/>
-    <target name="debug" description="Debug project." depends="clean,jar,remove-timestamp,pre-debug,cldc-debug,ricoh-debug,semc-debug,savaje-debug,sjmc-debug,nokiaS80-debug,nsicom-debug,bdj-debug"/>
+    <target name="debug" description="Debug project." depends="clean,jar,remove-timestamp,pre-debug,cldc-debug,ricoh-debug,semc-debug,savaje-debug,sjmc-debug,cdc-hi-debug,nokiaS80-debug,nsicom-debug,bdj-debug"/>
     <target name="nbdebug" description="Start NetBeans debugger" if="netbeans.home">
         <property name="debug.delay" value="5000"/>
         <nb-mobility-debug address="${jpda.port}" name="${app.codename}" delay="${debug.delay}" timeout="30000" period="2000"/>
