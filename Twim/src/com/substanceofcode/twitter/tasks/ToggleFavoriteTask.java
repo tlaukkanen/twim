@@ -28,13 +28,13 @@ import com.substanceofcode.twitter.model.Status;
  * Task for marking tweet as favorite.
  * @author Tommi Laukkanen
  */
-public class MarkAsFavoriteTask extends AbstractTask {
+public class ToggleFavoriteTask extends AbstractTask {
 
     TwitterController controller;
     TwitterApi api;
     Status status;
 
-    public MarkAsFavoriteTask(
+    public ToggleFavoriteTask(
             TwitterController controller,
             TwitterApi api,
             Status status) {
@@ -45,8 +45,13 @@ public class MarkAsFavoriteTask extends AbstractTask {
 
     public void doTask() {
         try {
-            Status favoriteStatus = api.markAsFavorite(status);
-            controller.addFavoriteStatus(favoriteStatus);
+            if(status.isFavorite()) {
+                Status unfavoriteStatus = api.markAsUnfavorite(status);
+                controller.removeFavoriteStatus(unfavoriteStatus);
+            } else {
+                Status favoriteStatus = api.markAsFavorite(status);
+                controller.addFavoriteStatus(favoriteStatus);
+            }
             controller.showTimeline();
         } catch(Exception ex) {
             controller.showError("Error while marking tweet as favorite: " + ex.getMessage());

@@ -1,6 +1,6 @@
 Twim - Mobile Twitter Client
 
-Copyright (c) 2006-2008 Tommi Laukkanen
+Copyright (c) 2006-2009 Tommi Laukkanen
 http://www.substanceofcode.com
 
 Contributors:
@@ -8,6 +8,12 @@ Tommi Laukkanen
 
 
 Release Notes:
+
+v1.12 (May 10th, 2009)
++ yfrog support
++ Favorites support
++ File based photo upload
++ Recent timeline not loaded automatically on startup
 
 v1.11
 + Twitgoo support for photos
