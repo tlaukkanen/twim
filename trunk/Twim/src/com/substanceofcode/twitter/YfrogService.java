@@ -139,7 +139,7 @@ public class YfrogService implements PhotoService {
                 while(parser.parse()!=XmlParser.END_DOCUMENT) {
                     String elementName = parser.getName();
                     if(elementName.equals("rsp")) {
-                        String statusValue = parser.getAttributeValue("status");
+                        String statusValue = parser.getAttributeValue("stat");
                         if(statusValue.equals("ok")) {
                             status = true;
                         }
