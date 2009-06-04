@@ -20,7 +20,7 @@
 package com.substanceofcode.twitter;
 
 import com.substanceofcode.twitter.model.FileSelect;
-import com.substanceofcode.twitter.model.PhotoFileSelect;
+import com.substanceofcode.twitter.model.MediaFileSelect;
 import com.substanceofcode.twitter.model.Status;
 import com.substanceofcode.twitter.model.User;
 import com.substanceofcode.twitter.tasks.ToggleFavoriteTask;
@@ -164,9 +164,17 @@ public class TwitterController {
         showEmptyTimeline();
     }
 
-    public void commentPhoto(byte[] photo) {
+    public void commentMedia(byte[] photo) {
         PhotoCommentForm commentForm = new PhotoCommentForm(photo);
         display.setCurrent(commentForm);
+    }
+
+    public void showVideoBrowser() {
+        if(fileBrowser==null) {
+            fileBrowser = new FileBrowserCanvas(new MediaFileSelect());
+            fileBrowser.showRoots();
+        }
+        display.setCurrent(fileBrowser);
     }
 
     public void toggleFavorite(Status selectedStatus) {
@@ -180,7 +188,7 @@ public class TwitterController {
         display.setCurrent(wait);
     }
 
-    public void sendPhoto(String comment, byte[] photo) {
+    public void sendMedia(String comment, byte[] photo) {
         String username = api.getUsername();
         String password = api.getPassword();
         SendPhotoTask task = new SendPhotoTask(photo, comment, username, password, activePhotoService);
@@ -247,9 +255,9 @@ public class TwitterController {
         display.setCurrent(alert, timeline);
     }
 
-    public void showFileBrowser() {
+    public void showPhotoBrowser() {
         if(fileBrowser==null) {
-            fileBrowser = new FileBrowserCanvas(new PhotoFileSelect());
+            fileBrowser = new FileBrowserCanvas(new MediaFileSelect());
             fileBrowser.showRoots();
         }
         display.setCurrent(fileBrowser);

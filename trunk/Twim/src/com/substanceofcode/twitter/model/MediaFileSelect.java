@@ -29,7 +29,7 @@ import javax.microedition.io.file.FileConnection;
  *
  * @author Tommi Laukkanen
  */
-public class PhotoFileSelect implements FileSelect {
+public class MediaFileSelect implements FileSelect {
 
     private String path;
 
@@ -39,13 +39,13 @@ public class PhotoFileSelect implements FileSelect {
             FileConnection fc = (FileConnection) Connector.open(path);
             int size = (int) fc.fileSize();
             if(size<=0) {
-                TwitterController.getInstance().showError("Can't send selected image. File size is 0 bytes.");
+                TwitterController.getInstance().showError("Can't send selected media file. File size is 0 bytes.");
                 return;
             }
-            byte[] photo = new byte[size];
+            byte[] mediaData = new byte[size];
             DataInputStream dis = fc.openDataInputStream();
-            dis.readFully(photo);
-            TwitterController.getInstance().commentPhoto(photo);
+            dis.readFully(mediaData);
+            TwitterController.getInstance().commentMedia(mediaData);
         } catch (IOException ex) {
             TwitterController.getInstance().showError("Error: " + ex.toString() + " " + ex.getMessage());
         }

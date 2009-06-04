@@ -34,7 +34,7 @@ import javax.microedition.io.HttpConnection;
  *
  * @author Tommi Laukkanen
  */
-public class YfrogService implements PhotoService {
+public class YfrogService implements PhotoService, VideoService {
 
     private final static String YFROG_API_URL = "http://yfrog.com/api/uploadAndPost";
     private static String response = "";
@@ -53,6 +53,14 @@ public class YfrogService implements PhotoService {
 
     public String getResponse() {
         return response;
+    }
+
+    public Status sendVideo(
+            byte[] video,
+            String comment,
+            String username,
+            String password) throws IOException, Exception {
+        return sendPhoto(video, comment, username, password);
     }
 
     public Status sendPhoto(
