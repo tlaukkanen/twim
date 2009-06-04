@@ -40,7 +40,8 @@ public class TimelineCanvas extends Canvas {
     private Menu menu;
     private Menu statusMenu;
     private Menu photoServiceMenu;
-    private Menu photoSourceMenu;
+    private Menu videoServiceMenu;
+    private Menu mediaSourceMenu;
     private int verticalScroll;
     
     /** 
@@ -56,18 +57,22 @@ public class TimelineCanvas extends Canvas {
         menuBar = new TabBar(2, labels, getWidth());
         
         /** Menu */
-        String[] menuLabels = {"Update status", "Send photo",
+        String[] menuLabels = {"Update status", "Send media",
             "Reload tweets", "Settings", "About", "Exit", "Cancel"};
         menu = new Menu(menuLabels, getWidth(), getHeight());
 
         /** Photo source */
-        String[] photoSourceLabels = {"Camera", "File"};
-        photoSourceMenu = new Menu(photoSourceLabels, getWidth(), getHeight());
-        photoSourceMenu.setTitle("Select source");
+        String[] photoSourceLabels = {"Camera", "Photo from file", "Video from file" };
+        mediaSourceMenu = new Menu(photoSourceLabels, getWidth(), getHeight());
+        mediaSourceMenu.setTitle("Select source");
 
         String[] photoServiceLabels = {"Twitgoo", "TwitPic", "yFrog", "Cancel"};
         photoServiceMenu = new Menu(photoServiceLabels, getWidth(), getHeight());
-        photoServiceMenu.setTitle("Select service");
+        photoServiceMenu.setTitle("Select photo service");
+
+        String[] videoServiceLabels = {"yFrog"};
+        videoServiceMenu = new Menu(videoServiceLabels, getWidth(), getHeight());
+        videoServiceMenu.setTitle("Select video service");
 
         /** Status menu */
         String[] statusMenuLabels = {"Open in browser", "Open link in browser",
@@ -96,7 +101,7 @@ public class TimelineCanvas extends Canvas {
         if( menu.isActive()==false &&
                 statusMenu.isActive()==false &&
                 photoServiceMenu.isActive()==false &&
-                photoSourceMenu.isActive()==false) {
+                mediaSourceMenu.isActive()==false) {
             boolean drawSelectionBox = menuBar.isSelectedActive();
             statusList.draw(
                     g, statuses,
@@ -109,9 +114,14 @@ public class TimelineCanvas extends Canvas {
             statusMenu.draw(g);
         } else if(photoServiceMenu.isActive()) {
             photoServiceMenu.draw(g);
-        } else if(photoSourceMenu.isActive()) {
-            photoSourceMenu.draw(g);
+        } else if(mediaSourceMenu.isActive()) {
+            mediaSourceMenu.draw(g);
+        } else if(videoServiceMenu.isActive()) {
+            videoServiceMenu.draw(g);
         }
+    }
+
+    private void activateVideoServiceMenuItem() {
     }
 
     private void handleTabChange() {
@@ -157,8 +167,8 @@ public class TimelineCanvas extends Canvas {
                 statusMenu.selectPrevious();
             } else if(photoServiceMenu.isActive()) {
                 photoServiceMenu.selectPrevious();
-            } else if(photoSourceMenu.isActive()) {
-                photoSourceMenu.selectPrevious();
+            } else if(mediaSourceMenu.isActive()) {
+                mediaSourceMenu.selectPrevious();
             } else {
                 verticalScroll += getHeight()/6;
                 if(verticalScroll>0) {
@@ -173,8 +183,8 @@ public class TimelineCanvas extends Canvas {
                 statusMenu.selectNext();
             } else if(photoServiceMenu.isActive()) {
                 photoServiceMenu.selectNext();
-            } else if(photoSourceMenu.isActive()) {
-                photoSourceMenu.selectNext();
+            } else if(mediaSourceMenu.isActive()) {
+                mediaSourceMenu.selectNext();
             } else {
                 verticalScroll -= getHeight()/6; 
             }
@@ -186,9 +196,9 @@ public class TimelineCanvas extends Canvas {
         if(selectedIndex==0) {
             controller.showStatusView("");
         } else if(selectedIndex==1) {
-            /** Photo service */
+            /** Media service */
             menu.deactivate();
-            photoServiceMenu.activate();
+            mediaSourceMenu.activate();
             repaint();
         } else if(selectedIndex==2) {
             controller.clearTimelines();
@@ -211,19 +221,19 @@ public class TimelineCanvas extends Canvas {
             case(0):
                 /** Twitgoo */
                 controller.setTwitgooAsCurrentPhotoService();
-                photoSourceMenu.activate();
+                mediaSourceMenu.activate();
                 repaint();
                 break;
             case(1):
                 /** TinyPic */
                 controller.setTwitPicAsCurrentPhotoService();
-                photoSourceMenu.activate();
+                mediaSourceMenu.activate();
                 repaint();
                 break;
             case(2):
                 /** yfrog */
                 controller.setYfrogAsCurrentPhotoService();
-                photoSourceMenu.activate();
+                mediaSourceMenu.activate();
                 repaint();
                 break;
             case(3):
@@ -236,13 +246,16 @@ public class TimelineCanvas extends Canvas {
         photoServiceMenu.deactivate();
     }
 
-    public void activatePhotoSourceMenuItem() {
-        if(photoSourceMenu.getSelectedIndex()==0) {
+    public void activateMediaSourceMenuItem() {
+        if(mediaSourceMenu.getSelectedIndex()==0) {
             /** Camera */
             controller.showCamera();
-        } else {
-            /** File */
-            controller.showFileBrowser();
+        } else if(mediaSourceMenu.getSelectedIndex()==1){
+            /** Photo from file */
+            controller.showPhotoBrowser();
+        } else if(mediaSourceMenu.getSelectedIndex()==2){
+            /** Video from file */
+            controller.showVideoBrowser();
         }
     }
 
@@ -325,9 +338,13 @@ public class TimelineCanvas extends Canvas {
                 photoServiceMenu.deactivate();
                 activatePhotoServiceMenuIten();
                 return;
-            } else if(photoSourceMenu.isActive()) {
-                photoSourceMenu.deactivate();
-                activatePhotoSourceMenuItem();
+            } else if(videoServiceMenu.isActive()) {
+                videoServiceMenu.deactivate();
+                activateVideoServiceMenuItem();
+                return;
+            } else if(mediaSourceMenu.isActive()) {
+                mediaSourceMenu.deactivate();
+                activateMediaSourceMenuItem();
                 return;
             } else if(statusList.getSelected()!=null){
                 Status selectedStatus = statusList.getSelected();
