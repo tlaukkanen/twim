@@ -20,7 +20,6 @@
 package com.substanceofcode.twitter.views;
 
 import com.substanceofcode.utils.TimeUtil;
-import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
@@ -31,6 +30,7 @@ import javax.microedition.lcdui.Graphics;
 public class Menu {
 
     private String[] labels;
+    private MenuAction[] actions;
     private int screenWidth;
     private int screenHeight;
     private int top;
@@ -54,10 +54,11 @@ public class Menu {
      * @param screenWidth 
      * @param screenHeight 
      */
-    public Menu(String[] labels, int screenWidth, int screenHeight) {
+    public Menu(String[] labels, MenuAction[] actions, int screenWidth, int screenHeight) {
         this.labels = labels;
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
+        this.actions = actions;
         selectedIndex = 0;
         active = false;
         title = "Menu";
@@ -165,6 +166,12 @@ public class Menu {
     public void activate() {
         active = true;
         selectedIndex = 0;
+    }
+
+    public void activateSelected() {
+        if(actions!=null) {
+            actions[ getSelectedIndex() ].activate();
+        }
     }
     
     public void deactivate() {

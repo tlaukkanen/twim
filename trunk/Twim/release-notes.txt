@@ -9,6 +9,11 @@ Tommi Laukkanen
 
 Release Notes:
 
+v1.13 (June 27th, 2009)
++ Mobypicture support
++ Video upload support
++ Minimize feature
+
 v1.12 (May 10th, 2009)
 + yfrog support
 + Favorites support

@@ -32,6 +32,11 @@ import javax.microedition.io.file.FileConnection;
 public class MediaFileSelect implements FileSelect {
 
     private String path;
+    private boolean isPhoto;
+
+    public MediaFileSelect(boolean isPhoto) {
+        this.isPhoto = isPhoto;
+    }
 
     public void select(String path) {
         try {
@@ -39,13 +44,27 @@ public class MediaFileSelect implements FileSelect {
             FileConnection fc = (FileConnection) Connector.open(path);
             int size = (int) fc.fileSize();
             if(size<=0) {
-                TwitterController.getInstance().showError("Can't send selected media file. File size is 0 bytes.");
+                TwitterController.getInstance().showError("Can't send selected media file. File size is 0 bytes. " + path);
                 return;
             }
+
+            String filename;
+            int lastSeparatorIndex = path.lastIndexOf('\\');
+            if(lastSeparatorIndex>0) {
+                filename = path.substring(lastSeparatorIndex+1);
+            } else {
+                lastSeparatorIndex = path.lastIndexOf('/');
+                if(lastSeparatorIndex>0) {
+                    filename = path.substring(lastSeparatorIndex+1);
+                } else {
+                    filename = path;
+                }
+            }
+
             byte[] mediaData = new byte[size];
             DataInputStream dis = fc.openDataInputStream();
             dis.readFully(mediaData);
-            TwitterController.getInstance().commentMedia(mediaData);
+            TwitterController.getInstance().showMediaService(mediaData, isPhoto, filename);
         } catch (IOException ex) {
             TwitterController.getInstance().showError("Error: " + ex.toString() + " " + ex.getMessage());
         }

@@ -6,31 +6,31 @@
 package com.substanceofcode.twitter.tasks;
 
 import com.substanceofcode.tasks.AbstractTask;
-import com.substanceofcode.twitter.PhotoService;
 import com.substanceofcode.twitter.TwitterController;
+import com.substanceofcode.twitter.VideoService;
 import com.substanceofcode.twitter.model.Status;
 
 /**
  *
  * @author tommi
  */
-public class SendPhotoTask extends AbstractTask {
+public class SendVideoTask extends AbstractTask {
 
-    byte[] photo;
+    byte[] video;
     String comment;
     String username;
     String password;
-    PhotoService service;
+    VideoService service;
     String filename;
 
-    public SendPhotoTask(
+    public SendVideoTask(
             byte[] photo,
-            String comment, 
-            String username, 
+            String comment,
+            String username,
             String password,
-            PhotoService service,
+            VideoService service,
             String filename) {
-        this.photo = photo;
+        this.video = photo;
         this.comment = comment;
         this.username = username;
         this.password = password;
@@ -41,12 +41,7 @@ public class SendPhotoTask extends AbstractTask {
     public void doTask() {
         TwitterController controller = TwitterController.getInstance();
         try {
-            Status stat = service.sendPhoto(
-                    photo,
-                    comment,
-                    username,
-                    password,
-                    filename);
+            Status stat = service.sendVideo(video, comment, username, password, filename);
             controller.addStatus(stat);
             controller.showTimeline();
             //controller.showRecentTimeline();

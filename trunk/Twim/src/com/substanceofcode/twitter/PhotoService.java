@@ -20,6 +20,7 @@ public interface PhotoService {
             byte[] photo,
             String comment,
             String username,
-            String password) throws IOException, Exception;
+            String password,
+            String filename) throws IOException, Exception;
 
 }
