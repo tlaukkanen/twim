@@ -42,18 +42,19 @@ public class FileBrowserCanvas extends Canvas implements FileSystemListener {
     private Menu fileMenu;
     private String folder;
     private Vector rootFolders;
-    private boolean showRoot;
     private FileSelect fileSelect;
-    String status;
+    private String status;
+    private String lastFolder;
 
     public FileBrowserCanvas(FileSelect select) {
         setFullScreenMode(true);
         width = getWidth();
         height = getHeight();
         folder = "";
+        lastFolder = "";
         status = "Please wait";
         this.fileSelect = select;
-        fileMenu = new Menu(null, width, height);
+        fileMenu = new Menu(null, null, width, height);
         fileMenu.alignLeft(true);
         FileSystemRegistry.addFileSystemListener(this);
         rootFolders = new Vector();
@@ -66,7 +67,6 @@ public class FileBrowserCanvas extends Canvas implements FileSystemListener {
             String root = (String)roots.nextElement();
             rootFolders.addElement(root);
         }
-        showRoot = true;
         String[] folders = new String[ rootFolders.size() ];
         for(int i=0; i<rootFolders.size(); i++) {
             folders[i] = (String)rootFolders.elementAt(i);
@@ -76,6 +76,10 @@ public class FileBrowserCanvas extends Canvas implements FileSystemListener {
         fileMenu.activate();
         status = "Roots: " + folders.length;
         repaint();
+    }
+
+    public void resetToLastFolder() {
+        folder = lastFolder;
     }
 
     public void showRoots() {
@@ -176,14 +180,13 @@ public class FileBrowserCanvas extends Canvas implements FileSystemListener {
             String path = (String)items.nextElement();
             rootFolders.addElement(path);
         }
-        showRoot = false;
         String[] folders = new String[ rootFolders.size()+1 ];
         folders[0] = "..";
         for(int i=0; i<rootFolders.size(); i++) {
             folders[i+1] = (String)rootFolders.elementAt(i);
         }
         fileMenu.setLabels(folders);
-        fileMenu.setTitle("Select photo");
+        fileMenu.setTitle("Select file");
     }
 
     private void selectFileEntry() {
@@ -203,12 +206,13 @@ public class FileBrowserCanvas extends Canvas implements FileSystemListener {
                     }
                 }
             } else if(folder.endsWith(label)==false) {
+                // TODO: Check if folder is already a file path
                 folder += label;
             }
             FileConnection fc = (FileConnection) Connector.open("file:///" + folder);
             if(fc.isDirectory()) {
                 /** move to directory */
-                
+                lastFolder = folder;
                 browseToDirectory(fc);
                 repaint();
             } else {

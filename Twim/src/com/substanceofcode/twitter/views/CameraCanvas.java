@@ -94,7 +94,7 @@ public class CameraCanvas extends Canvas {
                 // Take photo
                 exit = true;
                 byte[] image = videoControl.getSnapshot(null);
-                controller.commentMedia(image);
+                controller.showMediaService(image, true, "photo.jpg");
                 return;
             } else if( keyName.indexOf("SOFT")>=0) {
                 // Cancel

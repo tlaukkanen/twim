@@ -17,8 +17,9 @@
  * limitations under the License.
  */
 
-package com.substanceofcode.twitter;
+package com.substanceofcode.twitter.services;
 
+import com.substanceofcode.twitter.*;
 import com.substanceofcode.twitter.model.Status;
 import com.substanceofcode.utils.CustomInputStream;
 import com.substanceofcode.utils.XmlParser;
@@ -59,7 +60,8 @@ public class TwitPic implements PhotoService {
             byte[] photo,
             String comment,
             String username,
-            String password) throws IOException, Exception {
+            String password,
+            String filename) throws IOException, Exception {
         HttpConnection connection = null;
         try {
             connection = (HttpConnection) Connector.open(TWIT_PIC_URL);

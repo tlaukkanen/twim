@@ -30,27 +30,29 @@ import javax.microedition.lcdui.TextField;
  * Comment form for photo
  * @author Tommi Laukkanen
  */
-public class PhotoCommentForm extends TextBox implements CommandListener {
+public class MediaCommentForm extends TextBox implements CommandListener {
 
     private Command sendCommand;
     private Command cancelCommand;
     private byte[] media;
+    private String filename;
 
-    public PhotoCommentForm(byte[] photo) {
+    public MediaCommentForm(byte[] media, String filename) {
         super("Comment","", 124, TextField.ANY);
         sendCommand = new Command("Send", Command.SCREEN, 1);
         addCommand(sendCommand);
         cancelCommand = new Command("Cancel", Command.CANCEL, 2);
         addCommand(cancelCommand);
         setCommandListener(this);
-        this.media = photo;
+        this.media = media;
+        this.filename = filename;
     }
 
     public void commandAction(Command c, Displayable d) {
         TwitterController controller = TwitterController.getInstance();
         if(c==sendCommand) {
             String comment = this.getString();
-            controller.sendMedia(comment, media);
+            controller.sendMedia(comment, filename, media);
         } else if(c==cancelCommand) {
             controller.showTimeline();
         }

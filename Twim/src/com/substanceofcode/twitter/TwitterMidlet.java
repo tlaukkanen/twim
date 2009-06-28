@@ -19,6 +19,7 @@
 
 package com.substanceofcode.twitter;
 
+import com.substanceofcode.twitter.TwitterController;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 

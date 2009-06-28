@@ -19,7 +19,10 @@
 
 package com.substanceofcode.twitter;
 
-import com.substanceofcode.twitter.model.FileSelect;
+import com.substanceofcode.twitter.*;
+import com.substanceofcode.twitter.services.Twitgoo;
+import com.substanceofcode.twitter.services.TwitPic;
+import com.substanceofcode.twitter.services.YfrogService;
 import com.substanceofcode.twitter.model.MediaFileSelect;
 import com.substanceofcode.twitter.model.Status;
 import com.substanceofcode.twitter.model.User;
@@ -32,11 +35,13 @@ import com.substanceofcode.twitter.views.AboutCanvas;
 import com.substanceofcode.twitter.views.CameraCanvas;
 import com.substanceofcode.twitter.views.FileBrowserCanvas;
 import com.substanceofcode.twitter.views.LoginForm;
-import com.substanceofcode.twitter.views.PhotoCommentForm;
+import com.substanceofcode.twitter.views.MediaCommentForm;
 import com.substanceofcode.twitter.views.SplashCanvas;
 import com.substanceofcode.twitter.views.TimelineCanvas;
 import com.substanceofcode.twitter.views.UpdateStatusTextBox;
 import com.substanceofcode.twitter.views.WaitCanvas;
+import com.substanceofcode.twitter.views.menus.PhotoServicesMenu;
+import com.substanceofcode.twitter.views.menus.VideoServicesMenu;
 import com.substanceofcode.utils.Log;
 import java.io.IOException;
 import java.util.Calendar;
@@ -45,7 +50,6 @@ import java.util.Vector;
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
-import javax.microedition.media.MediaException;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.rms.RecordStoreException;
 
@@ -62,6 +66,7 @@ public class TwitterController {
     Settings settings;
     TimelineCanvas timeline;
     PhotoService activePhotoService;
+    VideoService activeVideoService;
     FileBrowserCanvas fileBrowser;
 
     Vector publicTimeline;
@@ -164,16 +169,41 @@ public class TwitterController {
         showEmptyTimeline();
     }
 
-    public void commentMedia(byte[] photo) {
-        PhotoCommentForm commentForm = new PhotoCommentForm(photo);
+    public void commentMedia(byte[] media, String filename) {
+        MediaCommentForm commentForm = new MediaCommentForm(media, filename);
         display.setCurrent(commentForm);
+    }
+
+    public void minimize() {
+        display.setCurrent(null);
+    }
+
+    public void setPhotoService(PhotoService service) {
+        this.activePhotoService = service;
+        this.activeVideoService = null;
+    }
+
+    public void setVideoService(VideoService service) {
+        this.activeVideoService = service;
+        this.activePhotoService = null;
+    }
+
+    public void showMediaService(byte[] mediaData, boolean isPhoto, String filename) {
+        if(isPhoto) {
+            PhotoServicesMenu servicesMenu = new PhotoServicesMenu(mediaData, filename);
+            display.setCurrent(servicesMenu);
+        } else {
+            VideoServicesMenu servicesMenu = new VideoServicesMenu(mediaData, filename);
+            display.setCurrent(servicesMenu);
+        }
     }
 
     public void showVideoBrowser() {
         if(fileBrowser==null) {
-            fileBrowser = new FileBrowserCanvas(new MediaFileSelect());
+            fileBrowser = new FileBrowserCanvas(new MediaFileSelect(false));
             fileBrowser.showRoots();
         }
+        fileBrowser.resetToLastFolder();
         display.setCurrent(fileBrowser);
     }
 
@@ -188,21 +218,13 @@ public class TwitterController {
         display.setCurrent(wait);
     }
 
-    public void sendMedia(String comment, byte[] photo) {
+    public void sendMedia(String comment, String filename, byte[] media) {
         String username = api.getUsername();
         String password = api.getPassword();
-        SendPhotoTask task = new SendPhotoTask(photo, comment, username, password, activePhotoService);
+        SendPhotoTask task = new SendPhotoTask(media, comment, username, password, activePhotoService, filename);
         WaitCanvas wait = new WaitCanvas(this, task);
-        wait.setWaitText("Sending photo...");
+        wait.setWaitText("Sending...");
         display.setCurrent(wait);
-    }
-
-    public void setTwitgooAsCurrentPhotoService() {
-        this.activePhotoService = (PhotoService) Twitgoo.getInstance();
-    }
-
-    public void setTwitPicAsCurrentPhotoService() {
-        this.activePhotoService = TwitPic.getInstance();
     }
 
     public void setPublicTimeline(Vector publicTimeline) {
@@ -223,11 +245,6 @@ public class TwitterController {
 
     public void setFriendsStatuses(Vector friendStatuses) {
         this.friendsStatuses = friendStatuses;
-    }
-
-    /** Set yfrog service as current photo service */
-    public void setYfrogAsCurrentPhotoService() {
-        this.activePhotoService = (PhotoService) YfrogService.getInstance();
     }
 
     public void showCamera() {
@@ -257,9 +274,10 @@ public class TwitterController {
 
     public void showPhotoBrowser() {
         if(fileBrowser==null) {
-            fileBrowser = new FileBrowserCanvas(new MediaFileSelect());
+            fileBrowser = new FileBrowserCanvas(new MediaFileSelect(true));
             fileBrowser.showRoots();
         }
+        fileBrowser.resetToLastFolder();
         display.setCurrent(fileBrowser);
     }
 

@@ -39,8 +39,6 @@ public class TimelineCanvas extends Canvas {
     private TabBar menuBar;
     private Menu menu;
     private Menu statusMenu;
-    private Menu photoServiceMenu;
-    private Menu videoServiceMenu;
     private Menu mediaSourceMenu;
     private int verticalScroll;
     
@@ -58,26 +56,18 @@ public class TimelineCanvas extends Canvas {
         
         /** Menu */
         String[] menuLabels = {"Update status", "Send media",
-            "Reload tweets", "Settings", "About", "Exit", "Cancel"};
-        menu = new Menu(menuLabels, getWidth(), getHeight());
+            "Reload tweets", "Settings", "About", "Exit", "Minimize"};
+        menu = new Menu(menuLabels, null, getWidth(), getHeight());
 
         /** Photo source */
         String[] photoSourceLabels = {"Camera", "Photo from file", "Video from file" };
-        mediaSourceMenu = new Menu(photoSourceLabels, getWidth(), getHeight());
+        mediaSourceMenu = new Menu(photoSourceLabels, null, getWidth(), getHeight());
         mediaSourceMenu.setTitle("Select source");
-
-        String[] photoServiceLabels = {"Twitgoo", "TwitPic", "yFrog", "Cancel"};
-        photoServiceMenu = new Menu(photoServiceLabels, getWidth(), getHeight());
-        photoServiceMenu.setTitle("Select photo service");
-
-        String[] videoServiceLabels = {"yFrog"};
-        videoServiceMenu = new Menu(videoServiceLabels, getWidth(), getHeight());
-        videoServiceMenu.setTitle("Select video service");
 
         /** Status menu */
         String[] statusMenuLabels = {"Open in browser", "Open link in browser",
             "Reply", "Retweet", "Mark as favorite", "Send direct message", "Cancel"};
-        statusMenu = new Menu(statusMenuLabels, getWidth(), getHeight());
+        statusMenu = new Menu(statusMenuLabels, null, getWidth(), getHeight());
         statusMenu.setTitle("Status menu");
 
         /** Status list control */
@@ -100,7 +90,6 @@ public class TimelineCanvas extends Canvas {
 
         if( menu.isActive()==false &&
                 statusMenu.isActive()==false &&
-                photoServiceMenu.isActive()==false &&
                 mediaSourceMenu.isActive()==false) {
             boolean drawSelectionBox = menuBar.isSelectedActive();
             statusList.draw(
@@ -112,16 +101,9 @@ public class TimelineCanvas extends Canvas {
             menu.draw(g);
         } else if(statusMenu.isActive()) {
             statusMenu.draw(g);
-        } else if(photoServiceMenu.isActive()) {
-            photoServiceMenu.draw(g);
         } else if(mediaSourceMenu.isActive()) {
             mediaSourceMenu.draw(g);
-        } else if(videoServiceMenu.isActive()) {
-            videoServiceMenu.draw(g);
         }
-    }
-
-    private void activateVideoServiceMenuItem() {
     }
 
     private void handleTabChange() {
@@ -165,8 +147,6 @@ public class TimelineCanvas extends Canvas {
                 menu.selectPrevious();
             } else if(statusMenu.isActive()) {
                 statusMenu.selectPrevious();
-            } else if(photoServiceMenu.isActive()) {
-                photoServiceMenu.selectPrevious();
             } else if(mediaSourceMenu.isActive()) {
                 mediaSourceMenu.selectPrevious();
             } else {
@@ -181,8 +161,6 @@ public class TimelineCanvas extends Canvas {
                 menu.selectNext();
             } else if(statusMenu.isActive()) {
                 statusMenu.selectNext();
-            } else if(photoServiceMenu.isActive()) {
-                photoServiceMenu.selectNext();
             } else if(mediaSourceMenu.isActive()) {
                 mediaSourceMenu.selectNext();
             } else {
@@ -210,40 +188,8 @@ public class TimelineCanvas extends Canvas {
         } else if(selectedIndex==5) {
             controller.exit();
         } else if(selectedIndex==6) {
-            /** Cancel = Do nothing */
-            repaint();
+            controller.minimize();
         }
-    }
-
-    public void activatePhotoServiceMenuIten() {
-        int selectedIndex = photoServiceMenu.getSelectedIndex();
-        switch(selectedIndex) {
-            case(0):
-                /** Twitgoo */
-                controller.setTwitgooAsCurrentPhotoService();
-                mediaSourceMenu.activate();
-                repaint();
-                break;
-            case(1):
-                /** TinyPic */
-                controller.setTwitPicAsCurrentPhotoService();
-                mediaSourceMenu.activate();
-                repaint();
-                break;
-            case(2):
-                /** yfrog */
-                controller.setYfrogAsCurrentPhotoService();
-                mediaSourceMenu.activate();
-                repaint();
-                break;
-            case(3):
-                /** Cancel */
-                menu.activate();
-                repaint();
-                break;
-            default:
-        }
-        photoServiceMenu.deactivate();
     }
 
     public void activateMediaSourceMenuItem() {
@@ -333,14 +279,6 @@ public class TimelineCanvas extends Canvas {
             } else if(statusMenu.isActive()) {
                 statusMenu.deactivate();
                 activateStatusMenuItem();
-                return;
-            } else if(photoServiceMenu.isActive()) {
-                photoServiceMenu.deactivate();
-                activatePhotoServiceMenuIten();
-                return;
-            } else if(videoServiceMenu.isActive()) {
-                videoServiceMenu.deactivate();
-                activateVideoServiceMenuItem();
                 return;
             } else if(mediaSourceMenu.isActive()) {
                 mediaSourceMenu.deactivate();
