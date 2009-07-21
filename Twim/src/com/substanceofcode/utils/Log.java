@@ -37,7 +37,7 @@ public class Log {
     }
     
     public static void debug(String entry) {
-        //System.out.println(entry);
+        System.out.println(entry);
         errors += entry + "\r\n";
     }
     

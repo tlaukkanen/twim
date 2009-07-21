@@ -40,10 +40,8 @@ public class TalkBalloon {
     
     /** Create new instanc of TalkBalloon. */
     public TalkBalloon(int screenWidth, int screenHeight) {
-        this.screenWidth = screenWidth;
-        this.screenHeight = screenHeight;
         this.fontHeight = textFont.getHeight();
-        this.textWidth = screenWidth-fontHeight*3;
+        setSize(screenWidth, screenHeight);
     }
 
     public int draw(Graphics g, String text, String talkerText, int y) {
@@ -117,6 +115,12 @@ public class TalkBalloon {
         g.drawString(talkerText, x+triSize * 4 + 2, textRow + fontHeight/2 + 2, Graphics.LEFT|Graphics.BOTTOM);
         
         return (int)((textLines.length)*fontHeight + fontHeight*2 + 1);
+    }
+
+    void setSize(int width, int height) {
+        this.screenWidth = width;
+        this.screenHeight = height;
+        this.textWidth = screenWidth-fontHeight*3;
     }
     
 }

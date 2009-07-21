@@ -84,5 +84,14 @@ public class Device {
             return "Unknown";
         }
     }
+
+    private static boolean isTouch = false;
+
+    public static boolean isTouch() {
+        return isTouch;
+    }
+    public static void setTouch(boolean isTouch) {
+        Device.isTouch = isTouch;
+    }
     
 }

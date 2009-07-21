@@ -80,6 +80,10 @@ public class TabBar {
         activeTabIndex = selectedTabIndex;
     }
 
+    public void selectNothing() {
+        selectedTabIndex = -1;
+    }
+
     public void resetSelectedTab() {
         selectedTabIndex = activeTabIndex;
     }
@@ -156,6 +160,12 @@ public class TabBar {
             g.drawString(tabLabel, col+1, y+labelFont.getHeight()+2, Graphics.LEFT|Graphics.BOTTOM);
 
             col += tabWidth+1;
+        }
+    }
+
+    void selectTab(int selectedTabIndex) {
+        if(selectedTabIndex>=0 && selectedTabIndex<menuLabels.length) {
+            this.selectedTabIndex = selectedTabIndex;
         }
     }
     

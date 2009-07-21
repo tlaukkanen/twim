@@ -79,7 +79,7 @@ public class HttpUtil extends HttpAbstractUtil {
                 hc.setRequestProperty("Cookie", cookie);
             }
 
-            if (username.length() > 0) {
+            if (username!=null && username.length() > 0) {
                 /**
                  * Add authentication header in HTTP request. Basic authentication
                  * should be formatted like this:

@@ -120,7 +120,8 @@ public class XmlParser {
             }
         }
         
-        if( currentElementData.charAt( currentElementData.length()-2 )=='/' &&
+        if( currentElementData.length()>2 &&
+            currentElementData.charAt( currentElementData.length()-2 )=='/' &&
             currentElementData.charAt( currentElementData.length()-1 )=='>' ) {
             currentElementContainsText = false;
         } else {
@@ -153,7 +154,7 @@ public class XmlParser {
     
     /** Get element text including inner xml */
     public String getText() throws IOException {
-        Log.debug("Getting text for element '" + currentElementName + "'");
+        //Log.debug("Getting text for element '" + currentElementName + "'");
         if(currentElementContainsText==false) {
             return "";
         }
@@ -267,7 +268,7 @@ public class XmlParser {
             int entityEnd = text.indexOf(";",entityStart);
             if(entityStart>=0 && entityEnd>0) {
                 String character = text.substring(entityStart+2, entityEnd);
-                System.out.print("char:" + character);
+                //System.out.print("char:" + character);
                 try {
                     int charValue = 0;
                     charValue = Integer.parseInt(character);

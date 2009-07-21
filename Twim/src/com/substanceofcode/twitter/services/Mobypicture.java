@@ -38,7 +38,7 @@ import javax.microedition.io.HttpConnection;
 public class Mobypicture implements PhotoService, VideoService {
 
     private final static String MOBYPICTURE_URL = "http://api.mobypicture.com/";
-    private final static String MOBYPICTURE_DEV_KEY = "CANTPUTTHISTOSVN";
+    private final static String MOBYPICTURE_DEV_KEY = "cOWRTeoxvFKJipTY";
     private static String response = "";
     private static Mobypicture instance;
 

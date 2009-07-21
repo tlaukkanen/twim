@@ -60,8 +60,11 @@ public class TimeUtil {
         long hours = intervalSeconds / 3600L;
         long minutes = (intervalSeconds % 3600L) / 60L;
         long days = hours / 24L;
-        
+
+        //Log.debug("Secs: " + intervalSeconds);
+
         if(days>1) {
+
             return String.valueOf(days) + " days";
         }        
         else if(hours>0) {

@@ -9,6 +9,10 @@ Tommi Laukkanen
 
 Release Notes:
 
+v1.14 (July xx, 20099
++ Follow/Unfollow
++ Search
+
 v1.13 (June 27th, 2009)
 + Mobypicture support
 + Video upload support

@@ -39,7 +39,7 @@ public class AboutCanvas extends Canvas {
         this.setFullScreenMode(true);
         this.controller = controller;
         texts = new String[3];
-        texts[0] = "Twim v1.13";
+        texts[0] = "Twim v1.14";
         texts[1] = "Copyright 2009 Tommi Laukkanen (www.substanceofcode.com)";
         texts[2] = HttpTransferStatus.getTotalBytesTransfered() + 
                    " bytes transferred since startup.";
@@ -65,5 +65,11 @@ public class AboutCanvas extends Canvas {
     public void keyPressed(int keyCode) {
         controller.showRecentTimeline();
     }
+
+    protected void pointerReleased(int arg0, int arg1) {
+        controller.showRecentTimeline();
+    }
+
+
     
 }

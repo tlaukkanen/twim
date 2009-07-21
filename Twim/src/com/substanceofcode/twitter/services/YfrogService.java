@@ -38,7 +38,7 @@ import javax.microedition.io.HttpConnection;
 public class YfrogService implements PhotoService, VideoService {
 
     private final static String YFROG_API_URL = "http://yfrog.com/api/uploadAndPost";
-    private final static String YFROG_API_KEY = "CANT_PUT_THIS_TO_SVN";
+    private final static String YFROG_API_KEY = "LRA80GZ3bf0c617825eabb9733216094db19312c";
     private static String response = "";
 
     private static YfrogService instance;

@@ -19,6 +19,7 @@
 
 package com.substanceofcode.twitter.views;
 
+import com.substanceofcode.infrastructure.Device;
 import com.substanceofcode.twitter.Settings;
 import com.substanceofcode.twitter.TwitterController;
 import com.substanceofcode.utils.ImageUtil;
@@ -79,7 +80,18 @@ public class SplashCanvas extends Canvas implements Runnable {
     protected void keyPressed(int keyCode) {
         showNextView();
     }
-    
+
+    /**
+     * Handle touchscreen press
+     * @param x coordinate
+     * @param y coordinate
+     */
+    protected void pointerPressed(int x, int y) {
+        /** Activate touch screen support */
+        Device.setTouch(true);
+        showNextView();
+    }
+
     private void showNextView() {
         Settings settings = controller.getSettings();
         String username = settings.getStringProperty(Settings.USERNAME, "");

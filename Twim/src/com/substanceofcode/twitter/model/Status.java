@@ -18,6 +18,7 @@
  */
 package com.substanceofcode.twitter.model;
 
+import com.substanceofcode.utils.Log;
 import com.substanceofcode.utils.StringUtil;
 import java.util.Date;
 import javax.microedition.io.ConnectionNotFoundException;
@@ -38,6 +39,7 @@ public class Status {
     private String inReplyToId;
     private boolean isDirect;
     private boolean isFavorite;
+    private boolean isFollowing;
     /** For optimizations */
     private int height;
     private String[] textLines;
@@ -50,11 +52,25 @@ public class Status {
     public Status(String screenName, String statusText, Date date, String id) {
         this.screenName = screenName;
         this.statusText = statusText;
-        this.date = date;
+        if(date!=null) {
+            this.date = date;
+        } else {
+            this.date = new Date(System.currentTimeMillis());
+        }
         this.height = 0;
         this.id = id;
         this.isDirect = false;
         this.isFavorite = false;
+
+        Log.debug("Date: " + date);
+    }
+
+    public void setFollowing(boolean isFollowing) {
+        this.isFollowing = isFollowing;
+    }
+
+    public boolean isFollowing() {
+        return isFollowing;
     }
 
     public void setInReplyToId(String replyToId) {
