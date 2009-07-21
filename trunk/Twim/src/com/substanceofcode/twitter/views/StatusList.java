@@ -105,5 +105,11 @@ public class StatusList {
     public Status getSelected() {
         return selectedStatus;
     }
+
+    void setSize(int width, int height) {
+        this.screenWidth = width;
+        this.screenHeight = height;
+        talkBalloon.setSize(width,height);
+    }
     
 }

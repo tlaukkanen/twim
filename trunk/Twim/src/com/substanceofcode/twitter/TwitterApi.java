@@ -22,6 +22,7 @@ package com.substanceofcode.twitter;
 import com.substanceofcode.twitter.model.Status;
 import com.substanceofcode.utils.HttpUtil;
 import com.substanceofcode.utils.Log;
+import com.substanceofcode.utils.StringUtil;
 import com.substanceofcode.utils.URLUTF8Encoder;
 import java.io.IOException;
 import java.util.Calendar;
@@ -47,9 +48,34 @@ public class TwitterApi {
     private static final String FAVORITE_TIMELINE_URL = "http://twitter.com/favorites.xml";
     private static final String FAVORITE_CREATE_URL = "http://twitter.com/favorites/create/";
     private static final String FAVORITE_DESTROY_URL = "http://twitter.com/favorites/destroy/";
+    private static final String FRIENDSHIPS_CREATE_URL = "http://twitter.com/friendships/create/";
+    private static final String FRIENDSHIPS_DESTROY_URL = "http://twitter.com/friendships/destroy/";
+    private static final String SEARCH_URL = "http://search.twitter.com/search.atom?q=";
 
     /** Creates a new instance of TwitterApi */
     public TwitterApi() {
+    }
+
+    public String followUser(Status status) throws Exception {
+        try {
+            NullParser parser = new NullParser();
+            String url = FRIENDSHIPS_CREATE_URL + status.getScreenName() + ".xml";
+            HttpUtil.doPost( url, parser );
+            return parser.getResponse();
+        } catch(Exception ex) {
+            throw ex;
+        }
+    }
+
+    public String unfollowUser(Status status) throws Exception {
+        try {
+            NullParser parser = new NullParser();
+            String url = FRIENDSHIPS_DESTROY_URL + status.getScreenName() + ".xml";
+            HttpUtil.doPost( url, parser );
+            return parser.getResponse();
+        } catch(Exception ex) {
+            throw ex;
+        }
     }
 
     public Status markAsFavorite(Status status) {
@@ -221,6 +247,19 @@ public class TwitterApi {
                     "0");
         }
         return null;
+    }
+
+    public Vector search(String query) throws Exception {
+        try {
+            SearchResultsParser parser = new SearchResultsParser();
+            String url = SEARCH_URL + StringUtil.urlEncode(query);
+            Log.debug("URL: " + url);
+            HttpUtil.doPost( url, parser );
+            Vector statuses = parser.getStatuses();
+            return statuses;
+        } catch(Exception ex) {
+            throw new Exception("Error while searching tweets: " + ex.getMessage());
+        }
     }
     
     

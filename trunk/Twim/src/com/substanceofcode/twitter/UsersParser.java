@@ -1,6 +1,18 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2005-2009 Tommi Laukkanen
+ * http://www.substanceofcode.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.substanceofcode.twitter;
@@ -87,6 +99,7 @@ public class UsersParser implements ResultParser {
             String id = "";
             while (xml.parse() != XmlParser.END_DOCUMENT) {
                 String elementName = xml.getName();
+                Thread.yield();
                 if(elementName.equals("text")) {
                     text = xml.getText();
                 } else if(elementName.equals("id")) {
@@ -117,6 +130,7 @@ public class UsersParser implements ResultParser {
             Status status = null;
             state = "starting parsing ";
             while (xml.parse() != XmlParser.END_DOCUMENT) {
+                Thread.yield();
                 String elementName = xml.getName();
                 if(elementName.equals("id")) {
                     state = "getting id";

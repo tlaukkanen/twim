@@ -41,7 +41,6 @@ public class WaitCanvas extends Canvas implements Runnable {
     private AbstractTask task;
     private Thread thread;
     private Font statusFont;
-    private Image loadingImage;
     private int loadingImageIndex;
     private TalkBalloon talkBalloon;
     
@@ -62,56 +61,27 @@ public class WaitCanvas extends Canvas implements Runnable {
         this.waitText = "Please wait...";
         this.task = task;
         this.talkBalloon = new TalkBalloon(getWidth(), getHeight());
-        this.loadingImage = ImageUtil.loadImage("/images/loading.png");
         loadingImageIndex = 0;
         statusFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL);
         thread = new Thread(this);
         thread.start();           
     }
     
-    protected void paint(Graphics g) {
-        // Get dimensions
-        int height = getHeight();
-        int width = getWidth();
-        
+    protected void paint(Graphics g) {  
         // Clear the background to white
         g.setColor( Theme.TWITTER_BLUE_COLOR );
-        g.fillRect( 0, 0, width, height );
+        g.fillRect( 0, 0, getWidth(), getHeight() );
         
-        /** Draw title */
-        //drawTitleBar(g);
-        
-        // Write title
-        // int titleX = width/2;
-        int titleY = height/4;
-
+        int titleY = getHeight()/4;
         talkBalloon.draw(g, waitText, "Twim", titleY);
-        
-        //g.setColor(0x000000);
-        //g.setFont(statusFont);
-        //g.drawString("Please wait...", getWidth()/2, titleY-6, Graphics.TOP|Graphics.HCENTER); 
-        
-        //g.setClip(getWidth()/2-8, titleY+titleFont.getHeight()+14,16,16);
-        //g.drawImage(loadingImage, getWidth()/2-8 - loadingImageIndex*16, titleY+titleFont.getHeight()+14, Graphics.TOP|Graphics.LEFT);
     }
-    
-    private void drawTitleBar(Graphics g) {
-        g.setColor( Theme.TWITTER_BLUE_COLOR );
-        g.fillRect( 0, 0, getWidth(), titleFont.getHeight()+2);
-        g.setFont( titleFont );
-        g.setColor( 0x000000 );
-        g.drawString("twim",getWidth()/2,titleFont.getHeight(),Graphics.HCENTER|Graphics.BOTTOM);
-    }    
 
     public void run() {
         task.execute(); 
         while(controller.getCurrentDisplay() == this) {            
             try {
-                Thread.sleep(100);
-                loadingImageIndex++;
-                if(loadingImageIndex>7) {
-                    loadingImageIndex = 0;
-                }
+                Thread.sleep(500);
+                waitText += ".";
                 this.repaint();
                 Thread.yield();
             }catch(Exception ex) {

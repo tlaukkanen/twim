@@ -27,6 +27,7 @@ import java.util.Enumeration;
 import java.util.Vector;
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
+//import javax.microedition.io.file.FileSystemListener;
 import javax.microedition.io.file.FileSystemListener;
 import javax.microedition.io.file.FileSystemRegistry;
 import javax.microedition.lcdui.Canvas;
@@ -36,7 +37,7 @@ import javax.microedition.lcdui.Graphics;
  *
  * @author Tommi Laukkanen
  */
-public class FileBrowserCanvas extends Canvas implements FileSystemListener {
+public class FileBrowserCanvas extends Canvas  {
 
     private int width, height;
     private Menu fileMenu;
@@ -56,7 +57,7 @@ public class FileBrowserCanvas extends Canvas implements FileSystemListener {
         this.fileSelect = select;
         fileMenu = new Menu(null, null, width, height);
         fileMenu.alignLeft(true);
-        FileSystemRegistry.addFileSystemListener(this);
+        //FileSystemRegistry.addFileSystemListener(this);
         rootFolders = new Vector();
     }
 
@@ -165,14 +166,6 @@ public class FileBrowserCanvas extends Canvas implements FileSystemListener {
         }
     }
 
-    public void rootChanged(int state, String rootName) {
-        if(state==FileSystemListener.ROOT_ADDED) {
-
-        } else if(state==FileSystemListener.ROOT_REMOVED) {
-            
-        }
-    }
-
     private void browseToDirectory(FileConnection fc) throws IOException {
         Enumeration items = fc.list();
         rootFolders.removeAllElements();
@@ -224,5 +217,37 @@ public class FileBrowserCanvas extends Canvas implements FileSystemListener {
                     + " " + ex.getMessage());
         }
     }
+
+
+    /**
+     * Handle touch screen press
+     * @param x coordinate
+     * @param y coordinate
+     */
+    protected void pointerPressed(int x, int y) {
+        fileMenu.selectWithPointer(x, y, true);
+        repaint();
+    }
+
+    /**
+     * Handle touch screen drag
+     * @param x coordinate
+     * @param y coordinate
+     */
+    protected void pointerDragged(int x, int y) {
+        fileMenu.selectWithPointer(x, y, false);
+        repaint();
+    }
+
+    /**
+     * Handle touch screen release
+     * @param x coordinate
+     * @param y coordinate
+     */
+    protected void pointerReleased(int x, int y) {
+        fileMenu.selectWithPointer(x, y, false);
+        selectFileEntry();
+    }
+
 
 }

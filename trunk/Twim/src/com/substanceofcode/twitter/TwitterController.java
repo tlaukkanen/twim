@@ -19,23 +19,23 @@
 
 package com.substanceofcode.twitter;
 
-import com.substanceofcode.twitter.*;
-import com.substanceofcode.twitter.services.Twitgoo;
-import com.substanceofcode.twitter.services.TwitPic;
-import com.substanceofcode.twitter.services.YfrogService;
+import com.substanceofcode.infrastructure.Device;
 import com.substanceofcode.twitter.model.MediaFileSelect;
 import com.substanceofcode.twitter.model.Status;
 import com.substanceofcode.twitter.model.User;
 import com.substanceofcode.twitter.tasks.ToggleFavoriteTask;
 import com.substanceofcode.twitter.tasks.RequestFriendsTask;
 import com.substanceofcode.twitter.tasks.RequestTimelineTask;
+import com.substanceofcode.twitter.tasks.SearchTask;
 import com.substanceofcode.twitter.tasks.SendPhotoTask;
+import com.substanceofcode.twitter.tasks.ToggleFollowingTask;
 import com.substanceofcode.twitter.tasks.UpdateStatusTask;
 import com.substanceofcode.twitter.views.AboutCanvas;
 import com.substanceofcode.twitter.views.CameraCanvas;
 import com.substanceofcode.twitter.views.FileBrowserCanvas;
 import com.substanceofcode.twitter.views.LoginForm;
 import com.substanceofcode.twitter.views.MediaCommentForm;
+import com.substanceofcode.twitter.views.SearchTextBox;
 import com.substanceofcode.twitter.views.SplashCanvas;
 import com.substanceofcode.twitter.views.TimelineCanvas;
 import com.substanceofcode.twitter.views.UpdateStatusTextBox;
@@ -273,12 +273,16 @@ public class TwitterController {
     }
 
     public void showPhotoBrowser() {
-        if(fileBrowser==null) {
-            fileBrowser = new FileBrowserCanvas(new MediaFileSelect(true));
-            fileBrowser.showRoots();
+        try {
+            if(fileBrowser==null) {
+                fileBrowser = new FileBrowserCanvas(new MediaFileSelect(true));
+                fileBrowser.showRoots();
+            }
+            fileBrowser.resetToLastFolder();
+            display.setCurrent(fileBrowser);
+        } catch(Exception ex) {
+            showError("Can't show photo browser due to an error. Your phone probably doesn't support File Connection API calls. Err: " + ex.getMessage() );
         }
-        fileBrowser.resetToLastFolder();
-        display.setCurrent(fileBrowser);
     }
 
     /** Show friends */
@@ -361,6 +365,20 @@ public class TwitterController {
     public void showStatusView(String prefix) {
         UpdateStatusTextBox statusView = new UpdateStatusTextBox(this, prefix);
         display.setCurrent(statusView);
+    }
+
+    public void toggleFollow(Status status) {
+        ToggleFollowingTask task = new ToggleFollowingTask(this, api, status);
+        WaitCanvas wait = new WaitCanvas(this, task);
+
+        String waitText = "";
+        if(status.isFollowing()) {
+            waitText = "Unfollow";
+        } else {
+            waitText = "Follow";
+        }
+        wait.setWaitText(waitText + " " + status.getScreenName() + "...");
+        display.setCurrent(wait);
     }
 
     /** 
@@ -449,6 +467,7 @@ public class TwitterController {
     /** Show current timeline */
     public void showTimeline() {
         timeline.resetScrolling();
+        timeline.resetMenus();
         display.setCurrent(timeline);
     }
 
@@ -467,6 +486,9 @@ public class TwitterController {
                 Calendar.getInstance().getTime(),
                 "0")
             );
+        if(Device.isTouch()) {
+            timeline.resetMenuTab();
+        }
         timeline.setTimeline(empty);
         display.setCurrent(timeline);
     }
@@ -483,6 +505,26 @@ public class TwitterController {
                 favouriteTimeline.removeElement(stat);
             }
         }
+    }
+
+    public void showSearchForm() {
+        SearchTextBox searchBox = new SearchTextBox();
+        display.setCurrent(searchBox);
+    }
+
+    public void search(String query) {
+        SearchTask task = new SearchTask(query, api);
+        WaitCanvas wait = new WaitCanvas(this, task);
+        wait.setWaitText("Searching...");
+        display.setCurrent(wait);
+    }
+
+    public void showTweets(Vector results, String string) {
+        timeline.setTimeline(results);
+        timeline.resetScrolling();
+        timeline.resetMenuTab();
+        //timeline.
+        display.setCurrent(timeline);
     }
 
 }

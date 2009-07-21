@@ -22,9 +22,12 @@ package com.substanceofcode.twitter.views;
 import com.substanceofcode.infrastructure.Device;
 import com.substanceofcode.twitter.TwitterController;
 import com.substanceofcode.twitter.model.Status;
+import com.substanceofcode.utils.Log;
 import java.util.Vector;
 import javax.microedition.lcdui.Canvas;
+import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
+import javax.microedition.lcdui.game.GameCanvas;
 
 /**
  * TimelineCanvas
@@ -41,6 +44,12 @@ public class TimelineCanvas extends Canvas {
     private Menu statusMenu;
     private Menu mediaSourceMenu;
     private int verticalScroll;
+    private Point pointerPressedPoint = new Point(0, 0);
+    private int lastY; /** Last touch coordinates */
+    private int screenWidth; /** Screen width to identify the screen rotation */
+    private String debug = "x";
+    private int boxWidth = 20, boxHeight = 20;
+    private static final Font LABEL_FONT = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_MEDIUM);
     
     /** 
      * Creates a new instance of TimelineCanvas
@@ -51,29 +60,61 @@ public class TimelineCanvas extends Canvas {
         setFullScreenMode(true);
         
         /** Menu bar tabs */
-        String[] labels = {"Archive", "Replies", "Recent", "Direct", "Favorites", "Friends", "Public"};
+        String[] labels = {
+            "Archive",
+            "Replies",
+            "Recent",
+            "Direct",
+            "Favorites",
+            "Friends",
+            "Public"};
         menuBar = new TabBar(2, labels, getWidth());
         
         /** Menu */
-        String[] menuLabels = {"Update status", "Send media",
-            "Reload tweets", "Settings", "About", "Exit", "Minimize"};
+        String[] menuLabels = {
+            "Update status",
+            "Send media",
+            "Reload tweets",
+            "Search tweets",
+            "Settings",
+            "About",
+            "Exit",
+            "Minimize"};
         menu = new Menu(menuLabels, null, getWidth(), getHeight());
 
         /** Photo source */
-        String[] photoSourceLabels = {"Camera", "Photo from file", "Video from file" };
+        String[] photoSourceLabels = {
+            "Camera",
+            "Photo from file",
+            "Video from file" };
         mediaSourceMenu = new Menu(photoSourceLabels, null, getWidth(), getHeight());
         mediaSourceMenu.setTitle("Select source");
 
         /** Status menu */
-        String[] statusMenuLabels = {"Open in browser", "Open link in browser",
-            "Reply", "Retweet", "Mark as favorite", "Send direct message", "Cancel"};
+        String[] statusMenuLabels = {
+            "Open in browser",
+            "Open link in browser",
+            "Reply",
+            "Retweet",
+            "Mark as favorite",
+            "Send direct message",
+            "Follow"};
         statusMenu = new Menu(statusMenuLabels, null, getWidth(), getHeight());
         statusMenu.setTitle("Status menu");
 
         /** Status list control */
         statusList = new StatusList(getWidth(), getHeight());        
+        statusList.setSize(getWidth(),getHeight());
+
         
         verticalScroll = 0;
+        screenWidth = getWidth();
+    }
+
+    public void resetMenus() {
+        menu.deactivate();
+        statusMenu.deactivate();
+        mediaSourceMenu.deactivate();
     }
 
     public void resetScrolling() {
@@ -84,7 +125,16 @@ public class TimelineCanvas extends Canvas {
         this.statuses = friendsTimeline;
     }
 
-    protected void paint(Graphics g) {
+    public void paint(Graphics g) {
+        /** Check for screen rotation change */
+        if(screenWidth != getWidth()) {
+            menu.setSize(getWidth(), getHeight());
+            statusMenu.setSize(getWidth(), getHeight());
+            mediaSourceMenu.setSize(getWidth(), getHeight());
+            statusList.setSize(getWidth(),getHeight());
+            screenWidth = getWidth();
+        }
+
         g.setColor(Theme.TWITTER_BLUE_COLOR);
         g.fillRect(0, 0, getWidth(), getHeight());
 
@@ -97,6 +147,11 @@ public class TimelineCanvas extends Canvas {
                     menuBar.getHeight() + verticalScroll + TalkBalloon.textFont.getHeight()/2,
                     drawSelectionBox);
             menuBar.draw(g, 0);
+            if(Device.isTouch()) {
+                drawMenuButton(g);
+            }
+
+
         } else if(menu.isActive()) {
             menu.draw(g);
         } else if(statusMenu.isActive()) {
@@ -104,6 +159,8 @@ public class TimelineCanvas extends Canvas {
         } else if(mediaSourceMenu.isActive()) {
             mediaSourceMenu.draw(g);
         }
+
+        //g.drawString(debug, 0, 40, Graphics.LEFT|Graphics.BOTTOM);
     }
 
     private void handleTabChange() {
@@ -140,8 +197,9 @@ public class TimelineCanvas extends Canvas {
     }
 
     private void handleUpAndDownKeys(int keyCode) {
+        Log.debug("handle up/down");
         int gameAction = this.getGameAction(keyCode);
-        if(gameAction == Canvas.UP) {
+        if(gameAction == GameCanvas.UP) {
             menuBar.resetSelectedTab();
             if(menu.isActive()) {
                 menu.selectPrevious();
@@ -155,7 +213,7 @@ public class TimelineCanvas extends Canvas {
                     verticalScroll = 0;
                 }            
             }
-        } else if(gameAction == Canvas.DOWN) {
+        } else if(gameAction == GameCanvas.DOWN) {
             menuBar.resetSelectedTab();
             if(menu.isActive()) {
                 menu.selectNext();
@@ -179,15 +237,18 @@ public class TimelineCanvas extends Canvas {
             mediaSourceMenu.activate();
             repaint();
         } else if(selectedIndex==2) {
+            /** Reload tweets */
             controller.clearTimelines();
             handleTabChange();
         } else if(selectedIndex==3) {
-            controller.showLoginForm();
+            controller.showSearchForm();
         } else if(selectedIndex==4) {
-            controller.about();
+            controller.showLoginForm();
         } else if(selectedIndex==5) {
-            controller.exit();
+            controller.about();
         } else if(selectedIndex==6) {
+            controller.exit();
+        } else if(selectedIndex==7) {
             controller.minimize();
         }
     }
@@ -245,14 +306,17 @@ public class TimelineCanvas extends Canvas {
                 controller.showStatusView("d " + selectedStatus.getScreenName() + " ");
             }
         }else if(selectedIndex==6) {
-            /** Cancel = Do nothing */
-            repaint();
+            /** Follow/Unfollow */
+            if(selectedStatus!=null) {
+                controller.toggleFollow(selectedStatus);
+            }
         }
     }
     
     public void keyPressed(int keyCode) {
         int gameAction = this.getGameAction(keyCode);
         String keyName = this.getKeyName(keyCode);
+        Log.debug("key: " + keyName);
         if(gameAction == Canvas.LEFT) {
             menuBar.selectPreviousTab();
             //handleTabChange();
@@ -263,7 +327,10 @@ public class TimelineCanvas extends Canvas {
             //handleTabChange();
             repaint();
             return;
-        } else if(gameAction == Canvas.FIRE) {
+        } else if(gameAction == Canvas.FIRE ||
+                keyName.toUpperCase().startsWith("ENTER") ||
+                (keyName.toUpperCase().startsWith("SPACE") &&
+                    (menu.isActive() || statusMenu.isActive() || mediaSourceMenu.isActive()) ) ) {
             
             if(menuBar.isSelectedActive()==false) {
                 menuBar.activateSelectedTab();
@@ -291,6 +358,11 @@ public class TimelineCanvas extends Canvas {
                 } else {
                     statusMenu.setLabel(4, "Mark as favorite");
                 }
+                if(selectedStatus.isFollowing()) {
+                    statusMenu.setLabel(6, "Unfollow user");
+                } else {
+                    statusMenu.setLabel(6, "Follow user");
+                }
                 statusMenu.activate();
             }
                 
@@ -300,9 +372,12 @@ public class TimelineCanvas extends Canvas {
             keyCode == Canvas.KEY_NUM0 ||
             keyCode == ' ') {
             /** Left soft key pressed */
-            if(menu.isActive()) {
+            if(statusMenu.isActive()) {
+                statusMenu.deactivate();
+            } else if(menu.isActive()) {
                 menu.deactivate();
-                activateMenuItem();
+                //activateMenuItem();
+                repaint();
                 return;
             } else {
                 menu.activate();
@@ -313,9 +388,12 @@ public class TimelineCanvas extends Canvas {
             keyCode == Canvas.KEY_NUM0 ||
             keyCode == ' ') {
             /** Right soft key pressed */
-            if(menu.isActive()) {
+            if(statusMenu.isActive()) {
+                statusMenu.deactivate();
+            } else if(menu.isActive()) {
                 menu.deactivate();
-                activateMenuItem();
+                //activateMenuItem();
+                repaint();
                 return;
             } else {
                 menu.activate();
@@ -324,7 +402,130 @@ public class TimelineCanvas extends Canvas {
         handleUpAndDownKeys(keyCode);
         repaint();
     }
-    
-    
+
+    /**
+     * Handle touch screen press.
+     * @param x coordinate
+     * @param y coordinate
+     */
+    protected void pointerPressed(int x, int y) {
+        super.pointerPressed(x, y);
+        Device.setTouch(true);
+        if(menu.isActive()) {
+            menu.selectWithPointer(x, y, true);
+        } else if(statusMenu.isActive()) {
+            statusMenu.selectWithPointer(x, y, true);
+        } else if(mediaSourceMenu.isActive()) {
+            mediaSourceMenu.selectWithPointer(x, y, true);
+        } else {
+            pointerPressedPoint.x = x;
+            pointerPressedPoint.y = y;
+            lastY = y;
+
+            debug = "(" + x + "," + y + ")";
+
+            if(y>getHeight()-boxHeight && x<getWidth()/2) {
+                menu.activate();
+            }
+            if(y>getHeight()-boxHeight && x>getWidth()/2) {
+                statusMenu.activate();
+            }
+        }
+        repaint();
+    }
+
+    /**
+     * Handle touch screen drag
+     * @param x coordinate
+     * @param y coordinate
+     */
+    protected void pointerDragged(int x, int y) {
+        super.pointerDragged(x, y);
+        if(menu.isActive()) {
+            menu.selectWithPointer(x, y, false);
+        } else if(statusMenu.isActive()) {
+            statusMenu.selectWithPointer(x, y, false);
+        } else if(mediaSourceMenu.isActive()) {
+            mediaSourceMenu.selectWithPointer(x, y, false);
+        } else {
+            if(y<LABEL_FONT.getHeight()*2) {
+                int tabWidth = getWidth()/7;
+                int selectedTabIndex = pointerPressedPoint.x/tabWidth;
+                menuBar.selectTab(selectedTabIndex);
+                pointerPressedPoint.x = x;
+                pointerPressedPoint.y = y;
+            } else {
+                if(lastY>0) {
+                    int dy = y - lastY;
+                    verticalScroll += dy;
+                    lastY = y;
+                }
+            }
+        }
+        repaint();
+    }
+
+    /**
+     * Handle touch screen press release event
+     * @param x coordinate
+     * @param y coordinate
+     */
+    protected void pointerReleased(int x, int y) {
+        if(menu.isActive()) {
+            menu.selectWithPointer(x, y, false);
+            if(menu.getSelectedLabel()!=null && menu.getSelectedLabel().length()>0) {
+                Log.debug("Selected menu item: " + menu.getSelectedLabel());
+                menu.deactivate();
+                activateMenuItem();
+            }
+        } else if(statusMenu.isActive()) {
+            statusMenu.selectWithPointer(x, y, false);
+            if(statusMenu.getSelectedLabel()!=null && statusMenu.getSelectedLabel().length()>0) {
+                statusMenu.deactivate();
+                activateStatusMenuItem();
+            }
+        } else if(mediaSourceMenu.isActive()) {
+            mediaSourceMenu.selectWithPointer(x, y, false);
+            if(mediaSourceMenu.getSelectedLabel()!=null && mediaSourceMenu.getSelectedLabel().length()>0) {
+                mediaSourceMenu.deactivate();
+                activateMediaSourceMenuItem();
+            }
+        } else {
+            if(!menuBar.isSelectedActive()) {
+                menuBar.activateSelectedTab();
+                handleTabChange();
+                return;
+            } else {
+
+            }
+            if(lastY>0) {
+                int dy = y - lastY;
+                verticalScroll += dy;
+                lastY = y;
+            }
+        }
+        repaint();
+    }
+
+    private void drawMenuButton(Graphics g) {
+        g.setFont(LABEL_FONT);
+        int wi = LABEL_FONT.stringWidth("Menu");
+        int wii = LABEL_FONT.stringWidth("Item");
+        int fontHeight = LABEL_FONT.getHeight();
+        boxWidth = wi + fontHeight;
+        boxHeight = fontHeight*2;
+        g.setColor(0xaaaaaa);
+        g.fillRect(0, getHeight()-boxHeight, getWidth(), boxHeight);
+        g.setColor(0x999999);
+        g.drawLine(getWidth()/2, getHeight()-boxHeight+2, getWidth()/2, getHeight()-4);
+        g.setColor(0x444444);
+        g.drawLine(0, getHeight()-boxHeight, getWidth(), getHeight()-boxHeight);
+        g.drawString("Menu", boxWidth/2-wi/2, getHeight()-boxHeight/2+fontHeight/2, Graphics.LEFT|Graphics.BOTTOM);
+        g.drawString("Item", getWidth()-boxWidth+boxWidth/2-wii/2, getHeight()-boxHeight/2+fontHeight/2, Graphics.LEFT|Graphics.BOTTOM);
+    }
+
+    public void resetMenuTab() {
+        menuBar.selectNothing();
+    }
     
 }

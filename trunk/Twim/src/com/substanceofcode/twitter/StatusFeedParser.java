@@ -70,6 +70,7 @@ public class StatusFeedParser implements ResultParser {
     </profile_image_url>
     <url>http://scobleshow.com</url>
     <protected>false</protected>
+    <following>false</following>
     </user>
     </status>
      */
@@ -87,10 +88,11 @@ public class StatusFeedParser implements ResultParser {
             boolean doSender = false;
             boolean doRecipient = false;
             boolean isFavorite = false;
+            boolean isFollowing = false;
             String inReplyToId = "";
             while (xml.parse() != XmlParser.END_DOCUMENT) {
                 String elementName = xml.getName();
-
+                Thread.yield();
                 if (elementName.equals("error")) {
                     // Parse error message
                     text = "Error from Twitter: " + xml.getText();
@@ -102,6 +104,7 @@ public class StatusFeedParser implements ResultParser {
                         Status status = new Status(screenName, text, date, id);
                         status.setDirect(isDirect);
                         status.setInReplyToId(inReplyToId);
+                        status.setFollowing(isFollowing);
                         status.setFavorite(isFavorite);
                         statuses.addElement(status);
                     }
@@ -112,6 +115,7 @@ public class StatusFeedParser implements ResultParser {
                     doSender = false;
                     doRecipient = false;
                     isFavorite = false;
+                    isFollowing = false;
                     inReplyToId = "";
 
                 } else if (elementName.equals("direct_message")) {
@@ -119,6 +123,7 @@ public class StatusFeedParser implements ResultParser {
                         Status status = new Status(screenName, text, date, id);
                         status.setDirect(isDirect);
                         status.setFavorite(isFavorite);
+                        status.setFollowing(isFollowing);
                         status.setInReplyToId(inReplyToId);
                         statuses.addElement(status);
                     }
@@ -129,6 +134,7 @@ public class StatusFeedParser implements ResultParser {
                     doSender = false;
                     doRecipient = false;
                     isFavorite = false;
+                    isFollowing = false;
                     inReplyToId = "";
                 } else if (elementName.equals("id") && id.equals("")) {
                     id = xml.getText();
@@ -156,6 +162,13 @@ public class StatusFeedParser implements ResultParser {
                         String dateString = xml.getText();
                         date = parseDate(dateString);
                     }
+                } else if (elementName.equals("following")) {
+                    String val = xml.getText();
+                    if(val.startsWith("false")) {
+                        isFollowing = false;
+                    } else {
+                        isFollowing = true;
+                    }
                 }
 
             }
@@ -163,6 +176,7 @@ public class StatusFeedParser implements ResultParser {
                 Status status = new Status(screenName, text, date, id);
                 status.setDirect(isDirect);
                 status.setFavorite(isFavorite);
+                status.setFollowing(isFollowing);
                 status.setInReplyToId(inReplyToId);
                 statuses.addElement(status);
             }
