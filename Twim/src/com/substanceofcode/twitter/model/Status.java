@@ -1,5 +1,5 @@
 /*
- * StatusEntry.java
+ * Status.java
  *
  * Copyright (C) 2005-2009 Tommi Laukkanen
  * http://www.substanceofcode.com
@@ -124,6 +124,10 @@ public class Status {
 
     public String[] getTextLines() {
         return textLines;
+    }
+
+    public void clearTextLines() {
+        textLines = null;
     }
 
     public void setHeight(int h) {

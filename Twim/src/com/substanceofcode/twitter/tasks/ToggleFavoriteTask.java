@@ -1,5 +1,5 @@
 /*
- * MarkAsFavoriteTask.java
+ * ToggleFavoriteTask.java
  *
  * Copyright (C) 2005-2009 Tommi Laukkanen
  * http://www.substanceofcode.com

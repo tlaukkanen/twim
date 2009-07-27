@@ -48,11 +48,12 @@ public class Menu {
     private int boxWidth = 32;
     private int longestLabelWidth = 10;
 
-    private static final Font TITLE_FONT = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_MEDIUM);
+    private static final Font TITLE_FONT = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL);
     private static final Font LABEL_FONT = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_MEDIUM);
     private static final int BACK_COLOR = 0xaaaaaa;
     private static final int SELECTED_COLOR = 0xffffff;
-    private static final int FONT_COLOR = 0x000000;
+    private static final int LABEL_COLOR = 0x000000;
+    private static final int TITLE_COLOR = 0x666666;
     private static final int BORDER_COLOR = 0x666666;
     
     /** Create new Menu instance 
@@ -102,9 +103,23 @@ public class Menu {
         g.drawRect(screenWidth/2 - menuWidth/2, top-2, menuWidth, height+4);
         
         /** Draw menu items */
-        g.setColor(FONT_COLOR);
         g.setFont(TITLE_FONT);
 
+        /** Draw time stamp */
+        if(!alignLeft) {
+            g.setColor(0xAAAAAA);
+            String currentTime = TimeUtil.getCurrentTime();
+            if(currentTime!=null) {
+                g.drawString(
+                        currentTime,
+                        screenWidth/2 - LABEL_FONT.stringWidth(currentTime)/2,
+                        LABEL_FONT.getHeight(),
+                        Graphics.BOTTOM|Graphics.LEFT);
+            }
+        }
+
+        /** Title */
+        g.setColor(TITLE_COLOR);
         g.drawString(
             title,
             screenWidth/2 - LABEL_FONT.stringWidth(title)/2,
@@ -112,24 +127,14 @@ public class Menu {
             Graphics.LEFT|Graphics.BOTTOM);
         g.setFont(LABEL_FONT);
 
-        /** Draw time stamp */
-        g.setColor(0xAAAAAA);
-        String currentTime = TimeUtil.getCurrentTime();
-        if(currentTime!=null) {
-            g.drawString(
-                    currentTime,
-                    screenWidth/2 - LABEL_FONT.stringWidth(currentTime)/2,
-                    LABEL_FONT.getHeight(),
-                    Graphics.BOTTOM|Graphics.LEFT);
-        }
-
-        g.setColor(FONT_COLOR);
+        /** Labels */
+        g.setColor(LABEL_COLOR);
         int col = (alignLeft ? 13 : 0 );
         for(int menuIndex=0; menuIndex<labels.length; menuIndex++) {
             if(menuIndex==selectedIndex) {
                 g.setColor(SELECTED_COLOR);
                 g.fillRect(screenWidth/2 - menuWidth/2+1, top+(menuIndex+1)*rowHeight, menuWidth-2, rowHeight);
-                g.setColor(FONT_COLOR);
+                g.setColor(LABEL_COLOR);
             }
             String label = labels[ menuIndex ];
             int labelWidth = LABEL_FONT.stringWidth(label);
@@ -228,7 +233,7 @@ public class Menu {
                     longestLabelWidth = labelWidth;
                 }
             }
-            longestLabelWidth += LABEL_FONT.getHeight();
+            longestLabelWidth += LABEL_FONT.getHeight()*2;
         }
 
         calculateSize();

@@ -1,4 +1,6 @@
 /*
+ * UserParser.java
+ *
  * Copyright (C) 2005-2009 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
@@ -20,7 +22,6 @@ package com.substanceofcode.twitter;
 import com.substanceofcode.twitter.model.Status;
 import com.substanceofcode.twitter.model.User;
 import com.substanceofcode.utils.CustomInputStream;
-import com.substanceofcode.utils.Log;
 import com.substanceofcode.utils.ResultParser;
 import com.substanceofcode.utils.XmlParser;
 import java.io.IOException;

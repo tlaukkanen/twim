@@ -23,6 +23,7 @@ import com.substanceofcode.infrastructure.Device;
 import com.substanceofcode.twitter.TwitterController;
 import com.substanceofcode.twitter.model.Status;
 import com.substanceofcode.utils.Log;
+import java.util.Enumeration;
 import java.util.Vector;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
@@ -68,7 +69,7 @@ public class TimelineCanvas extends Canvas {
             "Favorites",
             "Friends",
             "Public"};
-        menuBar = new TabBar(2, labels, getWidth());
+        menuBar = new TabBar(2, labels);
         
         /** Menu */
         String[] menuLabels = {
@@ -133,6 +134,13 @@ public class TimelineCanvas extends Canvas {
             mediaSourceMenu.setSize(getWidth(), getHeight());
             statusList.setSize(getWidth(),getHeight());
             screenWidth = getWidth();
+            if(statuses!=null) {
+                Enumeration en = statuses.elements();
+                while(en.hasMoreElements()) {
+                    Status status = (Status)en.nextElement();
+                    status.clearTextLines();
+                }
+            }
         }
 
         g.setColor(Theme.TWITTER_BLUE_COLOR);
@@ -146,7 +154,7 @@ public class TimelineCanvas extends Canvas {
                     g, statuses,
                     menuBar.getHeight() + verticalScroll + TalkBalloon.textFont.getHeight()/2,
                     drawSelectionBox);
-            menuBar.draw(g, 0);
+            menuBar.draw(g, 0, getWidth());
             if(Device.isTouch()) {
                 drawMenuButton(g);
             }

@@ -27,8 +27,6 @@ import java.util.Enumeration;
 import java.util.Vector;
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
-//import javax.microedition.io.file.FileSystemListener;
-import javax.microedition.io.file.FileSystemListener;
 import javax.microedition.io.file.FileSystemRegistry;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
@@ -57,7 +55,6 @@ public class FileBrowserCanvas extends Canvas  {
         this.fileSelect = select;
         fileMenu = new Menu(null, null, width, height);
         fileMenu.alignLeft(true);
-        //FileSystemRegistry.addFileSystemListener(this);
         rootFolders = new Vector();
     }
 
@@ -202,7 +199,7 @@ public class FileBrowserCanvas extends Canvas  {
                 // TODO: Check if folder is already a file path
                 folder += label;
             }
-            FileConnection fc = (FileConnection) Connector.open("file:///" + folder);
+            FileConnection fc = (FileConnection) Connector.open("file:///" + folder, Connector.READ);
             if(fc.isDirectory()) {
                 /** move to directory */
                 lastFolder = folder;

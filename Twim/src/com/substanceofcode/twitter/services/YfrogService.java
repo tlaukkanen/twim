@@ -1,5 +1,5 @@
 /*
- * YFrog.java
+ * YfrogService.java
  *
  * Copyright (C) 2008-2009 Tommi Laukkanen
  * http://www.substanceofcode.com

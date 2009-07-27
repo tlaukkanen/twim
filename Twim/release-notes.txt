@@ -9,9 +9,12 @@ Tommi Laukkanen
 
 Release Notes:
 
-v1.14 (July xx, 20099
+v1.14 (July xx, 2009)
 + Follow/Unfollow
 + Search
++ Experimental touch screen support
++ Twitvid video upload support
++ Improved screen rotation support
 
 v1.13 (June 27th, 2009)
 + Mobypicture support
