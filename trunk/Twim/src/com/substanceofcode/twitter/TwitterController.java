@@ -1,7 +1,7 @@
 /*
  * TwitterController.java
  *
- * Copyright (C) 2005-2008 Tommi Laukkanen
+ * Copyright (C) 2005-2009 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,7 @@
 package com.substanceofcode.twitter;
 
 import com.substanceofcode.infrastructure.Device;
+import com.substanceofcode.tasks.AbstractTask;
 import com.substanceofcode.twitter.model.MediaFileSelect;
 import com.substanceofcode.twitter.model.Status;
 import com.substanceofcode.twitter.model.User;
@@ -28,6 +29,7 @@ import com.substanceofcode.twitter.tasks.RequestFriendsTask;
 import com.substanceofcode.twitter.tasks.RequestTimelineTask;
 import com.substanceofcode.twitter.tasks.SearchTask;
 import com.substanceofcode.twitter.tasks.SendPhotoTask;
+import com.substanceofcode.twitter.tasks.SendVideoTask;
 import com.substanceofcode.twitter.tasks.ToggleFollowingTask;
 import com.substanceofcode.twitter.tasks.UpdateStatusTask;
 import com.substanceofcode.twitter.views.AboutCanvas;
@@ -221,7 +223,12 @@ public class TwitterController {
     public void sendMedia(String comment, String filename, byte[] media) {
         String username = api.getUsername();
         String password = api.getPassword();
-        SendPhotoTask task = new SendPhotoTask(media, comment, username, password, activePhotoService, filename);
+        AbstractTask task = null;
+        if(activePhotoService!=null) {
+            task = new SendPhotoTask(media, comment, username, password, activePhotoService, filename);
+        } else {
+            task = new SendVideoTask(media, comment, username, password, activeVideoService, filename);
+        }
         WaitCanvas wait = new WaitCanvas(this, task);
         wait.setWaitText("Sending...");
         display.setCurrent(wait);

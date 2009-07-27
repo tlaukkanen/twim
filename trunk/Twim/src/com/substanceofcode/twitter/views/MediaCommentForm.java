@@ -38,7 +38,7 @@ public class MediaCommentForm extends TextBox implements CommandListener {
     private String filename;
 
     public MediaCommentForm(byte[] media, String filename) {
-        super("Comment","", 124, TextField.ANY);
+        super("Comment","", 115, TextField.ANY);
         sendCommand = new Command("Send", Command.SCREEN, 1);
         addCommand(sendCommand);
         cancelCommand = new Command("Cancel", Command.CANCEL, 2);

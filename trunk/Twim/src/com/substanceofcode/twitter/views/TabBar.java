@@ -32,8 +32,6 @@ public class TabBar {
     private int activeTabIndex;
     private int selectedTabIndex;
     private String[] menuLabels;
-    private int width;
-    private int x;
     
     private static final int COLOR_BACKGROUND = 0x444444;
     private static final int COLOR_INACTIVE = 0xaaaaaa;
@@ -50,18 +48,17 @@ public class TabBar {
      * @param menuLabels        Menu label texts
      * @param width             Menu width
      */
-    public TabBar(int selectedTabIndex, String[] menuLabels, int width) {
+    public TabBar(int selectedTabIndex, String[] menuLabels) {
         this.selectedTabIndex = selectedTabIndex;
         activeTabIndex = -1;
         this.menuLabels = menuLabels;
-        this.width = width;
         
         int textWidth = 0;
         for(int textIndex=0; textIndex<menuLabels.length; textIndex++) {
             textWidth += labelFont.stringWidth(menuLabels[textIndex]) + 3;
         }
         
-        this.x = width/2 - textWidth/2;
+        
     }
     
     public int getHeight() {
@@ -102,7 +99,7 @@ public class TabBar {
         }
     }
 
-    private int calculateLeftSide() {
+    private int calculateLeftSide(int width) {
         int textWidth = 0;
         for(int textIndex=0; textIndex<menuLabels.length; textIndex++) {
             String label;
@@ -116,9 +113,9 @@ public class TabBar {
         return width/2 - textWidth/2;
     }
     
-    public void draw(Graphics g, int y) {
+    public void draw(Graphics g, int y, int width) {
         int tabCount = menuLabels.length;
-        int col = calculateLeftSide();
+        int col = calculateLeftSide(width);
         
         // Black menu label text
         g.setColor(COLOR_BACKGROUND);

@@ -31,7 +31,6 @@ import javax.microedition.io.file.FileConnection;
  */
 public class MediaFileSelect implements FileSelect {
 
-    private String path;
     private boolean isPhoto;
 
     public MediaFileSelect(boolean isPhoto) {
@@ -40,8 +39,7 @@ public class MediaFileSelect implements FileSelect {
 
     public void select(String path) {
         try {
-            this.path = path;
-            FileConnection fc = (FileConnection) Connector.open(path);
+            FileConnection fc = (FileConnection) Connector.open(path, Connector.READ);
             int size = (int) fc.fileSize();
             if(size<=0) {
                 TwitterController.getInstance().showError("Can't send selected media file. File size is 0 bytes. " + path);
