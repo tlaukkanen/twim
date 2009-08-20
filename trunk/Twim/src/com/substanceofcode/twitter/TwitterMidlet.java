@@ -19,6 +19,7 @@
 
 package com.substanceofcode.twitter;
 
+import com.substanceofcode.twitter.services.RefreshService;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 
@@ -34,6 +35,9 @@ public class TwitterMidlet extends MIDlet {
     public TwitterMidlet() {
         try{
             controller = TwitterController.getInstance(this);
+            // Start refresh service
+            RefreshService service = RefreshService.getInstance();
+            // Show splash screen
             controller.showSplash();            
         }catch(Exception any){
             any.printStackTrace();

@@ -33,8 +33,10 @@ public class CustomInputStream {
 
     private InputStream stream;
     private InputStreamReader reader;
+    private StringBuffer inputBuffer;
     
     public CustomInputStream(InputStream stream) {
+        inputBuffer = new StringBuffer();
         this.stream = stream;
         try {
             reader = new InputStreamReader(stream, "UTF-8");
@@ -46,8 +48,13 @@ public class CustomInputStream {
     public int read() throws IOException {
         HttpTransferStatus.addReceivedBytes(1);
         int next = reader.read();
+        inputBuffer.append((char)next);
         //System.out.print((char)next);
         return next;
+    }
+
+    public String getText() {
+        return inputBuffer.toString();
     }
     
     public void close() throws IOException {

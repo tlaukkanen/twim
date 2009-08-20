@@ -63,7 +63,7 @@ public class SendVideoTask extends AbstractTask {
                     filename);
             controller.addStatus(stat);
             controller.showTimeline();
-            //controller.showRecentTimeline();
+            //controller.showHomeTimeline();
         } catch (Exception ex) {
             controller.showError("Error while posting video: " + ex.toString());
         }

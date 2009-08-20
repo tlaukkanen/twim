@@ -34,7 +34,7 @@ public class RequestTimelineTask extends AbstractTask {
     private TwitterController controller;
     private TwitterApi api;
     private int feedType;
-    public final static int FEED_FRIENDS = 0;
+    public final static int FEED_HOME = 0;
     public final static int FEED_RESPONSES = 1;
     public final static int FEED_ARCHIVE = 2;
     public final static int FEED_PUBLIC = 3;
@@ -57,32 +57,27 @@ public class RequestTimelineTask extends AbstractTask {
     }
 
     public void doTask() {
-        if(feedType==FEED_FRIENDS) {
-            Vector friendsTimeline = api.requestFriendsTimeline();
-            controller.setRecentTimeline( friendsTimeline );
-            controller.showTimeline( friendsTimeline );
+        Vector timeline = null;
+        if(feedType==FEED_HOME) {
+            timeline = api.requestHomeTimeline();
+            controller.setHomeTimeline( timeline );
         } else if(feedType==FEED_ARCHIVE) {
-            Vector archiveTimeline = api.requestUserTimeline();
-            controller.setUserTimeline( archiveTimeline );
-            controller.showTimeline( archiveTimeline );
+            timeline = api.requestUserTimeline();
+            controller.setUserTimeline( timeline );
         } else if(feedType==FEED_RESPONSES) {
-            Vector responsesTimeline = api.requestResponsesTimeline();
-            controller.setResponsesTimeline( responsesTimeline );
-            controller.showTimeline( responsesTimeline );
+            timeline = api.requestResponsesTimeline();
+            controller.setResponsesTimeline( timeline );
         } else if(feedType==FEED_PUBLIC) {
-            Vector publicTimeline = api.requestPublicTimeline();
-            controller.setPublicTimeline( publicTimeline );
-            controller.showTimeline( publicTimeline );
+            timeline = api.requestPublicTimeline();
+            controller.setPublicTimeline( timeline );
         } else if(feedType==FEED_DIRECT) {
-            Vector directTimeline = api.requestDirectTimeline();
-            controller.setDirectTimeline(directTimeline);
-            controller.showTimeline( directTimeline );
+            timeline = api.requestDirectTimeline();
+            controller.setDirectTimeline(timeline);
         } else if(feedType==FEED_FAVOURITE) {
-            Vector favouritesTimeline = api.requestFavouriteTimeline();
-            controller.setFavouriteTimeline(favouritesTimeline);
-            controller.showTimeline(favouritesTimeline);
+            timeline = api.requestFavouriteTimeline();
+            controller.setFavouriteTimeline(timeline);
         }
-        
+        controller.showTimeline( timeline );
     }
 
 }

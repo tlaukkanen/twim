@@ -39,7 +39,7 @@ public class TwitterApi {
     private String username;
     private String password;
     private static final String PUBLIC_TIMELINE_URL = "http://www.twitter.com/statuses/public_timeline.xml";
-    private static final String FRIENDS_TIMELINE_URL = "http://www.twitter.com/statuses/friends_timeline.xml";
+    private static final String HOME_TIMELINE_URL = "http://www.twitter.com/statuses/friends_timeline.xml";
     private static final String USER_TIMELINE_URL = "http://www.twitter.com/statuses/user_timeline.xml";
     private static final String RESPONSES_TIMELINE_URL = "http://twitter.com/statuses/replies.xml";
     private static final String STATUS_UPDATE_URL = "http://twitter.com/statuses/update.xml";
@@ -122,11 +122,11 @@ public class TwitterApi {
     }
 
     /**
-     * Request public timeline from Twitter API.
+     * Request home (following) timeline from Twitter API.
      * @return Vector containing StatusEntry items.
      */
-    public Vector requestFriendsTimeline() {
-        return requestTimeline( FRIENDS_TIMELINE_URL );
+    public Vector requestHomeTimeline() {
+        return requestTimeline( HOME_TIMELINE_URL );
     }    
     
     /**
@@ -206,13 +206,28 @@ public class TwitterApi {
     private Vector requestTimeline(String timelineUrl) {
         Vector entries = new Vector();
         try {
-            HttpUtil.setBasicAuthentication(username, password);
-            StatusFeedParser parser = new StatusFeedParser();
-            if(timelineUrl.equals(DIRECT_TIMELINE_URL)) {
-                parser.setDirect(true);
-            }
-            HttpUtil.doGet(timelineUrl, parser);
-            entries = parser.getStatuses();
+            boolean retry = false;
+            do {
+                HttpUtil.setBasicAuthentication(username, password);
+                StatusFeedParser parser = new StatusFeedParser();
+                if(timelineUrl.equals(DIRECT_TIMELINE_URL)) {
+                    parser.setDirect(true);
+                }
+                HttpUtil.doGet(timelineUrl, parser);
+                int lastResponseCode = HttpUtil.getLastResponseCode();
+                entries = parser.getStatuses();
+                if(entries.isEmpty()) {
+                    entries.addElement(
+                        new Status("Twitter", "No statuses. API response from " +
+                        timelineUrl + " (" + lastResponseCode + "): " +
+                        HttpUtil.getHeaders() + " " +
+                        parser.getRawData(),
+                        Calendar.getInstance().getTime(), ""));
+                    retry = !retry;
+                } else {
+                    retry = false;
+                }
+            } while(retry);
         } catch (IOException ex) {
             entries.addElement(
                     new Status("Twitter", "Error occured. Please check " +
@@ -225,7 +240,9 @@ public class TwitterApi {
 
             ex.printStackTrace();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            entries.addElement(
+                    new Status("Twitter", "API exception: " + ex.toString(),
+                    Calendar.getInstance().getTime(), ""));
         }
         return entries;
     }

@@ -1,5 +1,5 @@
 /*
- * ToggleFavoriteTask.java
+ * SearchTask.java
  *
  * Copyright (C) 2005-2009 Tommi Laukkanen
  * http://www.substanceofcode.com
@@ -17,46 +17,39 @@
  * limitations under the License.
  */
 
+
 package com.substanceofcode.twitter.tasks;
 
 import com.substanceofcode.tasks.AbstractTask;
 import com.substanceofcode.twitter.TwitterApi;
 import com.substanceofcode.twitter.TwitterController;
-import com.substanceofcode.twitter.model.Status;
+import java.util.Vector;
 
 /**
- * Task for marking tweet as favorite.
- * @author Tommi Laukkanen
+ *
+ * @author tommi
  */
-public class ToggleFavoriteTask extends AbstractTask {
+public class SearchTask extends AbstractTask {
 
-    TwitterController controller;
-    TwitterApi api;
-    Status status;
+    private String query;
+    private TwitterApi api;
 
-    public ToggleFavoriteTask(
-            TwitterController controller,
-            TwitterApi api,
-            Status status) {
-        this.controller = controller;
+    public SearchTask(String query, TwitterApi api) {
+        this.query = query;
         this.api = api;
-        this.status = status;
     }
 
     public void doTask() {
+        String state = "";
+        TwitterController controller = TwitterController.getInstance();
         try {
-            if(status.isFavorite()) {
-                Status unfavoriteStatus = api.markAsUnfavorite(status);
-                controller.removeFavoriteStatus(unfavoriteStatus);
-            } else {
-                Status favoriteStatus = api.markAsFavorite(status);
-                controller.addFavoriteStatus(favoriteStatus);
-            }
-            controller.showPreviousTimeline();
+            state = "searching";
+            Vector results = api.search(query);
+            state = "showing results";
+            controller.showTweets( results, "Results" );
         } catch(Exception ex) {
-            controller.showError("Error while marking tweet as favorite: " + ex.getMessage());
+            controller.showError("Error while " + state + ": " + ex.getMessage());
         }
-        
     }
 
 }

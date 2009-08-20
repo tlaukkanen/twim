@@ -24,6 +24,7 @@ import com.substanceofcode.tasks.AbstractTask;
 import com.substanceofcode.twitter.model.MediaFileSelect;
 import com.substanceofcode.twitter.model.Status;
 import com.substanceofcode.twitter.model.User;
+import com.substanceofcode.twitter.services.RefreshService;
 import com.substanceofcode.twitter.tasks.ToggleFavoriteTask;
 import com.substanceofcode.twitter.tasks.RequestFriendsTask;
 import com.substanceofcode.twitter.tasks.RequestTimelineTask;
@@ -35,7 +36,7 @@ import com.substanceofcode.twitter.tasks.UpdateStatusTask;
 import com.substanceofcode.twitter.views.AboutCanvas;
 import com.substanceofcode.twitter.views.CameraCanvas;
 import com.substanceofcode.twitter.views.FileBrowserCanvas;
-import com.substanceofcode.twitter.views.LoginForm;
+import com.substanceofcode.twitter.views.SettingsForm;
 import com.substanceofcode.twitter.views.MediaCommentForm;
 import com.substanceofcode.twitter.views.SearchTextBox;
 import com.substanceofcode.twitter.views.SplashCanvas;
@@ -72,7 +73,7 @@ public class TwitterController {
     FileBrowserCanvas fileBrowser;
 
     Vector publicTimeline;
-    Vector recentTimeline;
+    Vector homeTimeline;
     Vector archiveTimeline;
     Vector responsesTimeline;
     Vector directTimeline;
@@ -122,8 +123,8 @@ public class TwitterController {
     }
 
     public void addStatus(Status status) {
-        if(recentTimeline!=null) {
-            recentTimeline.insertElementAt(status, 0);
+        if(homeTimeline!=null) {
+            homeTimeline.insertElementAt(status, 0);
         }
         if(archiveTimeline!=null) {
             archiveTimeline.insertElementAt(status, 0);
@@ -131,7 +132,7 @@ public class TwitterController {
     }
 
     public void clearTimelines() {
-        setRecentTimeline(null);
+        setHomeTimeline(null);
         setPublicTimeline(null);
         setResponsesTimeline(null);
         setUserTimeline(null);
@@ -165,10 +166,24 @@ public class TwitterController {
      * @param username Username for Twitter
      * @param password Password for Twitter
      */
-    public void login(String username, String password) {
+    public void login(String username, String password, boolean loadTweets) {
         api.setUsername(username);
         api.setPassword(password);
-        showEmptyTimeline();
+
+        /** Start refresh service */
+        boolean refresh = settings.getBooleanProperty(Settings.REFRESH, false);
+        RefreshService refreshService = RefreshService.getInstance();
+        if(refresh) {
+            refreshService.activate();
+        } else {
+            refreshService.deactivate();
+        }
+
+        if(loadTweets) {
+            showHomeTimeline();
+        } else {
+            showEmptyTimeline();
+        }
     }
 
     public void commentMedia(byte[] media, String filename) {
@@ -424,8 +439,8 @@ public class TwitterController {
      * Set friends time line entries.
      * @param friendsTimeline 
      */
-    public void setRecentTimeline(Vector friendsTimeline) {
-        this.recentTimeline = friendsTimeline;
+    public void setHomeTimeline(Vector timeline) {
+        this.homeTimeline = timeline;
     }
 
     public void setFavouriteTimeline(Vector timeline) {
@@ -433,20 +448,21 @@ public class TwitterController {
     }
     
     /** Show login form */
-    public void showLoginForm() {
-        LoginForm loginForm = new LoginForm( this );
-        display.setCurrent( loginForm );
+    public void showSettingsForm() {
+        SettingsForm settingsForm = new SettingsForm( this );
+        display.setCurrent( settingsForm );
     }
 
-    public void showRecentTimeline() {
-        if( recentTimeline==null) {
+    public void showHomeTimeline() {
+        if( homeTimeline==null) {
+            timeline.selectHomeTab();
             RequestTimelineTask task = new RequestTimelineTask(
-                this, api, RequestTimelineTask.FEED_FRIENDS);
+                this, api, RequestTimelineTask.FEED_HOME);
             WaitCanvas wait = new WaitCanvas(this, task);
             wait.setWaitText("Loading your timeline...");
             display.setCurrent(wait);
         } else {
-            timeline.setTimeline( recentTimeline );
+            timeline.setTimeline( homeTimeline );
             timeline.resetScrolling();
             display.setCurrent( timeline );
         }
@@ -466,9 +482,13 @@ public class TwitterController {
         }
     }
     
-    public void showTimeline(Vector timelineFeed ) {        
-        timeline.setTimeline( timelineFeed );
-        display.setCurrent( timeline );
+    public void showTimeline(Vector timelineFeed ) {
+        if(timelineFeed==null || timelineFeed.isEmpty()) {
+            showError("No statuses to display");
+        } else {
+            timeline.setTimeline( timelineFeed );
+            display.setCurrent( timeline );
+        }
     }
 
     /** Show current timeline */
@@ -532,6 +552,19 @@ public class TwitterController {
         timeline.resetMenuTab();
         //timeline.
         display.setCurrent(timeline);
+    }
+
+    public void showPreviousTimeline() {
+        timeline.resetMenus();
+        display.setCurrent(timeline);
+    }
+
+    /**
+     * Get recent status items.
+     * @return recent status items in vector
+     */
+    public Vector getRecentStatuses() {
+        return homeTimeline;
     }
 
 }

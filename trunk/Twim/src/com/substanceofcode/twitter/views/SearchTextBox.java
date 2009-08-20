@@ -1,7 +1,7 @@
 /*
- * UpdateStatusTextBox.java
- * 
- * Copyright (C) 2005-2008 Tommi Laukkanen
+ * SearchTextBox.java
+ *
+ * Copyright (C) 2005-2009 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,42 +23,35 @@ import com.substanceofcode.twitter.TwitterController;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.TextBox;
 import javax.microedition.lcdui.TextField;
 
 /**
  *
- * @author Tommi Laukkanen
+ * @author tommi
  */
-public class UpdateStatusTextBox extends TextBox implements CommandListener {
+public class SearchTextBox extends TextBox implements CommandListener {
 
-    private TwitterController controller;
-    private Command okCommand;
+    private Command searchCommand;
     private Command cancelCommand;
-    
-    public UpdateStatusTextBox(TwitterController controller, String prefix) {
-        super("Status", prefix, 140, TextField.ANY);
-        this.controller = controller;
-        
-        okCommand = new Command("OK", Command.OK, 1);
-        this.addCommand(okCommand);
-        
+
+    public SearchTextBox() {
+        super("Search", "", 140, TextField.ANY);
+        searchCommand = new Command("Search", Command.OK, 1);
+        addCommand(searchCommand);
         cancelCommand = new Command("Cancel", Command.CANCEL, 2);
-        this.addCommand(cancelCommand);
-        
+        addCommand(cancelCommand);
         this.setCommandListener(this);
     }
-    
-    /** 
-     * Handle commands.
-     * @param cmd   Activated command.
-     * @param disp  Display.
-     */
+
     public void commandAction(Command cmd, Displayable disp) {
-        if(cmd==okCommand) {
-            controller.updateStatus(this.getString());
-        } else {
-            controller.showHomeTimeline();
+        TwitterController controller = TwitterController.getInstance();
+        if(cmd==searchCommand) {
+            String query = this.getString();
+            controller.search( query );
+        } else if(cmd==cancelCommand) {
+            controller.showTimeline();
         }
     }
 

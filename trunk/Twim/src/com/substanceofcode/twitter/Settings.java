@@ -45,6 +45,8 @@ public class Settings {
         
         public static final String USERNAME = "username";
         public static final String PASSWORD = "password";
+        public static final String REFRESH = "refresh";
+        public static final String LOAD_ON_STARTUP = "loadonstartup";
 
 	/**
 	 * Singleton pattern is used to return 

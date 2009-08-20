@@ -61,6 +61,10 @@ public class XmlParser {
         CustomInputStream cis = new CustomInputStream(is);
         inputStream = cis;
     }
+
+    public String getRawData() {
+        return inputStream.getText();
+    }
     
     /** 
      * Parse next element

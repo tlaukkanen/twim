@@ -1,5 +1,5 @@
 /*
- * ToggleFavoriteTask.java
+ * ToggleFollowingTask.java
  *
  * Copyright (C) 2005-2009 Tommi Laukkanen
  * http://www.substanceofcode.com
@@ -28,13 +28,13 @@ import com.substanceofcode.twitter.model.Status;
  * Task for marking tweet as favorite.
  * @author Tommi Laukkanen
  */
-public class ToggleFavoriteTask extends AbstractTask {
+public class ToggleFollowingTask extends AbstractTask {
 
     TwitterController controller;
     TwitterApi api;
     Status status;
 
-    public ToggleFavoriteTask(
+    public ToggleFollowingTask(
             TwitterController controller,
             TwitterApi api,
             Status status) {
@@ -45,16 +45,18 @@ public class ToggleFavoriteTask extends AbstractTask {
 
     public void doTask() {
         try {
-            if(status.isFavorite()) {
-                Status unfavoriteStatus = api.markAsUnfavorite(status);
-                controller.removeFavoriteStatus(unfavoriteStatus);
+            if(status.isFollowing()) {
+                String result = api.unfollowUser(status);
+				status.setFollowing(false);
+                //controller.showError(result);
             } else {
-                Status favoriteStatus = api.markAsFavorite(status);
-                controller.addFavoriteStatus(favoriteStatus);
+                String result = api.followUser(status);
+				status.setFollowing(true);
+                //controller.showError(result);
             }
-            controller.showPreviousTimeline();
+            controller.showTimeline();
         } catch(Exception ex) {
-            controller.showError("Error while marking tweet as favorite: " + ex.getMessage());
+            controller.showError("Error while toggling following of user: " + ex.getMessage());
         }
         
     }
