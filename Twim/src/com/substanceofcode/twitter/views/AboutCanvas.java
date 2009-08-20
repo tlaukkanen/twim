@@ -63,11 +63,11 @@ public class AboutCanvas extends Canvas {
     }
         
     public void keyPressed(int keyCode) {
-        controller.showRecentTimeline();
+        controller.showHomeTimeline();
     }
 
     protected void pointerReleased(int arg0, int arg1) {
-        controller.showRecentTimeline();
+        controller.showHomeTimeline();
     }
 
 

@@ -96,10 +96,11 @@ public class SplashCanvas extends Canvas implements Runnable {
         Settings settings = controller.getSettings();
         String username = settings.getStringProperty(Settings.USERNAME, "");
         String password = settings.getStringProperty(Settings.PASSWORD, "");
+        boolean loadTweets = settings.getBooleanProperty(Settings.LOAD_ON_STARTUP, false);
         if(username.length()>0) {
-            controller.login(username, password);
+            controller.login(username, password, loadTweets);
         } else {
-            controller.showLoginForm();
+            controller.showSettingsForm();
         }
     }
 

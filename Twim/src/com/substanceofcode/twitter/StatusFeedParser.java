@@ -38,11 +38,17 @@ public class StatusFeedParser implements ResultParser {
 
     private Vector statuses;
     private boolean isDirect;
+    private String rawData;
 
     /** Creates a new instance of StatusFeedParser */
     public StatusFeedParser() {
         statuses = new Vector();
         isDirect = false;
+        rawData = "";
+    }
+
+    public String getRawData() {
+        return rawData;
     }
 
     /**
@@ -169,8 +175,9 @@ public class StatusFeedParser implements ResultParser {
                     } else {
                         isFollowing = true;
                     }
+                } else if (elementName.equals("html")) {
+                    return;
                 }
-
             }
             if (text.length() > 0) {
                 Status status = new Status(screenName, text, date, id);
@@ -180,6 +187,7 @@ public class StatusFeedParser implements ResultParser {
                 status.setInReplyToId(inReplyToId);
                 statuses.addElement(status);
             }
+            rawData = xml.getRawData();
         } catch (Exception ex) {
             throw new IOException("Error in StatusFeedParser.parse(): " + ex.getMessage());
         }

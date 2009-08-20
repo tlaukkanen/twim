@@ -23,6 +23,7 @@ import com.substanceofcode.infrastructure.Device;
 import com.substanceofcode.twitter.TwitterController;
 import com.substanceofcode.twitter.model.Status;
 import com.substanceofcode.utils.Log;
+import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.Vector;
 import javax.microedition.lcdui.Canvas;
@@ -51,6 +52,7 @@ public class TimelineCanvas extends Canvas {
     private String debug = "x";
     private int boxWidth = 20, boxHeight = 20;
     private static final Font LABEL_FONT = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_MEDIUM);
+    private static final int HOME_TAB = 2;
     
     /** 
      * Creates a new instance of TimelineCanvas
@@ -64,10 +66,10 @@ public class TimelineCanvas extends Canvas {
         String[] labels = {
             "Archive",
             "Replies",
-            "Recent",
+            "Home",
             "Direct",
             "Favorites",
-            "Friends",
+            "Following",
             "Public"};
         menuBar = new TabBar(2, labels);
         
@@ -87,7 +89,8 @@ public class TimelineCanvas extends Canvas {
         String[] photoSourceLabels = {
             "Camera",
             "Photo from file",
-            "Video from file" };
+            "Video from file",
+            "Cancel"};
         mediaSourceMenu = new Menu(photoSourceLabels, null, getWidth(), getHeight());
         mediaSourceMenu.setTitle("Select source");
 
@@ -123,6 +126,13 @@ public class TimelineCanvas extends Canvas {
     }
 
     public void setTimeline(Vector friendsTimeline) {
+        if(friendsTimeline.isEmpty()) {
+            this.statuses = new Vector();
+            this.statuses.addElement(
+                new Status("Twim", "Sorry... No statuses to display",
+                    Calendar.getInstance().getTime(), "")
+            );
+        }
         this.statuses = friendsTimeline;
     }
 
@@ -182,7 +192,7 @@ public class TimelineCanvas extends Canvas {
             controller.showResponsesTimeline();
         } else if(tabIndex==2) {
             /** Recent selected */
-            controller.showRecentTimeline();
+            controller.showHomeTimeline();
         } else if(tabIndex==3) {
             /** Direct messages */
             controller.showDirectMessages();
@@ -251,7 +261,7 @@ public class TimelineCanvas extends Canvas {
         } else if(selectedIndex==3) {
             controller.showSearchForm();
         } else if(selectedIndex==4) {
-            controller.showLoginForm();
+            controller.showSettingsForm();
         } else if(selectedIndex==5) {
             controller.about();
         } else if(selectedIndex==6) {
@@ -271,6 +281,10 @@ public class TimelineCanvas extends Canvas {
         } else if(mediaSourceMenu.getSelectedIndex()==2){
             /** Video from file */
             controller.showVideoBrowser();
+        } else {
+            /** Cancel */
+            mediaSourceMenu.deactivate();
+            repaint();
         }
     }
 
@@ -534,6 +548,10 @@ public class TimelineCanvas extends Canvas {
 
     public void resetMenuTab() {
         menuBar.selectNothing();
+    }
+
+    public void selectHomeTab() {
+        menuBar.selectTab( HOME_TAB );
     }
     
 }

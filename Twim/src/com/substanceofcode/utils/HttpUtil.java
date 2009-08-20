@@ -33,6 +33,22 @@ public class HttpUtil extends HttpAbstractUtil {
 
     /** Total bytes transfered */
     private static long totalBytes = 0;
+
+    /** Last response code */
+    private static int lastResponseCode = 0;
+
+    /** HTTP Headers */
+    private static String headers = "";
+    private static String lastResponseContentType = "";
+
+    public static String getHeaders() {
+        return headers;
+    }
+
+
+    public static int getLastResponseCode() {
+        return lastResponseCode;
+    }
     
     /** Creates a new instance of HttpUtil */
     public HttpUtil() {
@@ -58,6 +74,7 @@ public class HttpUtil extends HttpAbstractUtil {
         HttpConnection hc = null;
         DataInputStream dis = null;
         String response = "";
+        lastResponseCode = 0;
         try {
             /**
              * Open an HttpConnection with the Web server
@@ -109,6 +126,20 @@ public class HttpUtil extends HttpAbstractUtil {
             } else {
                 Log.debug("No cookie found");
             }
+
+            lastResponseCode = hc.getResponseCode();
+            lastResponseContentType = hc.getHeaderField("Content-Type");
+            
+            String header = "";
+            int headerIndex = 0;
+            while((header=hc.getHeaderField(headerIndex))!=null) {
+                headerIndex++;
+                if(header==null || header.length()==0) {
+                    break;
+                }
+                headers += header + "\n";
+            }
+            
 
             if (parser == null) {
                 // Prepare buffer for input data
