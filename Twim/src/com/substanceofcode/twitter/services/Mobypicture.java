@@ -107,7 +107,8 @@ public class Mobypicture implements PhotoService, VideoService {
             writeString(dos, "Content-Disposition: form-data; name=\"t\"\r\n");
 
             writeString(dos, "\r\n");
-            writeString(dos, comment + "\r\n");
+            dos.write(comment.getBytes("UTF-8"));
+            writeString(dos, "\r\n");
 
             writeString(dos, "--" + boundary + "--\r\n");
             dos.flush();

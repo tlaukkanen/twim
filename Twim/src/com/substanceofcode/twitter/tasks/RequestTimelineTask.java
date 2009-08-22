@@ -22,6 +22,7 @@ package com.substanceofcode.twitter.tasks;
 import com.substanceofcode.tasks.AbstractTask;
 import com.substanceofcode.twitter.TwitterApi;
 import com.substanceofcode.twitter.TwitterController;
+import com.substanceofcode.twitter.model.Status;
 import java.util.Vector;
 
 /**
@@ -40,6 +41,8 @@ public class RequestTimelineTask extends AbstractTask {
     public final static int FEED_PUBLIC = 3;
     public final static int FEED_DIRECT = 4;
     public final static int FEED_FAVOURITE = 5;
+
+    private static String lastHomeStatusID = "";
     
     /** 
      * Creates a new instance of RequestFriendsTimelineTask.
@@ -60,6 +63,15 @@ public class RequestTimelineTask extends AbstractTask {
         Vector timeline = null;
         if(feedType==FEED_HOME) {
             timeline = api.requestHomeTimeline();
+            if(timeline!=null) {
+                Status lastStatus = (Status) timeline.lastElement();
+                String newStatusID = lastStatus.getId();
+                if(lastHomeStatusID.length()>0 &&
+                        !lastHomeStatusID.equals(newStatusID)) {
+                    controller.playInfoSound();
+                }
+                lastHomeStatusID = newStatusID;
+            }
             controller.setHomeTimeline( timeline );
         } else if(feedType==FEED_ARCHIVE) {
             timeline = api.requestUserTimeline();

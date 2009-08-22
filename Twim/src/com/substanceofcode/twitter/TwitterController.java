@@ -51,6 +51,7 @@ import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.Vector;
 import javax.microedition.lcdui.Alert;
+import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.midlet.MIDlet;
@@ -192,6 +193,7 @@ public class TwitterController {
     }
 
     public void minimize() {
+        display.setCurrent(timeline);
         display.setCurrent(null);
     }
 
@@ -453,6 +455,18 @@ public class TwitterController {
         display.setCurrent( settingsForm );
     }
 
+    /**
+     * Check if application is minimized
+     * @return true if minimized
+     */
+    public boolean isMinimized() {
+        if(display.getCurrent()==null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public void showHomeTimeline() {
         if( homeTimeline==null) {
             timeline.selectHomeTab();
@@ -460,11 +474,15 @@ public class TwitterController {
                 this, api, RequestTimelineTask.FEED_HOME);
             WaitCanvas wait = new WaitCanvas(this, task);
             wait.setWaitText("Loading your timeline...");
-            display.setCurrent(wait);
+            if(display.getCurrent()!=null) {
+                display.setCurrent(wait);
+            }
         } else {
             timeline.setTimeline( homeTimeline );
             timeline.resetScrolling();
-            display.setCurrent( timeline );
+            if(display.getCurrent()!=null) {
+                display.setCurrent( timeline );
+            }
         }
     }
 
@@ -487,7 +505,10 @@ public class TwitterController {
             showError("No statuses to display");
         } else {
             timeline.setTimeline( timelineFeed );
-            display.setCurrent( timeline );
+            /** Don't show if we are in minimized mode */
+            if(display.getCurrent()!=null) {
+                display.setCurrent( timeline );
+            }
         }
     }
 
@@ -565,6 +586,31 @@ public class TwitterController {
      */
     public Vector getRecentStatuses() {
         return homeTimeline;
+    }
+
+    public void vibrate(int milliSeconds) {
+        display.vibrate(milliSeconds);
+    }
+
+    /**
+     * Can we make an auto-refresh?
+     * @return true if we can
+     */
+    public boolean canAutorefresh() {
+        boolean timelineIsShown = (display.getCurrent()==timeline);
+        if(timelineIsShown || isMinimized()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Play info sound.
+     */
+    public void playInfoSound() {
+        display.vibrate(500);
+        AlertType.INFO.playSound(display);
     }
 
 }

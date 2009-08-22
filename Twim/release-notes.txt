@@ -9,11 +9,12 @@ Tommi Laukkanen
 
 Release Notes:
 
-v1.15 (August xth, 2009)
+v1.15 (August 22nd, 2009)
 + TwitrPic support
 + Cancel option to media menu
-+ Initial auto-refresh option
++ Initial auto-refresh option with alarming of new tweets
 + Tab names changed: "Recent">"Home", "Friends">"Following"
++ Fix for non-latin characters when posting photos (thanks Lexa!)
 
 v1.14 (July 30th, 2009)
 + Follow/Unfollow
