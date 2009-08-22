@@ -101,7 +101,8 @@ public class Twitgoo implements PhotoService {
             writeString(dos, "Content-Disposition: form-data; name=\"message\"\r\n");
 
             writeString(dos, "\r\n");
-            writeString(dos, comment + "\r\n");
+            dos.write(comment.getBytes("UTF-8"));
+            writeString(dos, "\r\n");
 
             writeString(dos, "--" + boundary + "--\r\n");
             dos.flush();

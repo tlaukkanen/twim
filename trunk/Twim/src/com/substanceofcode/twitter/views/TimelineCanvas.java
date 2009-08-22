@@ -552,6 +552,8 @@ public class TimelineCanvas extends Canvas {
 
     public void selectHomeTab() {
         menuBar.selectTab( HOME_TAB );
+        menuBar.activateSelectedTab();
+        verticalScroll = 0;
     }
     
 }

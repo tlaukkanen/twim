@@ -22,6 +22,7 @@ package com.substanceofcode.twitter.services;
 import com.substanceofcode.twitter.TwitterController;
 import com.substanceofcode.twitter.model.Status;
 import java.util.Vector;
+import javax.microedition.lcdui.Alert;
 import javax.microedition.media.Manager;
 import javax.microedition.media.MediaException;
 import javax.microedition.media.control.ToneControl;
@@ -60,25 +61,15 @@ public class RefreshService implements Runnable {
     }
 
     public void run() {
-        String lastStatusId = "";
         while(true) {
             try {
                 Thread.yield();
                 Thread.sleep(300000); // 5 min
-                lastStatusId = getLastStatusId();
-                if(active) {
+                boolean canAutorefresh = controller.canAutorefresh();
+                if(active && canAutorefresh) {
                     controller.clearTimelines();
                     controller.showHomeTimeline();
-                    String newLastStatusId = getLastStatusId();
-                    if(lastStatusId.equals( newLastStatusId )==false && newLastStatusId.length()>0) {
-                        try {
-                            Manager.playTone(ToneControl.C4, 100, 80);
-                        } catch (MediaException ex) {
-                            ex.printStackTrace();
-                        }
-                    }
                 }
-
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             }
