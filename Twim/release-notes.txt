@@ -9,6 +9,10 @@ Tommi Laukkanen
 
 Release Notes:
 
+v1.16 (xxx xx, 2009)
++ Option to skip splash screen
++ Google Translate support
+
 v1.15 (August 22nd, 2009)
 + TwitrPic support
 + Cancel option to media menu

@@ -47,6 +47,7 @@ public class Settings {
         public static final String PASSWORD = "password";
         public static final String REFRESH = "refresh";
         public static final String LOAD_ON_STARTUP = "loadonstartup";
+        public static final String SKIP_SPLASH_SCREEN = "skipsplash";
 
 	/**
 	 * Singleton pattern is used to return 

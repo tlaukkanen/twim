@@ -63,11 +63,12 @@ public class SettingsForm extends Form implements CommandListener {
         passwordField = new TextField("Password", password, 32, TextField.PASSWORD);
         append(passwordField);
 
-        String[] labels = {"Save credentials", "Auto refresh", "Load tweets on startup"};
+        String[] labels = {"Save credentials", "Auto refresh", "Load tweets on startup", "Skip splash screen"};
         rememberValuesChoice = new ChoiceGroup("Options", ChoiceGroup.MULTIPLE, labels, null);
         boolean doRefresh = settings.getBooleanProperty(Settings.REFRESH, false);
         boolean loadOnStartup = settings.getBooleanProperty(Settings.LOAD_ON_STARTUP, false);
-        rememberValuesChoice.setSelectedFlags(new boolean[]{true, doRefresh, loadOnStartup});
+        boolean skipSplashScreen = settings.getBooleanProperty(Settings.SKIP_SPLASH_SCREEN, false);
+        rememberValuesChoice.setSelectedFlags(new boolean[]{true, doRefresh, loadOnStartup, skipSplashScreen});
         append(rememberValuesChoice);
 
         loginCommand = new Command("Save", Command.ITEM, 1);
@@ -93,6 +94,8 @@ public class SettingsForm extends Form implements CommandListener {
             settings.setBooleanProperty(Settings.REFRESH, refresh);
             boolean loadOnStartup = rememberValuesChoice.isSelected(2);
             settings.setBooleanProperty(Settings.LOAD_ON_STARTUP, loadOnStartup);
+            boolean skipSplashScreen = rememberValuesChoice.isSelected(3);
+            settings.setBooleanProperty(Settings.SKIP_SPLASH_SCREEN, skipSplashScreen);
             if (rememberValuesChoice.isSelected(0)) {
                 /** Store username and password */
                 Log.debug("Remember");
