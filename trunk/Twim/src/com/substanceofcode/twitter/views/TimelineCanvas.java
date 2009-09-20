@@ -102,7 +102,8 @@ public class TimelineCanvas extends Canvas {
             "Retweet",
             "Mark as favorite",
             "Send direct message",
-            "Follow"};
+            "Follow",
+            "Translate to English"};
         statusMenu = new Menu(statusMenuLabels, null, getWidth(), getHeight());
         statusMenu.setTitle("Status menu");
 
@@ -331,6 +332,11 @@ public class TimelineCanvas extends Canvas {
             /** Follow/Unfollow */
             if(selectedStatus!=null) {
                 controller.toggleFollow(selectedStatus);
+            }
+        }else if(selectedIndex==7) {
+            /** Translate to English */
+            if(selectedStatus!=null) {
+                controller.translateToEnglish(selectedStatus);
             }
         }
     }

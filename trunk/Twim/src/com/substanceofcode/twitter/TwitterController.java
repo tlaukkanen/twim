@@ -32,6 +32,7 @@ import com.substanceofcode.twitter.tasks.SearchTask;
 import com.substanceofcode.twitter.tasks.SendPhotoTask;
 import com.substanceofcode.twitter.tasks.SendVideoTask;
 import com.substanceofcode.twitter.tasks.ToggleFollowingTask;
+import com.substanceofcode.twitter.tasks.TranslateTask;
 import com.substanceofcode.twitter.tasks.UpdateStatusTask;
 import com.substanceofcode.twitter.views.AboutCanvas;
 import com.substanceofcode.twitter.views.CameraCanvas;
@@ -72,6 +73,7 @@ public class TwitterController {
     PhotoService activePhotoService;
     VideoService activeVideoService;
     FileBrowserCanvas fileBrowser;
+    boolean tweetsShownOnce = false;
 
     Vector publicTimeline;
     Vector homeTimeline;
@@ -160,6 +162,14 @@ public class TwitterController {
 
     public Displayable getCurrentDisplay() {
         return display.getCurrent();
+    }
+
+    /** Login to Twitter stream */
+    public void login() {
+        String username = settings.getStringProperty(Settings.USERNAME, "");
+        String password = settings.getStringProperty(Settings.PASSWORD, "");
+        boolean loadTweets = settings.getBooleanProperty(Settings.LOAD_ON_STARTUP, false);
+        login(username, password, loadTweets);
     }
 
     /** 
@@ -474,15 +484,16 @@ public class TwitterController {
                 this, api, RequestTimelineTask.FEED_HOME);
             WaitCanvas wait = new WaitCanvas(this, task);
             wait.setWaitText("Loading your timeline...");
-            if(display.getCurrent()!=null) {
+            if(display.getCurrent()!=null || tweetsShownOnce==false) {
                 display.setCurrent(wait);
             }
         } else {
             timeline.setTimeline( homeTimeline );
             timeline.resetScrolling();
-            if(display.getCurrent()!=null) {
+            if(display.getCurrent()!=null || tweetsShownOnce==false) {
                 display.setCurrent( timeline );
             }
+            tweetsShownOnce = true;
         }
     }
 
@@ -611,6 +622,21 @@ public class TwitterController {
     public void playInfoSound() {
         display.vibrate(500);
         AlertType.INFO.playSound(display);
+    }
+
+    public void translateToEnglish(Status status) {
+        TranslateTask task = new TranslateTask( status );
+        WaitCanvas wait = new WaitCanvas(this, task);
+        wait.setWaitText("Translating...");
+        display.setCurrent(wait);
+    }
+
+    public void showSingleStatus(Status stat) {
+        Vector statuses = new Vector(1);
+        statuses.addElement(stat);
+        timeline.setTimeline(statuses);
+        timeline.resetScrolling();
+        display.setCurrent(timeline);
     }
 
 }

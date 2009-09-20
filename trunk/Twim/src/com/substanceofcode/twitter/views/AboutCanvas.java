@@ -39,7 +39,7 @@ public class AboutCanvas extends Canvas {
         this.setFullScreenMode(true);
         this.controller = controller;
         texts = new String[3];
-        texts[0] = "Twim v1.15";
+        texts[0] = "Twim v1.16";
         texts[1] = "Copyright 2009 Tommi Laukkanen (www.substanceofcode.com)";
         texts[2] = HttpTransferStatus.getTotalBytesTransfered() + 
                    " bytes transferred since startup.";

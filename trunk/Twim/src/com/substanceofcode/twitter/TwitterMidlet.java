@@ -38,7 +38,12 @@ public class TwitterMidlet extends MIDlet {
             // Start refresh service
             RefreshService service = RefreshService.getInstance();
             // Show splash screen
-            controller.showSplash();            
+            Settings settings = controller.getSettings();
+            if(settings.getBooleanProperty(Settings.SKIP_SPLASH_SCREEN, false)){
+                controller.login();
+            } else {
+                controller.showSplash();
+            }
         }catch(Exception any){
             any.printStackTrace();
         }
