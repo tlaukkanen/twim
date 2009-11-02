@@ -23,6 +23,7 @@ import com.substanceofcode.tasks.AbstractTask;
 import com.substanceofcode.twitter.TwitterApi;
 import com.substanceofcode.twitter.TwitterController;
 import com.substanceofcode.twitter.model.Status;
+import java.util.Enumeration;
 import java.util.Vector;
 
 /**
@@ -35,6 +36,7 @@ public class RequestTimelineTask extends AbstractTask {
     private TwitterController controller;
     private TwitterApi api;
     private int feedType;
+    private int page;
     public final static int FEED_HOME = 0;
     public final static int FEED_RESPONSES = 1;
     public final static int FEED_ARCHIVE = 2;
@@ -53,17 +55,19 @@ public class RequestTimelineTask extends AbstractTask {
     public RequestTimelineTask(
             TwitterController controller,
             TwitterApi api,
-            int feedType) {
+            int feedType,
+            int page) {
         this.controller = controller;
         this.api = api;
         this.feedType = feedType;
+        this.page = page;
     }
 
     public void doTask() {
         Vector timeline = null;
         if(feedType==FEED_HOME) {
-            timeline = api.requestHomeTimeline();
-            if(timeline!=null) {
+            timeline = api.requestHomeTimeline( page );
+            if(timeline!=null && page==0) {
                 Status lastStatus = (Status) timeline.lastElement();
                 String newStatusID = lastStatus.getId();
                 if(lastHomeStatusID.length()>0 &&
@@ -72,7 +76,13 @@ public class RequestTimelineTask extends AbstractTask {
                 }
                 lastHomeStatusID = newStatusID;
             }
-            controller.setHomeTimeline( timeline );
+            if(page<2) {
+                controller.setHomeTimeline( timeline );
+            } else {
+                Vector homeTimeline = controller.getHomeTimeline();
+                timeline = appendToTimeline(homeTimeline, timeline);
+                controller.setHomeTimeline( timeline );
+            }
         } else if(feedType==FEED_ARCHIVE) {
             timeline = api.requestUserTimeline();
             controller.setUserTimeline( timeline );
@@ -89,7 +99,29 @@ public class RequestTimelineTask extends AbstractTask {
             timeline = api.requestFavouriteTimeline();
             controller.setFavouriteTimeline(timeline);
         }
+        boolean resetVerticalScrolling = true;
+        if(page>1) {
+            resetVerticalScrolling = false;
+        }
         controller.showTimeline( timeline );
+    }
+
+    private Vector appendToTimeline(Vector original, Vector added) {
+        Vector newVector = new Vector();
+        Enumeration orig = original.elements();
+        while(orig.hasMoreElements()) {
+            newVector.addElement(orig.nextElement());
+        }
+
+        if(added!=null) {
+            Enumeration en = added.elements();
+            while(en.hasMoreElements()) {
+                Status stat = (Status)en.nextElement();
+                newVector.addElement( stat );
+            }
+        }
+        
+        return newVector;
     }
 
 }

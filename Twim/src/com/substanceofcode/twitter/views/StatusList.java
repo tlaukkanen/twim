@@ -41,6 +41,7 @@ public class StatusList {
     private int screenHeight;
     private TalkBalloon talkBalloon;
     private Status selectedStatus;
+    private static Status nextPageStatus = new Status("Twim", "Click to load next page...", null, "page");
     
     /** 
      * Creates a new instance of StatusList
@@ -51,6 +52,7 @@ public class StatusList {
         this.screenWidth = width;
         this.screenHeight = screenHeight;
         this.talkBalloon = new TalkBalloon(width, screenHeight);
+        nextPageStatus.createTextLines(width, TalkBalloon.textFont);
     }
 
     /** 
@@ -59,7 +61,12 @@ public class StatusList {
      * @param statuses  Vector containing status entries.
      * @param row       Row where drawing is started.
      */
-    public void draw(Graphics g, Vector stats, int row, boolean drawSelectBox) {
+    public void draw(
+            Graphics g,
+            Vector stats,
+            int row,
+            boolean drawSelectBox,
+            boolean drawNextPageLink) {
         if(stats==null) {
             return;
         }
@@ -67,6 +74,8 @@ public class StatusList {
         
         int currentRow = row;
         selectedStatus = null;
+        boolean isSelected;
+        int currentStatusIndex = 0;
         while(statusEnum.hasMoreElements()) {
             Status status = (Status)statusEnum.nextElement();
             //System.out.println("Status: " + status.getText());
@@ -76,7 +85,7 @@ public class StatusList {
                 status.createTextLines(screenWidth-textFont.getHeight()*2-textFont.getHeight()/2, textFont);
             }
 
-            boolean isSelected = false;
+            isSelected = false;
             if(currentRow - (textFont.getHeight()+2)>=0 && selectedStatus==null && drawSelectBox==true) {
                 selectedStatus = status;
                 isSelected = true;
@@ -92,13 +101,31 @@ public class StatusList {
             if(currentRow>screenHeight) {
                 break;
             }
+            currentStatusIndex++;
+        }
+
+        System.out.println("current status index " + currentStatusIndex);
+
+        /** Draw "Load next page..." link */
+        if(drawNextPageLink && currentStatusIndex%20==0) {
+            isSelected = false;
+            if(currentRow - (textFont.getHeight()+2)>=0 && selectedStatus==null && drawSelectBox==true) {
+                selectedStatus = nextPageStatus;
+                isSelected = true;
+            }
+            drawStatus(g, currentRow, nextPageStatus, isSelected);
         }
     }
     
     private int drawStatus(Graphics g, int row, Status status, boolean isSelected) {
         /** Parse the text below the talk balloon */
-        String time = TimeUtil.getTimeInterval(status.getDate());
-        String infoText = status.getScreenName() + ", " + time + " ago";
+        String infoText;
+        if( status.getDate()!=null ) {
+            String time = TimeUtil.getTimeInterval(status.getDate());
+            infoText = status.getScreenName() + ", " + time + " ago";
+        } else {
+            infoText = status.getScreenName();
+        }
         return talkBalloon.draw(g, status.getTextLines(), infoText, row, isSelected);
     }
 

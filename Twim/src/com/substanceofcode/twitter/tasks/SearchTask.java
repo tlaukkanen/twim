@@ -31,11 +31,21 @@ import java.util.Vector;
  */
 public class SearchTask extends AbstractTask {
 
-    private String query;
+    private static String query;
+    private static int page;
     private TwitterApi api;
 
     public SearchTask(String query, TwitterApi api) {
-        this.query = query;
+        SearchTask.query = query;
+        page = 1;
+        this.api = api;
+    }
+
+    public static void turnPage() {
+        page++;
+    }
+
+    public SearchTask(TwitterApi api) {
         this.api = api;
     }
 
@@ -44,7 +54,7 @@ public class SearchTask extends AbstractTask {
         TwitterController controller = TwitterController.getInstance();
         try {
             state = "searching";
-            Vector results = api.search(query);
+            Vector results = api.search(query, page);
             state = "showing results";
             controller.showTweets( results, "Results" );
         } catch(Exception ex) {

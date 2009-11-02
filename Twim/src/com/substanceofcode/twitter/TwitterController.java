@@ -83,6 +83,16 @@ public class TwitterController {
     Vector friendsStatuses;
     Vector favouriteTimeline;
 
+    private static final int PUBLIC_TIMELINE = 0;
+    private static final int HOME_TIMELINE = 1;
+    private static final int ARCHIVE_TIMELINE = 2;
+    private static final int RESPONSES_TIMELINE = 3;
+    private static final int DIRECT_TIMELINE = 4;
+    private static final int FRIENDS_TIMELINE = 5;
+    private static final int FAVOURITE_TIMELINE = 6;
+    private static final int SEARCH_TIMELINE = 7;
+    int currentTimeline;
+
     static TwitterController instance;
 
     public static TwitterController getInstance(TwitterMidlet midlet) {
@@ -191,7 +201,7 @@ public class TwitterController {
         }
 
         if(loadTweets) {
-            showHomeTimeline();
+            showHomeTimeline( false );
         } else {
             showEmptyTimeline();
         }
@@ -288,9 +298,11 @@ public class TwitterController {
     }
 
     public void showDirectMessages() {
+        currentTimeline = DIRECT_TIMELINE;
+        timeline.showDrawNextPageLink(false);
         if(directTimeline==null) {
             RequestTimelineTask task = new RequestTimelineTask(
-                this, api, RequestTimelineTask.FEED_DIRECT);
+                this, api, RequestTimelineTask.FEED_DIRECT, 1);
             WaitCanvas wait = new WaitCanvas(this, task);
             display.setCurrent(wait);
         } else {
@@ -321,6 +333,8 @@ public class TwitterController {
 
     /** Show friends */
     public void showFriends() {
+        currentTimeline = FRIENDS_TIMELINE;
+        timeline.showDrawNextPageLink(false);
         if(friendsStatuses==null) {
             RequestFriendsTask task = new RequestFriendsTask(this, api);
             WaitCanvas wait = new WaitCanvas(this, task);
@@ -334,6 +348,8 @@ public class TwitterController {
 
     /** Show friends */
     public void showFriends(Vector friends) {
+        currentTimeline = FRIENDS_TIMELINE;
+        timeline.showDrawNextPageLink(false);
         String state = "";
         int nullUserCount = 0; // Only for debugging purposes
         try {
@@ -371,9 +387,11 @@ public class TwitterController {
     }
 
     public void showPublicTimeline() {
+        currentTimeline = PUBLIC_TIMELINE;
+        timeline.showDrawNextPageLink(false);
         if(publicTimeline==null) {
             RequestTimelineTask task = new RequestTimelineTask(
-                this, api, RequestTimelineTask.FEED_PUBLIC);
+                this, api, RequestTimelineTask.FEED_PUBLIC, 1);
             WaitCanvas wait = new WaitCanvas(this, task);
             display.setCurrent(wait);
         } else {
@@ -383,9 +401,11 @@ public class TwitterController {
     }
 
     public void showResponsesTimeline() {
+        currentTimeline = RESPONSES_TIMELINE;
+        timeline.showDrawNextPageLink(false);
         if(responsesTimeline==null) {
             RequestTimelineTask task = new RequestTimelineTask(
-                this, api, RequestTimelineTask.FEED_RESPONSES);
+                this, api, RequestTimelineTask.FEED_RESPONSES, 1);
             WaitCanvas wait = new WaitCanvas(this, task);
             wait.setWaitText("Loading responses...");
             display.setCurrent(wait);
@@ -434,10 +454,12 @@ public class TwitterController {
         timeline.setTimeline(responsesTimeline);
     }
     
-    public void showArchiveTimeline() {
+    public void showArchiveTimeline(boolean showNextAvailablePage) {
+        currentTimeline = ARCHIVE_TIMELINE;
+        timeline.showDrawNextPageLink(false);
         if(archiveTimeline==null) {
             RequestTimelineTask task = new RequestTimelineTask(
-                this, api, RequestTimelineTask.FEED_ARCHIVE);
+                this, api, RequestTimelineTask.FEED_ARCHIVE, 1);
             WaitCanvas wait = new WaitCanvas(this, task);
             wait.setWaitText("Loading tweets...");
             display.setCurrent(wait);
@@ -477,11 +499,20 @@ public class TwitterController {
         }
     }
 
-    public void showHomeTimeline() {
-        if( homeTimeline==null) {
-            timeline.selectHomeTab();
+    public void showHomeTimeline(boolean nextPage) {
+        currentTimeline = HOME_TIMELINE;
+        timeline.showDrawNextPageLink(true);
+        if( homeTimeline==null || nextPage) {
+            timeline.selectHomeTab( !nextPage );
+            int page = 1;
+            if(nextPage) {
+                if(homeTimeline!=null) {
+                    int pages = homeTimeline.size() / 20;
+                    page += pages;
+                }
+            }
             RequestTimelineTask task = new RequestTimelineTask(
-                this, api, RequestTimelineTask.FEED_HOME);
+                this, api, RequestTimelineTask.FEED_HOME, page);
             WaitCanvas wait = new WaitCanvas(this, task);
             wait.setWaitText("Loading your timeline...");
             if(display.getCurrent()!=null || tweetsShownOnce==false) {
@@ -498,9 +529,11 @@ public class TwitterController {
     }
 
     public void showFavouriteTimeline() {
+        currentTimeline = FAVOURITE_TIMELINE;
+        timeline.showDrawNextPageLink(false);
         if( favouriteTimeline==null) {
             RequestTimelineTask task = new RequestTimelineTask(
-                this, api, RequestTimelineTask.FEED_FAVOURITE);
+                this, api, RequestTimelineTask.FEED_FAVOURITE, 1);
             WaitCanvas wait = new WaitCanvas(this, task);
             wait.setWaitText("Loading your timeline...");
             display.setCurrent(wait);
@@ -511,7 +544,7 @@ public class TwitterController {
         }
     }
     
-    public void showTimeline(Vector timelineFeed ) {
+    public void showTimeline(Vector timelineFeed) {
         if(timelineFeed==null || timelineFeed.isEmpty()) {
             showError("No statuses to display");
         } else {
@@ -539,6 +572,7 @@ public class TwitterController {
     /** Show empty timeline view */
     private void showEmptyTimeline() {
         Vector empty = new Vector();
+        timeline.showDrawNextPageLink(false);
         empty.addElement(
                 new Status(
                 "Twim", "Select what tweets you'd like to see",
@@ -572,9 +606,19 @@ public class TwitterController {
     }
 
     public void search(String query) {
+        timeline.showDrawNextPageLink(true);
+        currentTimeline = SEARCH_TIMELINE;
         SearchTask task = new SearchTask(query, api);
         WaitCanvas wait = new WaitCanvas(this, task);
         wait.setWaitText("Searching...");
+        display.setCurrent(wait);
+    }
+
+    public void searchNextPage() {
+        SearchTask task = new SearchTask(api);
+        SearchTask.turnPage();
+        WaitCanvas wait = new WaitCanvas(this, task);
+        wait.setWaitText("Loading next page...");
         display.setCurrent(wait);
     }
 
@@ -582,7 +626,6 @@ public class TwitterController {
         timeline.setTimeline(results);
         timeline.resetScrolling();
         timeline.resetMenuTab();
-        //timeline.
         display.setCurrent(timeline);
     }
 
@@ -637,6 +680,49 @@ public class TwitterController {
         timeline.setTimeline(statuses);
         timeline.resetScrolling();
         display.setCurrent(timeline);
+    }
+
+    public void loadNextPage() {
+        switch(currentTimeline) {
+            case(PUBLIC_TIMELINE):
+                break;
+            case(HOME_TIMELINE):
+                showHomeTimeline(true);
+                break;
+            case(ARCHIVE_TIMELINE):
+                break;
+            case(RESPONSES_TIMELINE):
+                break;
+            case(DIRECT_TIMELINE):
+                break;
+            case(FRIENDS_TIMELINE):
+                break;
+            case(FAVOURITE_TIMELINE):
+                break;
+            case(SEARCH_TIMELINE):
+                searchNextPage();
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void addToHomeTimeline(Vector timeline) {
+        addToTimeline(homeTimeline, timeline);
+    }
+
+    private void addToTimeline(Vector original, Vector added) {
+        if(added!=null) {
+            Enumeration en = added.elements();
+            while(en.hasMoreElements()) {
+                Status stat = (Status)en.nextElement();
+                original.addElement( stat );
+            }
+        }
+    }
+
+    public Vector getHomeTimeline() {
+        return homeTimeline;
     }
 
 }

@@ -68,7 +68,7 @@ public class RefreshService implements Runnable {
                 boolean canAutorefresh = controller.canAutorefresh();
                 if(active && canAutorefresh) {
                     controller.clearTimelines();
-                    controller.showHomeTimeline();
+                    controller.showHomeTimeline(false);
                 }
             } catch (InterruptedException ex) {
                 ex.printStackTrace();

@@ -58,7 +58,7 @@ public class UpdateStatusTextBox extends TextBox implements CommandListener {
         if(cmd==okCommand) {
             controller.updateStatus(this.getString());
         } else {
-            controller.showHomeTimeline();
+            controller.showHomeTimeline(false);
         }
     }
 

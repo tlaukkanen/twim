@@ -41,6 +41,7 @@ public class TimelineCanvas extends Canvas {
     private TwitterController controller;
     private Vector statuses;
     private StatusList statusList;
+    private boolean drawNextPageLink;
     private TabBar menuBar;
     private Menu menu;
     private Menu statusMenu;
@@ -61,6 +62,7 @@ public class TimelineCanvas extends Canvas {
     public TimelineCanvas(TwitterController controller) {
         this.controller = controller;
         setFullScreenMode(true);
+        drawNextPageLink = true;
         
         /** Menu bar tabs */
         String[] labels = {
@@ -116,6 +118,10 @@ public class TimelineCanvas extends Canvas {
         screenWidth = getWidth();
     }
 
+    public void showDrawNextPageLink(boolean show) {
+        drawNextPageLink = show;
+    }
+
     public void resetMenus() {
         menu.deactivate();
         statusMenu.deactivate();
@@ -164,7 +170,8 @@ public class TimelineCanvas extends Canvas {
             statusList.draw(
                     g, statuses,
                     menuBar.getHeight() + verticalScroll + TalkBalloon.textFont.getHeight()/2,
-                    drawSelectionBox);
+                    drawSelectionBox,
+                    drawNextPageLink);
             menuBar.draw(g, 0, getWidth());
             if(Device.isTouch()) {
                 drawMenuButton(g);
@@ -187,13 +194,13 @@ public class TimelineCanvas extends Canvas {
         int tabIndex = menuBar.getSelectedTabIndex();
         if(tabIndex==0) {
             /** Archive selected */
-            controller.showArchiveTimeline();
+            controller.showArchiveTimeline(false);
         } else if(tabIndex==1) {
             /** Responses selected */
             controller.showResponsesTimeline();
         } else if(tabIndex==2) {
             /** Recent selected */
-            controller.showHomeTimeline();
+            controller.showHomeTimeline(false);
         } else if(tabIndex==3) {
             /** Direct messages */
             controller.showDirectMessages();
@@ -381,6 +388,10 @@ public class TimelineCanvas extends Canvas {
                 return;
             } else if(statusList.getSelected()!=null){
                 Status selectedStatus = statusList.getSelected();
+                if(selectedStatus.getId().equals("page")) {
+                    loadNextPage();
+                    return;
+                }
                 if(selectedStatus.isFavorite()) {
                     statusMenu.setLabel(4, "Unfavorite");
                 } else {
@@ -556,10 +567,16 @@ public class TimelineCanvas extends Canvas {
         menuBar.selectNothing();
     }
 
-    public void selectHomeTab() {
+    public void selectHomeTab(boolean resetVerticalScroll) {
         menuBar.selectTab( HOME_TAB );
         menuBar.activateSelectedTab();
-        verticalScroll = 0;
+        if(resetVerticalScroll) {
+            verticalScroll = 0;
+        }
+    }
+
+    private void loadNextPage() {
+        controller.loadNextPage();
     }
     
 }
