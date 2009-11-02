@@ -58,7 +58,7 @@ public class UpdateStatusTask extends AbstractTask {
                 controller.addStatus(updatedStatus);
             }
         } finally {
-            controller.showHomeTimeline();
+            controller.showHomeTimeline(false);
         }
     }
     

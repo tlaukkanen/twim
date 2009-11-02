@@ -26,7 +26,6 @@ import com.substanceofcode.utils.StringUtil;
 import com.substanceofcode.utils.URLUTF8Encoder;
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Vector;
 
 /**
@@ -50,7 +49,7 @@ public class TwitterApi {
     private static final String FAVORITE_DESTROY_URL = "http://twitter.com/favorites/destroy/";
     private static final String FRIENDSHIPS_CREATE_URL = "http://twitter.com/friendships/create/";
     private static final String FRIENDSHIPS_DESTROY_URL = "http://twitter.com/friendships/destroy/";
-    private static final String SEARCH_URL = "http://search.twitter.com/search.atom?q=";
+    private static final String SEARCH_URL = "http://search.twitter.com/search.atom?rpp=20&q=";
 
     /** Creates a new instance of TwitterApi */
     public TwitterApi() {
@@ -125,8 +124,12 @@ public class TwitterApi {
      * Request home (following) timeline from Twitter API.
      * @return Vector containing StatusEntry items.
      */
-    public Vector requestHomeTimeline() {
-        return requestTimeline( HOME_TIMELINE_URL );
+    public Vector requestHomeTimeline(int page) {
+        String url = HOME_TIMELINE_URL;
+        if(page>1) {
+            url += "?page=" + page;
+        }
+        return requestTimeline( url );
     }    
     
     /**
@@ -266,10 +269,10 @@ public class TwitterApi {
         return null;
     }
 
-    public Vector search(String query) throws Exception {
+    public Vector search(String query, int page) throws Exception {
         try {
             SearchResultsParser parser = new SearchResultsParser();
-            String url = SEARCH_URL + StringUtil.urlEncode(query);
+            String url = SEARCH_URL + StringUtil.urlEncode(query) + "&page=" + page;
             Log.debug("URL: " + url);
             HttpUtil.doPost( url, parser );
             Vector statuses = parser.getStatuses();
