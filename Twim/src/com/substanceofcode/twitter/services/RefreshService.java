@@ -22,10 +22,6 @@ package com.substanceofcode.twitter.services;
 import com.substanceofcode.twitter.TwitterController;
 import com.substanceofcode.twitter.model.Status;
 import java.util.Vector;
-import javax.microedition.lcdui.Alert;
-import javax.microedition.media.Manager;
-import javax.microedition.media.MediaException;
-import javax.microedition.media.control.ToneControl;
 
 /**
  *

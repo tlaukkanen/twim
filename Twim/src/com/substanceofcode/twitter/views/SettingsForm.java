@@ -44,6 +44,7 @@ public class SettingsForm extends Form implements CommandListener {
     private TextField usernameField;
     private TextField passwordField;
     private ChoiceGroup rememberValuesChoice;
+    private ChoiceGroup themeChoice;
 
     /**
      * Creates a new instance of SettingsForm
@@ -70,6 +71,12 @@ public class SettingsForm extends Form implements CommandListener {
         boolean skipSplashScreen = settings.getBooleanProperty(Settings.SKIP_SPLASH_SCREEN, false);
         rememberValuesChoice.setSelectedFlags(new boolean[]{true, doRefresh, loadOnStartup, skipSplashScreen});
         append(rememberValuesChoice);
+
+        String[] themes = {"Default", "Gray", "Night"};
+        themeChoice = new ChoiceGroup("Theme", ChoiceGroup.EXCLUSIVE, themes, null);
+        int theme = settings.getIntProperty(Settings.THEME, 0);
+        themeChoice.setSelectedIndex(theme, true);
+        append(themeChoice);
 
         loginCommand = new Command("Save", Command.ITEM, 1);
         this.addCommand(loginCommand);
@@ -107,6 +114,10 @@ public class SettingsForm extends Form implements CommandListener {
                 settings.setStringProperty(Settings.USERNAME, "");
                 settings.setStringProperty(Settings.PASSWORD, "");
             }
+            /** Theme */
+            int selectedTheme = themeChoice.getSelectedIndex();
+            Theme.setTheme(selectedTheme);
+            settings.setIntProperty(Settings.THEME, selectedTheme);
             try {
                 settings.save(true);
             } catch (IOException ex) {

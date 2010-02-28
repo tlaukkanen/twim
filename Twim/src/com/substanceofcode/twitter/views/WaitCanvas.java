@@ -60,7 +60,7 @@ public class WaitCanvas extends Canvas implements Runnable {
         this.controller = controller;
         this.waitText = "Please wait...";
         this.task = task;
-        this.talkBalloon = new TalkBalloon(getWidth(), getHeight());
+        this.talkBalloon = new ComicTalkBalloon(getWidth(), getHeight());
         loadingImageIndex = 0;
         statusFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL);
         thread = new Thread(this);
@@ -69,7 +69,7 @@ public class WaitCanvas extends Canvas implements Runnable {
     
     protected void paint(Graphics g) {  
         // Clear the background to white
-        g.setColor( Theme.TWITTER_BLUE_COLOR );
+        g.setColor( Theme.COLOR_BACKGROUND );
         g.fillRect( 0, 0, getWidth(), getHeight() );
         
         int titleY = getHeight()/4;

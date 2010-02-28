@@ -37,9 +37,9 @@ public class StatusList {
             Font.FACE_SYSTEM,
             Font.STYLE_PLAIN,
             Font.SIZE_SMALL);
-    private int screenWidth;
-    private int screenHeight;
-    private TalkBalloon talkBalloon;
+    private static int screenWidth;
+    private static int screenHeight;
+    private static TalkBalloon talkBalloon;
     private Status selectedStatus;
     private static Status nextPageStatus = new Status("Twim", "Click to load next page...", null, "page");
     
@@ -49,10 +49,19 @@ public class StatusList {
      * @param screenHeight  Screen height
      */
     public StatusList(int width, int screenHeight) {
-        this.screenWidth = width;
-        this.screenHeight = screenHeight;
-        this.talkBalloon = new TalkBalloon(width, screenHeight);
-        nextPageStatus.createTextLines(width, TalkBalloon.textFont);
+        screenWidth = width;
+        StatusList.screenHeight = screenHeight;
+        if(Theme.getTheme()==Theme.THEME_UNORIGINAL) {
+            talkBalloon = new ListTalkBalloon(screenWidth, screenHeight);
+        } else {
+            talkBalloon = new ComicTalkBalloon(screenWidth, screenHeight);
+        }
+        nextPageStatus.createTextLines(width, talkBalloon.getFont());
+    }
+
+    public static void setTalkBalloon(TalkBalloon themeBalloon) {
+        talkBalloon = themeBalloon;
+        talkBalloon.setSize(screenWidth, screenHeight);
     }
 
     /** 
@@ -126,7 +135,7 @@ public class StatusList {
         } else {
             infoText = status.getScreenName();
         }
-        return talkBalloon.draw(g, status.getTextLines(), infoText, row, isSelected);
+        return talkBalloon.draw(g, status.getText(), infoText, row, isSelected);
     }
 
     public Status getSelected() {

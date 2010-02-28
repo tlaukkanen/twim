@@ -98,10 +98,10 @@ public class FileBrowserCanvas extends Canvas  {
         height = getHeight();
 
         /** Background */
-        g.setColor(Theme.TWITTER_BLUE_COLOR);
+        g.setColor(Theme.COLOR_BACKGROUND);
         g.fillRect(0, 0, width, height);
 
-        g.setColor(0x000000);
+        g.setColor(Theme.COLOR_TEXT);
         //g.drawString(status, 0, getHeight()/2, Graphics.BASELINE|Graphics.LEFT);
 
         /** Draw the file directory */

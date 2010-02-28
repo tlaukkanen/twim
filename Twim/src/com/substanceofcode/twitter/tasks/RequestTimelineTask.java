@@ -43,8 +43,10 @@ public class RequestTimelineTask extends AbstractTask {
     public final static int FEED_PUBLIC = 3;
     public final static int FEED_DIRECT = 4;
     public final static int FEED_FAVOURITE = 5;
+    public final static int FEED_RETWEETS_OF_ME = 6;
 
     private static String lastHomeStatusID = "";
+    private static String lastRetweetsOfMeStatusID = "";
     
     /** 
      * Creates a new instance of RequestFriendsTimelineTask.
@@ -98,6 +100,24 @@ public class RequestTimelineTask extends AbstractTask {
         } else if(feedType==FEED_FAVOURITE) {
             timeline = api.requestFavouriteTimeline();
             controller.setFavouriteTimeline(timeline);
+        } else if(feedType==FEED_RETWEETS_OF_ME) {
+            timeline = api.requestRetweetsOfMe( page );
+            if(timeline!=null && page==0) {
+                Status lastStatus = (Status) timeline.lastElement();
+                String newStatusID = lastStatus.getId();
+                if(lastRetweetsOfMeStatusID.length()>0 &&
+                        !lastRetweetsOfMeStatusID.equals(newStatusID)) {
+                    controller.playInfoSound();
+                }
+                lastRetweetsOfMeStatusID = newStatusID;
+            }
+            if(page<2) {
+                controller.setRetweetsOfMeTimeline( timeline );
+            } else {
+                Vector retweetsOfMeTimeline = controller.getRetweetsOfMeTimeline();
+                timeline = appendToTimeline(retweetsOfMeTimeline, timeline);
+                controller.setRetweetsOfMeTimeline(timeline);
+            }
         }
         boolean resetVerticalScrolling = true;
         if(page>1) {

@@ -1,6 +1,6 @@
 Twim - Mobile Twitter Client
 
-Copyright (c) 2006-2009 Tommi Laukkanen
+Copyright (c) 2006-2010 Tommi Laukkanen
 http://www.substanceofcode.com
 
 Contributors:
@@ -8,6 +8,12 @@ Tommi Laukkanen
 
 
 Release Notes:
+
+v1.17 (February 28th, 2010)
++ Fixed parsing of new kind retweets (no more duplicate texts)
++ Posterous photo upload support
++ TwitnGo photo upload support
++ Themes support
 
 v1.16 (November 2nd, 2009)
 + Option to skip splash screen

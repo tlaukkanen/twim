@@ -50,9 +50,9 @@ public abstract class MenuCanvas extends Canvas {
         }
 
         /** Draw menu */
-        g.setColor(Theme.TWITTER_BLUE_COLOR);
+        g.setColor(Theme.COLOR_BACKGROUND);
         g.fillRect(0, 0, getWidth(), getHeight());
-        g.setColor(0x000000);
+        g.setColor(Theme.COLOR_TEXT);
         menu.draw(g);
     }
 

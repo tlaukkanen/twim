@@ -26,6 +26,9 @@ public class GenericUploadAndPostService implements PhotoService {
     protected String url = "";
     private static String response = "";
     private static GenericUploadAndPostService instance;
+    protected String photoContentPartName = "media";
+    protected String statusContentPartName = "message";
+    protected boolean includeSource = false;
 
     GenericUploadAndPostService() {
     }
@@ -53,6 +56,7 @@ public class GenericUploadAndPostService implements PhotoService {
             String password,
             String filename) throws IOException, Exception {
         HttpConnection connection = null;
+        String state = "posting";
         try {
             connection = (HttpConnection) Connector.open( url );
             connection.setRequestMethod( HttpConnection.POST );
@@ -62,7 +66,7 @@ public class GenericUploadAndPostService implements PhotoService {
 
             // Media
             writeString(dos, "--" + boundary + "\r\n");
-            writeString(dos, "Content-Disposition: form-data; name=\"media\"; filename=\"" + filename + "\"\r\n");
+            writeString(dos, "Content-Disposition: form-data; name=\"" + photoContentPartName + "\"; filename=\"" + filename + "\"\r\n");
             writeString(dos, "Content-Transfer-Encoding: binary\r\n");
             writeString(dos, "\r\n");
             dos.write(photo,0,photo.length);
@@ -82,10 +86,23 @@ public class GenericUploadAndPostService implements PhotoService {
 
             // Message
             writeString(dos, "--" + boundary + "\r\n");
-            writeString(dos, "Content-Disposition: form-data; name=\"message\"\r\n");
-
+            writeString(dos, "Content-Disposition: form-data; name=\"" + statusContentPartName + "\"\r\n");
             writeString(dos, "\r\n");
             writeString(dos, comment + "\r\n");
+
+            if(includeSource) {
+                // Source
+                writeString(dos, "--" + boundary + "\r\n");
+                writeString(dos, "Content-Disposition: form-data; name=\"source\"\r\n");
+                writeString(dos, "\r\n");
+                writeString(dos, "Twim\r\n");
+
+                // Source link
+                writeString(dos, "--" + boundary + "\r\n");
+                writeString(dos, "Content-Disposition: form-data; name=\"sourceLink\"\r\n");
+                writeString(dos, "\r\n");
+                writeString(dos, "http://www.substanceofcode.com/software/mobile-twitter-client-twim/\r\n");
+            }
 
             writeString(dos, "--" + boundary + "--\r\n");
             dos.flush();
@@ -93,6 +110,8 @@ public class GenericUploadAndPostService implements PhotoService {
 
             InputStream his = connection.openInputStream();
             CustomInputStream is = new CustomInputStream(his);
+
+            state = "parsing response";
 
             // Prepare buffer for input data
             StringBuffer inputBuffer = new StringBuffer();
@@ -118,6 +137,7 @@ public class GenericUploadAndPostService implements PhotoService {
             response = inputBuffer.toString();
 
             // Parse response
+            state = "parsing response XML";
             boolean status = false;
             String err = "";
             String mediaUrl = response;
@@ -131,16 +151,27 @@ public class GenericUploadAndPostService implements PhotoService {
                     String elementName = parser.getName();
                     if(elementName.equals("rsp")) {
                         String statusValue = parser.getAttributeValue("status");
-                        if(statusValue.equals("ok")) {
+                        if(statusValue!=null && statusValue.equals("ok")) {
                             status = true;
+                        } else {
+                            statusValue = parser.getAttributeValue("stat");
+                            if(statusValue!=null && statusValue.equals("ok")) {
+                                status = true;
+                            }
                         }
                     } else if(elementName.equals("mediaurl")) {
                         mediaUrl = parser.getText();
                     } else if(elementName.equals("err")) {
                         err = parser.getAttributeValue("msg");
+                    } else if(elementName.equals("success")) {
+                        status = true;
+                    } else if(elementName.equals("url")) {
+                        mediaUrl = parser.getText();
                     }
                 }
             }
+
+            state = "creating status";
 
             // Create status based on response
             Status stat = null;
@@ -148,14 +179,14 @@ public class GenericUploadAndPostService implements PhotoService {
             if(status) {
                 stat = new Status(username, comment + " - " + mediaUrl, now, "");
             } else {
-                stat = new Status("Remote API", "Error: " + err, now, "");
+                stat = new Status("Remote API", "Error in URL: " + url + " Err: " + err + " Response: " + response, now, "");
             }
             return stat;
 
         } catch (IOException e) {
             throw new IOException("IOException: " + e.toString());
         } catch (Exception e) {
-            throw new Exception("Error while posting: " + e.toString());
+            throw new Exception("Error while " + state + ": " + e.toString());
         } finally {
             if (connection != null) {
                 connection.close();
