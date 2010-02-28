@@ -41,6 +41,7 @@ import com.substanceofcode.twitter.views.SettingsForm;
 import com.substanceofcode.twitter.views.MediaCommentForm;
 import com.substanceofcode.twitter.views.SearchTextBox;
 import com.substanceofcode.twitter.views.SplashCanvas;
+import com.substanceofcode.twitter.views.Theme;
 import com.substanceofcode.twitter.views.TimelineCanvas;
 import com.substanceofcode.twitter.views.UpdateStatusTextBox;
 import com.substanceofcode.twitter.views.WaitCanvas;
@@ -82,6 +83,7 @@ public class TwitterController {
     Vector directTimeline;
     Vector friendsStatuses;
     Vector favouriteTimeline;
+    Vector retweetsOfMeTimeline;
 
     private static final int PUBLIC_TIMELINE = 0;
     private static final int HOME_TIMELINE = 1;
@@ -91,6 +93,7 @@ public class TwitterController {
     private static final int FRIENDS_TIMELINE = 5;
     private static final int FAVOURITE_TIMELINE = 6;
     private static final int SEARCH_TIMELINE = 7;
+    private static final int RETWEETS_OF_ME_TIMELINE = 8;
     int currentTimeline;
 
     static TwitterController instance;
@@ -176,9 +179,11 @@ public class TwitterController {
 
     /** Login to Twitter stream */
     public void login() {
+        /** Get saved credentials */
         String username = settings.getStringProperty(Settings.USERNAME, "");
         String password = settings.getStringProperty(Settings.PASSWORD, "");
         boolean loadTweets = settings.getBooleanProperty(Settings.LOAD_ON_STARTUP, false);
+        /** Login */
         login(username, password, loadTweets);
     }
 
@@ -190,6 +195,10 @@ public class TwitterController {
     public void login(String username, String password, boolean loadTweets) {
         api.setUsername(username);
         api.setPassword(password);
+
+        /** Set saved theme */
+        int theme = settings.getIntProperty(Settings.THEME, 0);
+        Theme.setTheme(theme);
 
         /** Start refresh service */
         boolean refresh = settings.getBooleanProperty(Settings.REFRESH, false);
@@ -413,6 +422,35 @@ public class TwitterController {
             timeline.setTimeline(responsesTimeline);
             display.setCurrent(timeline);
         }        
+    }
+
+    public void showRetweetsOfMeTimeline(boolean nextPage) {
+        currentTimeline = RETWEETS_OF_ME_TIMELINE;
+        timeline.showDrawNextPageLink(true);
+        if( retweetsOfMeTimeline==null || nextPage) {
+            timeline.selectRetweetsOfMeTab(!nextPage);
+            int page = 1;
+            if(nextPage) {
+                if(retweetsOfMeTimeline!=null) {
+                    int pages = retweetsOfMeTimeline.size() / 20;
+                    page += pages;
+                }
+            }
+            RequestTimelineTask task = new RequestTimelineTask(
+                this, api, RequestTimelineTask.FEED_RETWEETS_OF_ME, page);
+            WaitCanvas wait = new WaitCanvas(this, task);
+            wait.setWaitText("Loading retweets of you...");
+            if(display.getCurrent()!=null || tweetsShownOnce==false) {
+                display.setCurrent(wait);
+            }
+        } else {
+            timeline.setTimeline( homeTimeline );
+            timeline.resetScrolling();
+            if(display.getCurrent()!=null || tweetsShownOnce==false) {
+                display.setCurrent( timeline );
+            }
+            tweetsShownOnce = true;
+        }
     }
 
     /** Show status updating view. */
@@ -723,6 +761,14 @@ public class TwitterController {
 
     public Vector getHomeTimeline() {
         return homeTimeline;
+    }
+
+    public void setRetweetsOfMeTimeline(Vector timeline) {
+        this.retweetsOfMeTimeline = timeline;
+    }
+
+    public Vector getRetweetsOfMeTimeline() {
+        return retweetsOfMeTimeline;
     }
 
 }

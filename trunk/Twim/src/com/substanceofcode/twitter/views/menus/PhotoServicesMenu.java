@@ -20,8 +20,10 @@
 package com.substanceofcode.twitter.views.menus;
 
 import com.substanceofcode.twitter.services.Mobypicture;
+import com.substanceofcode.twitter.services.Posterous;
 import com.substanceofcode.twitter.services.TwitPic;
 import com.substanceofcode.twitter.services.Twitgoo;
+import com.substanceofcode.twitter.services.TwitnGo;
 import com.substanceofcode.twitter.services.TwitrPix;
 import com.substanceofcode.twitter.services.YfrogService;
 import com.substanceofcode.twitter.views.MenuAction;
@@ -35,12 +37,14 @@ public class PhotoServicesMenu extends MenuCanvas {
 
     public PhotoServicesMenu(byte[] media, String filename) {
         super("Photo services",
-                new String[]{"Twitgoo", "TwitPic", "TwitrPix", "Mobypicture", "yFrog", "Cancel"},
+                new String[]{"Twitgoo", "TwitnGo", "TwitPic", "TwitrPix", "Mobypicture", "Posterous", "yFrog", "Cancel"},
                 new MenuAction[]{
                     new PhotoServiceChangeAction( Twitgoo.getInstance(), media, filename ),
+                    new PhotoServiceChangeAction( TwitnGo.getInstance(new TwitnGo()), media, filename ),
                     new PhotoServiceChangeAction( TwitPic.getInstance(), media, filename ),
                     new PhotoServiceChangeAction( TwitrPix.getInstance(new TwitrPix()), media, filename),
                     new PhotoServiceChangeAction( Mobypicture.getInstance(), media, filename ),
+                    new PhotoServiceChangeAction( Posterous.getInstance(new Posterous()), media, filename ),
                     new PhotoServiceChangeAction( YfrogService.getInstance(), media, filename ),
                     new ShowTimelineAction()
                 }

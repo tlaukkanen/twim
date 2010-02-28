@@ -39,12 +39,14 @@ public class StatusFeedParser implements ResultParser {
     private Vector statuses;
     private boolean isDirect;
     private String rawData;
+    private boolean isReallyEmpty;
 
     /** Creates a new instance of StatusFeedParser */
     public StatusFeedParser() {
         statuses = new Vector();
         isDirect = false;
         rawData = "";
+        isReallyEmpty = false;
     }
 
     public String getRawData() {
@@ -79,12 +81,26 @@ public class StatusFeedParser implements ResultParser {
     <following>false</following>
     </user>
     </status>
+     *
+     *
      */
     public Vector getStatuses() {
         return statuses;
     }
 
+    public boolean isReallyEmpty() {
+        return this.isReallyEmpty;
+    }
+
+    /**
+     * Parse statuses feed.
+     * @param is
+     * @throws IOException
+     */
     public void parse(CustomInputStream is) throws IOException {
+        /* If empty then the following XML is returned:
+         * <nilclasses type="array"></nilclasses>
+         */
         try {
             XmlParser xml = new XmlParser(is);
             String text = "";
@@ -104,6 +120,9 @@ public class StatusFeedParser implements ResultParser {
                     text = "Error from Twitter: " + xml.getText();
                     screenName = "Twitter";
                     date = new Date(System.currentTimeMillis());
+                } else if(elementName.equals("nilclasses")) {
+                    isReallyEmpty = true;
+                    return;
                 } else if (elementName.equals("status")) {
                     // Parse normal status
                     if (text.length() > 0) {
@@ -145,7 +164,9 @@ public class StatusFeedParser implements ResultParser {
                 } else if (elementName.equals("id") && id.equals("")) {
                     id = xml.getText();
                 } else if (elementName.equals("text")) {
-                    text += xml.getText();
+                    if(text.length()==0) {
+                        text += xml.getText();
+                    }
                 } else if (elementName.equals("in_reply_to_status_id")) {
                     inReplyToId = xml.getText();
                 } else if (elementName.equals("favorited")) {
@@ -170,6 +191,8 @@ public class StatusFeedParser implements ResultParser {
                     }
                 } else if (elementName.equals("following")) {
                     String val = xml.getText();
+                    System.out.println("Following " + val);
+
                     if(val.startsWith("false")) {
                         isFollowing = false;
                     } else {

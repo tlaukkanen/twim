@@ -38,7 +38,7 @@ public class TwitterApi {
     private String username;
     private String password;
     private static final String PUBLIC_TIMELINE_URL = "http://www.twitter.com/statuses/public_timeline.xml";
-    private static final String HOME_TIMELINE_URL = "http://www.twitter.com/statuses/friends_timeline.xml";
+    private static final String HOME_TIMELINE_URL = "http://api.twitter.com/1/statuses/home_timeline.xml"; // Old: "http://www.twitter.com/statuses/friends_timeline.xml";
     private static final String USER_TIMELINE_URL = "http://www.twitter.com/statuses/user_timeline.xml";
     private static final String RESPONSES_TIMELINE_URL = "http://twitter.com/statuses/replies.xml";
     private static final String STATUS_UPDATE_URL = "http://twitter.com/statuses/update.xml";
@@ -50,6 +50,7 @@ public class TwitterApi {
     private static final String FRIENDSHIPS_CREATE_URL = "http://twitter.com/friendships/create/";
     private static final String FRIENDSHIPS_DESTROY_URL = "http://twitter.com/friendships/destroy/";
     private static final String SEARCH_URL = "http://search.twitter.com/search.atom?rpp=20&q=";
+    private static final String RETWEETS_OF_ME_URL = "http://api.twitter.com/1/statuses/retweets_of_me.xml";
 
     /** Creates a new instance of TwitterApi */
     public TwitterApi() {
@@ -148,6 +149,14 @@ public class TwitterApi {
         return requestTimeline(PUBLIC_TIMELINE_URL);
     }
 
+    public Vector requestRetweetsOfMe(int page) {
+        String url = RETWEETS_OF_ME_URL;
+        if(page>1) {
+            url += "?page=" + page;
+        }
+        return requestTimeline( url );
+    }
+
     /**
      * Request responses timeline from Twitter API.{
      * @return Vector containing StatusEntry items.
@@ -219,7 +228,7 @@ public class TwitterApi {
                 HttpUtil.doGet(timelineUrl, parser);
                 int lastResponseCode = HttpUtil.getLastResponseCode();
                 entries = parser.getStatuses();
-                if(entries.isEmpty()) {
+                if(entries.isEmpty() && parser.isReallyEmpty()==false) {
                     entries.addElement(
                         new Status("Twitter", "No statuses. API response from " +
                         timelineUrl + " (" + lastResponseCode + "): " +
@@ -227,6 +236,10 @@ public class TwitterApi {
                         parser.getRawData(),
                         Calendar.getInstance().getTime(), ""));
                     retry = !retry;
+                } else if(entries.isEmpty() && parser.isReallyEmpty()==true) {
+                    entries.addElement(
+                        new Status("Twitter", "No Tweets found.",
+                        Calendar.getInstance().getTime(), ""));
                 } else {
                     retry = false;
                 }

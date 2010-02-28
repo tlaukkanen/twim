@@ -53,7 +53,8 @@ public class TimelineCanvas extends Canvas {
     private String debug = "x";
     private int boxWidth = 20, boxHeight = 20;
     private static final Font LABEL_FONT = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_MEDIUM);
-    private static final int HOME_TAB = 2;
+    private static final int HOME_TAB = 3;
+    private static final int RETWEETS_OF_ME_TAB = 2;
     
     /** 
      * Creates a new instance of TimelineCanvas
@@ -68,12 +69,13 @@ public class TimelineCanvas extends Canvas {
         String[] labels = {
             "Archive",
             "Replies",
+            "Retweets",
             "Home",
             "Direct",
             "Favorites",
             "Following",
             "Public"};
-        menuBar = new TabBar(2, labels);
+        menuBar = new TabBar(HOME_TAB, labels);
         
         /** Menu */
         String[] menuLabels = {
@@ -160,7 +162,7 @@ public class TimelineCanvas extends Canvas {
             }
         }
 
-        g.setColor(Theme.TWITTER_BLUE_COLOR);
+        g.setColor(Theme.COLOR_BACKGROUND);
         g.fillRect(0, 0, getWidth(), getHeight());
 
         if( menu.isActive()==false &&
@@ -169,7 +171,7 @@ public class TimelineCanvas extends Canvas {
             boolean drawSelectionBox = menuBar.isSelectedActive();
             statusList.draw(
                     g, statuses,
-                    menuBar.getHeight() + verticalScroll + TalkBalloon.textFont.getHeight()/2,
+                    menuBar.getHeight() + verticalScroll + Theme.FONT_TEXT.getHeight()/2,
                     drawSelectionBox,
                     drawNextPageLink);
             menuBar.draw(g, 0, getWidth());
@@ -199,18 +201,21 @@ public class TimelineCanvas extends Canvas {
             /** Responses selected */
             controller.showResponsesTimeline();
         } else if(tabIndex==2) {
+            /** Retweets selected */
+            controller.showRetweetsOfMeTimeline(false);
+        } else if(tabIndex==3) {
             /** Recent selected */
             controller.showHomeTimeline(false);
-        } else if(tabIndex==3) {
+        } else if(tabIndex==4) {
             /** Direct messages */
             controller.showDirectMessages();
-        } else if(tabIndex==4) {
+        } else if(tabIndex==5) {
             /** Favorites */
             controller.showFavouriteTimeline();
-        } else if(tabIndex==5) {
+        } else if(tabIndex==6) {
             /** Friends */
             controller.showFriends();
-        } else if(tabIndex==6) {
+        } else if(tabIndex==7) {
             /** Public selected */
             controller.showPublicTimeline();
         }
@@ -567,6 +572,10 @@ public class TimelineCanvas extends Canvas {
         menuBar.selectNothing();
     }
 
+    private void loadNextPage() {
+        controller.loadNextPage();
+    }
+
     public void selectHomeTab(boolean resetVerticalScroll) {
         menuBar.selectTab( HOME_TAB );
         menuBar.activateSelectedTab();
@@ -575,8 +584,12 @@ public class TimelineCanvas extends Canvas {
         }
     }
 
-    private void loadNextPage() {
-        controller.loadNextPage();
+    public void selectRetweetsOfMeTab(boolean resetVerticalScroll) {
+        menuBar.selectTab( RETWEETS_OF_ME_TAB );
+        menuBar.activateSelectedTab();
+        if(resetVerticalScroll) {
+            verticalScroll = 0;
+        }
     }
     
 }
