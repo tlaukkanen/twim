@@ -62,8 +62,8 @@ public class Theme {
                 COLOR_BACKGROUND = 0xdddddd;
                 COLOR_TEXT = 0x000000;
                 COLOR_TEXT_BG = 0xffffff;
-                COLOR_SELECTED_BG = 0xEEEEEE;
-                COLOR_USER_TEXT = 0x666699;
+                COLOR_SELECTED_BG = 0xF6F6F6;
+                COLOR_USER_TEXT = 0x222288;
                 StatusList.setTalkBalloon(new ListTalkBalloon(10, 10));
                 break;
             case(THEME_NIGHT):

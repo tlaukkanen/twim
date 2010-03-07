@@ -60,7 +60,7 @@ public class ListTalkBalloon implements TalkBalloon {
 
         // Draw the main balloon box
         if(!isSelected) {
-            g.setColor( 0xdddddd );
+            g.setColor( 0xffffff );
         } else {
             g.setColor( Theme.COLOR_SELECTED_BG );
         }
