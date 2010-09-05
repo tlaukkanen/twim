@@ -11,7 +11,7 @@ import javax.microedition.lcdui.Graphics;
 
 /**
  *
- * @author tommi
+ * @author Tommi Laukkanen
  */
 public class ListTalkBalloon implements TalkBalloon {
 

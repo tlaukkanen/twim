@@ -1,7 +1,7 @@
 /*
  * PhotoService.java
  *
- * Copyright (C) 2005-2009 Tommi Laukkanen
+ * Copyright (C) 2005-2010 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,7 @@ import java.io.IOException;
 
 /**
  *
- * @author tommi
+ * @author Tommi Laukkanen (tlaukkanen at gmail dot com)
  */
 public interface PhotoService {
 

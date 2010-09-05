@@ -41,6 +41,7 @@ public class SettingsForm extends Form implements CommandListener {
     private TwitterController controller;
     private Command loginCommand;
     private Command exitCommand;
+    private Command resetAuthenticationTokenCommand;
     private TextField usernameField;
     private TextField passwordField;
     private ChoiceGroup rememberValuesChoice;
@@ -81,7 +82,10 @@ public class SettingsForm extends Form implements CommandListener {
         loginCommand = new Command("Save", Command.ITEM, 1);
         this.addCommand(loginCommand);
 
-        exitCommand = new Command("Exit", Command.EXIT, 2);
+        resetAuthenticationTokenCommand = new Command("Reset auth token", Command.ITEM, 2);
+        this.addCommand(resetAuthenticationTokenCommand);
+
+        exitCommand = new Command("Exit", Command.EXIT, 3);
         this.addCommand(exitCommand);
 
         this.setCommandListener(this);
@@ -128,6 +132,8 @@ public class SettingsForm extends Form implements CommandListener {
             controller.login(username, password, loadOnStartup);
         } else if (cmd == exitCommand) {
             controller.exit();
+        } else if (cmd == resetAuthenticationTokenCommand) {
+            controller.resetAuthenticationToken();
         }
     }
 }

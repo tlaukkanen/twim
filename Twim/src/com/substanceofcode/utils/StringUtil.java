@@ -276,7 +276,7 @@ public class StringUtil {
                         if (b <= 0xf) {
                             tmp.append("0");
                         }
-                        tmp.append(Integer.toHexString(b));
+                        tmp.append(Integer.toHexString(b).toUpperCase());
                     }
                 }
             } catch (Exception e) {

@@ -1,7 +1,7 @@
 /*
  * RequestFriendsTask.java
  *
- * Copyright (C) 2005-2009 Tommi Laukkanen
+ * Copyright (C) 2005-2010 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,9 +42,9 @@ public class RequestFriendsTask extends AbstractTask {
         String state = "";
         try {
             state = "requesting friends";
-            Vector friends = api.requestFriends();
-            state = "showing friends";
-            controller.showFriends( friends );
+            Vector friendStatuses = api.requestFriendsTimeline();
+            state = "showing friend statuses";
+            controller.showFriends( friendStatuses );
         } catch(Exception ex) {
             controller.showError("Error while " + state + ": " + ex.getMessage());
         }

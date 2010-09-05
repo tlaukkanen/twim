@@ -1,7 +1,7 @@
 /**
  * Settings.java
  *
- * Copyright (C) 2005-2008 Tommi Laukkanen
+ * Copyright (C) 2005-2010 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,6 +49,8 @@ public class Settings {
         public static final String LOAD_ON_STARTUP = "loadonstartup";
         public static final String SKIP_SPLASH_SCREEN = "skipsplash";
         public static final String THEME = "theme";
+        public static final String TOKEN = "token";
+        public static final String TOKEN_SECRET = "tokensecret";
 
 	/**
 	 * Singleton pattern is used to return 

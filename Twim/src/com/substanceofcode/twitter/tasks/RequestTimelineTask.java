@@ -1,7 +1,7 @@
 /*
  * RequestFriendsTimelineTask.java
  *
- * Copyright (C) 2005-2008 Tommi Laukkanen
+ * Copyright (C) 2005-2010 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,6 +37,7 @@ public class RequestTimelineTask extends AbstractTask {
     private TwitterApi api;
     private int feedType;
     private int page;
+    private String listName;
     public final static int FEED_HOME = 0;
     public final static int FEED_RESPONSES = 1;
     public final static int FEED_ARCHIVE = 2;
@@ -44,6 +45,7 @@ public class RequestTimelineTask extends AbstractTask {
     public final static int FEED_DIRECT = 4;
     public final static int FEED_FAVOURITE = 5;
     public final static int FEED_RETWEETS_OF_ME = 6;
+    public final static int FEED_CUSTOM = 7;
 
     private static String lastHomeStatusID = "";
     private static String lastRetweetsOfMeStatusID = "";
@@ -63,6 +65,20 @@ public class RequestTimelineTask extends AbstractTask {
         this.api = api;
         this.feedType = feedType;
         this.page = page;
+    }
+
+    /**
+     * Create request for specific URL of statuses.
+     */
+    public RequestTimelineTask(
+            TwitterController controller,
+            TwitterApi api,
+            String listName) {
+        this.controller = controller;
+        this.api = api;
+        this.listName = listName;
+        this.page = 0;
+        this.feedType = FEED_CUSTOM;
     }
 
     public void doTask() {
@@ -118,6 +134,9 @@ public class RequestTimelineTask extends AbstractTask {
                 timeline = appendToTimeline(retweetsOfMeTimeline, timeline);
                 controller.setRetweetsOfMeTimeline(timeline);
             }
+        } else if(feedType==FEED_CUSTOM) {
+            timeline = api.requestListStatuses( this.listName );
+            controller.showTimeline(timeline);
         }
         boolean resetVerticalScrolling = true;
         if(page>1) {

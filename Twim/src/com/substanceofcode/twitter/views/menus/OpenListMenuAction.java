@@ -1,7 +1,7 @@
 /*
- * TwitrPix.java
+ * OpenListMenuAction.java
  *
- * Copyright (C) 2005-2009 Tommi Laukkanen
+ * Copyright (C) 2005-2010 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,17 +17,27 @@
  * limitations under the License.
  */
 
-package com.substanceofcode.twitter.services;
+package com.substanceofcode.twitter.views.menus;
+
+import com.substanceofcode.twitter.TwitterController;
+import com.substanceofcode.twitter.model.UserList;
+import com.substanceofcode.twitter.views.MenuAction;
 
 /**
  *
  * @author Tommi Laukkanen
  */
-public class TwitrPix extends GenericUploadAndPostService {
+public class OpenListMenuAction implements MenuAction {
 
-    public TwitrPix() {
-        super();
-        this.url = "http://api.twitrpix.com/uploadAndPost";
+    private UserList userList;
+
+    public OpenListMenuAction(UserList list) {
+        this.userList = list;
+    }
+
+    public void activate() {
+        TwitterController controller = TwitterController.getInstance();
+        controller.showList(userList);
     }
 
 }

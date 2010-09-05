@@ -1,7 +1,7 @@
 /*
  * AboutCanvas.java
  * 
- * Copyright (C) 2005-2009 Tommi Laukkanen
+ * Copyright (C) 2005-2010 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,7 +39,7 @@ public class AboutCanvas extends Canvas {
         this.setFullScreenMode(true);
         this.controller = controller;
         texts = new String[3];
-        texts[0] = "Twim v1.17";
+        texts[0] = "Twim v1.19";
         texts[1] = "Copyright 2010 Tommi Laukkanen (www.substanceofcode.com)";
         texts[2] = HttpTransferStatus.getTotalBytesTransfered() + 
                    " bytes transferred since startup.";

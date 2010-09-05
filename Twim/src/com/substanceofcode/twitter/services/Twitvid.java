@@ -1,7 +1,7 @@
 /*
  * Twitvid.java
  *
- * Copyright (C) 2005-2009 Tommi Laukkanen
+ * Copyright (C) 2005-2010 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,7 +32,7 @@ import javax.microedition.io.HttpConnection;
 
 /**
  *
- * @author tommi
+ * @author Tommi Laukkanen
  */
 public class Twitvid implements VideoService {
 

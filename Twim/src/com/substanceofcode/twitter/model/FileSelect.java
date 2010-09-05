@@ -1,7 +1,7 @@
 /*
  * FileSelect.java
  *
- * Copyright (C) 2008-2009 Tommi Laukkanen
+ * Copyright (C) 2008-2010 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,7 @@ package com.substanceofcode.twitter.model;
 
 /**
  * Interface for file selection.
- * @author Tommi Laukkanen
+ * @author Tommi Laukkanen (tlaukkanen at gmail dot com)
  */
 public interface FileSelect {
 

@@ -1,6 +1,20 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * ComicTalkBalloon.java
+ *
+ * Copyright (C) 2005-2010 Tommi Laukkanen
+ * http://www.substanceofcode.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.substanceofcode.twitter.views;
@@ -11,7 +25,7 @@ import javax.microedition.lcdui.Graphics;
 
 /**
  *
- * @author tommi
+ * @author Tommi Laukkanen
  */
 public class ComicTalkBalloon implements TalkBalloon {
 
@@ -88,12 +102,12 @@ public class ComicTalkBalloon implements TalkBalloon {
         }
         int triSize = fontHeight/2;
         g.fillTriangle(
-            x+triSize, y + textHeight,
-            x+triSize * 2, y + textHeight + triSize,
-            x+triSize * 3, y + textHeight);
+            x+16, y + textHeight,
+            x+16+triSize, y + textHeight + triSize,
+            x+16+triSize * 2, y + textHeight);
         g.setColor(BORDER_COLOR);
-        g.drawLine(x+triSize, y + textHeight, x+triSize * 2, y + textHeight + triSize);
-        g.drawLine(x+triSize * 2, y + textHeight + triSize, x+triSize * 3, y + textHeight);
+        g.drawLine(x+16, y + textHeight, x+16+triSize, y + textHeight + triSize);
+        g.drawLine(x+16+triSize, y + textHeight + triSize, x+16+triSize * 2, y + textHeight);
 
         // Draw text inside balloon
         g.setColor( Theme.COLOR_TEXT );
@@ -105,10 +119,15 @@ public class ComicTalkBalloon implements TalkBalloon {
         }
 
         // Draw talker text
-        g.setColor( Theme.COLOR_USER_TEXT );
-        g.drawString(talkerText, x+triSize * 4 + 2, textRow + fontHeight/2 + 2, Graphics.LEFT|Graphics.BOTTOM);
+        g.drawImage(Images.getUser(), x, y + textHeight+4, Graphics.LEFT|Graphics.TOP);
 
-        return (int)((textLines.length)*fontHeight + fontHeight*2 + 1);
+        g.setColor( Theme.COLOR_USER_TEXT );
+        g.drawString(talkerText, x+16+triSize * 2 + 2, y + textHeight + 4 + fontHeight, Graphics.LEFT|Graphics.BOTTOM);
+
+        int titleHeight = fontHeight + 1 ;
+        if(titleHeight<23) { titleHeight = 23; }
+
+        return (int)((textLines.length)*fontHeight + fontHeight + titleHeight);
     }
 
     public void setSize(int width, int height) {

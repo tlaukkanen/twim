@@ -1,7 +1,7 @@
 /*
- * TwitrPix.java
+ * UserList.java
  *
- * Copyright (C) 2005-2009 Tommi Laukkanen
+ * Copyright (C) 2005-2010 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,17 +17,38 @@
  * limitations under the License.
  */
 
-package com.substanceofcode.twitter.services;
+package com.substanceofcode.twitter.model;
 
 /**
  *
  * @author Tommi Laukkanen
  */
-public class TwitrPix extends GenericUploadAndPostService {
+public class UserList {
 
-    public TwitrPix() {
-        super();
-        this.url = "http://api.twitrpix.com/uploadAndPost";
+    String id;
+    String name;
+    String uri;
+
+    public UserList(String id, String name, String uri) {
+        this.id = id;
+        this.name = name;
+        this.uri = uri;
+    }
+
+    public String getId() {
+        return this.id;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public String getUri() {
+        return this.uri;
+    }
+
+    public String toString() {
+        return this.name;
     }
 
 }
