@@ -77,12 +77,13 @@ public class TimelineCanvas extends Canvas {
             "Public"};
         menuBar = new TabBar(HOME_TAB, labels);
         
-        /** Menu */
+        /** Main menu */
         String[] menuLabels = {
             "Update status",
             "Send media",
             "Reload tweets",
             "Search tweets",
+            "Lists",
             "Settings",
             "About",
             "Exit",
@@ -274,12 +275,14 @@ public class TimelineCanvas extends Canvas {
         } else if(selectedIndex==3) {
             controller.showSearchForm();
         } else if(selectedIndex==4) {
-            controller.showSettingsForm();
+            controller.showLists();
         } else if(selectedIndex==5) {
-            controller.about();
+            controller.showSettingsForm();
         } else if(selectedIndex==6) {
-            controller.exit();
+            controller.about();
         } else if(selectedIndex==7) {
+            controller.exit();
+        } else if(selectedIndex==8) {
             controller.minimize();
         }
     }

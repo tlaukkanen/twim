@@ -1,7 +1,7 @@
 /*
- * TwitrPix.java
+ * ListsMenu.java
  *
- * Copyright (C) 2005-2009 Tommi Laukkanen
+ * Copyright (C) 2005-2010 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,17 +17,19 @@
  * limitations under the License.
  */
 
-package com.substanceofcode.twitter.services;
+package com.substanceofcode.twitter.views.menus;
+
+import com.substanceofcode.twitter.views.MenuAction;
+import com.substanceofcode.twitter.views.MenuCanvas;
 
 /**
  *
  * @author Tommi Laukkanen
  */
-public class TwitrPix extends GenericUploadAndPostService {
+public class ListsMenu extends MenuCanvas {
 
-    public TwitrPix() {
-        super();
-        this.url = "http://api.twitrpix.com/uploadAndPost";
+    public ListsMenu(String[] lists, MenuAction[] actions) {
+        super("Lists", lists, actions);
     }
 
 }

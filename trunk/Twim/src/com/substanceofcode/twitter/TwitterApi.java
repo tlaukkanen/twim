@@ -1,7 +1,7 @@
 /*
  * TwitterApi.java
  *
- * Copyright (C) 2005-2009 Tommi Laukkanen
+ * Copyright (C) 2005-2010 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,6 @@ import com.substanceofcode.twitter.model.Status;
 import com.substanceofcode.utils.HttpUtil;
 import com.substanceofcode.utils.Log;
 import com.substanceofcode.utils.StringUtil;
-import com.substanceofcode.utils.URLUTF8Encoder;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Vector;
@@ -37,30 +36,84 @@ public class TwitterApi {
 
     private String username;
     private String password;
+
     private static final String PUBLIC_TIMELINE_URL = "http://www.twitter.com/statuses/public_timeline.xml";
     private static final String HOME_TIMELINE_URL = "http://api.twitter.com/1/statuses/home_timeline.xml"; // Old: "http://www.twitter.com/statuses/friends_timeline.xml";
-    private static final String USER_TIMELINE_URL = "http://www.twitter.com/statuses/user_timeline.xml";
-    private static final String RESPONSES_TIMELINE_URL = "http://twitter.com/statuses/replies.xml";
-    private static final String STATUS_UPDATE_URL = "http://twitter.com/statuses/update.xml";
-    private static final String DIRECT_TIMELINE_URL = "http://twitter.com/direct_messages.xml";
-    private static final String FRIENDS_URL = "http://twitter.com/statuses/friends.xml";
-    private static final String FAVORITE_TIMELINE_URL = "http://twitter.com/favorites.xml";
-    private static final String FAVORITE_CREATE_URL = "http://twitter.com/favorites/create/";
-    private static final String FAVORITE_DESTROY_URL = "http://twitter.com/favorites/destroy/";
-    private static final String FRIENDSHIPS_CREATE_URL = "http://twitter.com/friendships/create/";
-    private static final String FRIENDSHIPS_DESTROY_URL = "http://twitter.com/friendships/destroy/";
+    private static final String USER_TIMELINE_URL = "http://api.twitter.com/1/statuses/user_timeline.xml";
+    private static final String RESPONSES_TIMELINE_URL = "http://api.twitter.com/1/statuses/mentions.xml";
+    private static final String STATUS_UPDATE_URL = "http://api.twitter.com/1/statuses/update.xml"; // "http://twitter.com/statuses/update.xml";
+    private static final String DIRECT_TIMELINE_URL = "http://api.twitter.com/1/direct_messages.xml";
+    private static final String FRIENDS_URL = "http://api.twitter.com/1/statuses/friends_timeline.xml";
+    private static final String FAVORITE_TIMELINE_URL = "http://api.twitter.com/1/favorites.xml";
+    private static final String FAVORITE_CREATE_URL = "http://api.twitter.com/1/favorites/create/";
+    private static final String FAVORITE_DESTROY_URL = "http://api.twitter.com/1/favorites/destroy/";
+    private static final String FRIENDSHIPS_CREATE_URL = "http://api.twitter.com/1/friendships/create/";
+    private static final String FRIENDSHIPS_DESTROY_URL = "http://api.twitter.com/1/friendships/destroy/";
     private static final String SEARCH_URL = "http://search.twitter.com/search.atom?rpp=20&q=";
     private static final String RETWEETS_OF_ME_URL = "http://api.twitter.com/1/statuses/retweets_of_me.xml";
+    private static final String LISTS_URL = "http://api.twitter.com/1/@USERNAME@/lists.xml";
+    private static final String LIST_STATUSES_URL = "http://api.twitter.com/1/@USERNAME@/lists/@LIST@/statuses.xml";
+
+    // XAuth specific parameters
+    private static final String OAUTH_REQUEST_TOKEN_URL = "https://api.twitter.com/oauth/request_token";
+    private static final String OAUTH_ACCESS_TOKEN_URL = "https://api.twitter.com/oauth/access_token";
+    private static final String OAUTH_AUTHORIZE_URL = "https://api.twitter.com/oauth/authorize";
+
+    private static boolean isAuthenticated = false;
+    private static Status authErrStatus = null;
+    private static XAuth xauth;
 
     /** Creates a new instance of TwitterApi */
     public TwitterApi() {
+    }
+
+    public void bypassAuthorization(String token, String tokenSecret) {
+        if(token!=null && token.length()>0) {
+            xauth = new XAuth(username, password);
+            xauth.setTokenAndSecret(token, tokenSecret);
+            isAuthenticated = true;
+        } else {
+            isAuthenticated = false;
+        }
+    }
+
+    public boolean authorize() {
+        if(isAuthenticated) {
+            return true;
+        }
+        String token = "";
+        try {
+            System.out.println("Trying to authenticate");
+            xauth = new XAuth(username, password);
+            token = xauth.xAuthWebRequest(false, OAUTH_ACCESS_TOKEN_URL, null, null);
+            System.out.println("ACCESS TOKEN: " + token);
+            if(token.indexOf("oauth_token_secret")>0) {
+                // Success
+                String oauthToken = HttpUtil.parseParameter(token, "oauth_token");
+                String oauthTokenSecret = HttpUtil.parseParameter(token, "oauth_token_secret");
+                xauth.setTokenAndSecret(oauthToken, oauthTokenSecret);
+                isAuthenticated = true;
+                authErrStatus = null;
+                return true;
+            } else {
+                // Failure
+                authErrStatus = new Status("Twitter", "Couldn't find OAuth token from response: " + token, null, "");
+                isAuthenticated = false;
+                return false;
+            }
+        } catch (Exception ex) {
+            authErrStatus = new Status("Twitter", "Couldn't authenticate. Exception: " + ex.getMessage(), null, "");
+            isAuthenticated = false;
+            return false;
+        }
     }
 
     public String followUser(Status status) throws Exception {
         try {
             NullParser parser = new NullParser();
             String url = FRIENDSHIPS_CREATE_URL + status.getScreenName() + ".xml";
-            HttpUtil.doPost( url, parser );
+            xauth.xAuthWebRequest(true, url, null, parser);
+            //HttpUtil.doPost( url, parser );
             return parser.getResponse();
         } catch(Exception ex) {
             throw ex;
@@ -71,7 +124,7 @@ public class TwitterApi {
         try {
             NullParser parser = new NullParser();
             String url = FRIENDSHIPS_DESTROY_URL + status.getScreenName() + ".xml";
-            HttpUtil.doPost( url, parser );
+            xauth.xAuthWebRequest(true, url, null, parser);
             return parser.getResponse();
         } catch(Exception ex) {
             throw ex;
@@ -82,7 +135,8 @@ public class TwitterApi {
         try {
             StatusFeedParser parser = new StatusFeedParser();
             String url = FAVORITE_CREATE_URL + status.getId() + ".xml";
-            HttpUtil.doPost( url, parser );
+            xauth.xAuthWebRequest(true, url, null, parser);
+            //HttpUtil.doPost( url, parser );
             Vector statuses = parser.getStatuses();
             if(statuses!=null && statuses.isEmpty()==false) {
                 return (Status)statuses.elementAt(0);
@@ -114,8 +168,8 @@ public class TwitterApi {
     }
 
     /**
-     * Request favourite tweets from Twitter API.
-     * @return Vector containing favourite tweets.
+     * Request favorite tweets from Twitter API.
+     * @return Vector containing favorite tweets.
      */
     public Vector requestFavouriteTimeline() {
         return requestTimeline(FAVORITE_TIMELINE_URL);
@@ -167,11 +221,22 @@ public class TwitterApi {
     
     public Status updateStatus(String status) {
         try {
+            if(authorize()==false) {
+                if(authErrStatus!=null) {
+                    return authErrStatus;
+                }
+            }
+
             StatusFeedParser parser = new StatusFeedParser();
-            String url = STATUS_UPDATE_URL + 
-                    "?status=" + URLUTF8Encoder.encode(status) +
-                    "&source=twim";
-            HttpUtil.doPost( url, parser );
+            String url = STATUS_UPDATE_URL;
+            QueryParameter[] params = new QueryParameter[] {
+                new QueryParameter("status", status),
+                new QueryParameter("source", "twim")
+            };
+            // "?status=" + URLUTF8Encoder.encode(status) +
+            // "&source=twim";
+            xauth.xAuthWebRequest(true, STATUS_UPDATE_URL, params, parser);
+            //HttpUtil.doPost( url, parser );
             Vector statuses = parser.getStatuses();
             if(statuses!=null && statuses.isEmpty()==false && status.startsWith("d ")==false) {
                 return (Status)statuses.elementAt(0);
@@ -190,13 +255,15 @@ public class TwitterApi {
      * Request friends from Twitter API.
      * @return Vector containing friends.
      */
-    public Vector requestFriends() throws IOException, Exception{
+    public Vector requestFriendsTimeline() throws IOException, Exception{
         Vector entries = new Vector();
+        authorize();
         try {
-            HttpUtil.setBasicAuthentication(username, password);
-            UsersParser parser = new UsersParser();
-            HttpUtil.doGet(FRIENDS_URL, parser);
-            entries = parser.getUsers();
+            HttpUtil.setBasicAuthentication("", "");
+            StatusFeedParser parser = new StatusFeedParser();
+            xauth.xAuthWebRequest(false, FRIENDS_URL, null, parser);
+            //HttpUtil.doGet(FRIENDS_URL, parser);
+            entries = parser.getStatuses();
         } catch (IOException ex) {
             throw new IOException("Error in TwitterApi.requestFriends: "
                     + ex.getMessage());
@@ -217,15 +284,23 @@ public class TwitterApi {
     
     private Vector requestTimeline(String timelineUrl) {
         Vector entries = new Vector();
+        if(authorize()==false) {
+            if(authErrStatus!=null) {
+                entries.addElement(authErrStatus);
+                return entries;
+            }
+        }
         try {
             boolean retry = false;
             do {
-                HttpUtil.setBasicAuthentication(username, password);
+                //HttpUtil.setBasicAuthentication(username, password);
+                HttpUtil.setBasicAuthentication("", "");
                 StatusFeedParser parser = new StatusFeedParser();
                 if(timelineUrl.equals(DIRECT_TIMELINE_URL)) {
                     parser.setDirect(true);
                 }
-                HttpUtil.doGet(timelineUrl, parser);
+                xauth.xAuthWebRequest(false, timelineUrl, null, parser);
+                //HttpUtil.doGet(timelineUrl, parser);
                 int lastResponseCode = HttpUtil.getLastResponseCode();
                 entries = parser.getStatuses();
                 if(entries.isEmpty() && parser.isReallyEmpty()==false) {
@@ -267,7 +342,8 @@ public class TwitterApi {
         try {
             StatusFeedParser parser = new StatusFeedParser();
             String url = FAVORITE_DESTROY_URL + status.getId() + ".xml";
-            HttpUtil.doPost( url, parser );
+            xauth.xAuthWebRequest(true, url, null, parser);
+            //HttpUtil.doPost( url, parser );
             Vector statuses = parser.getStatuses();
             if(statuses!=null && statuses.isEmpty()==false) {
                 return (Status)statuses.elementAt(0);
@@ -293,6 +369,38 @@ public class TwitterApi {
         } catch(Exception ex) {
             throw new Exception("Error while searching tweets: " + ex.getMessage());
         }
+    }
+
+    public Vector requestLists() throws Exception {
+        authorize();
+
+        Vector entries = new Vector();
+        try {
+            ListsParser parser = new ListsParser();
+            String url = StringUtil.replace(LISTS_URL, "@USERNAME@", username);
+            xauth.xAuthWebRequest(false, url, null, parser);
+            //HttpUtil.doGet(url, parser);
+            entries = parser.getUserLists();
+        } catch (IOException ex) {
+            throw new IOException("Error in TwitterApi.requestLists: "
+                    + ex.getMessage());
+        } catch (Exception ex) {
+            throw new Exception("Error in TwitterApi.requestLists: "
+                    + ex.getMessage());
+        }
+        return entries;
+    }
+
+    public Vector requestListStatuses(String listName) {
+        String url = StringUtil.replace(LIST_STATUSES_URL, "@LIST@", StringUtil.urlEncode(listName));
+        url = StringUtil.replace(url, "@USERNAME@", username);
+        System.out.println("Loading custom URL: " + url);
+        return requestTimeline(url);
+    }
+
+    void resetToken() {
+        xauth.setTokenAndSecret("", "");
+        isAuthenticated = false;
     }
     
     

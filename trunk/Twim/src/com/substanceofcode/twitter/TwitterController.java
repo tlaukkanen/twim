@@ -1,7 +1,7 @@
 /*
  * TwitterController.java
  *
- * Copyright (C) 2005-2009 Tommi Laukkanen
+ * Copyright (C) 2005-2010 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,9 +24,11 @@ import com.substanceofcode.tasks.AbstractTask;
 import com.substanceofcode.twitter.model.MediaFileSelect;
 import com.substanceofcode.twitter.model.Status;
 import com.substanceofcode.twitter.model.User;
+import com.substanceofcode.twitter.model.UserList;
 import com.substanceofcode.twitter.services.RefreshService;
 import com.substanceofcode.twitter.tasks.ToggleFavoriteTask;
 import com.substanceofcode.twitter.tasks.RequestFriendsTask;
+import com.substanceofcode.twitter.tasks.RequestListsTask;
 import com.substanceofcode.twitter.tasks.RequestTimelineTask;
 import com.substanceofcode.twitter.tasks.SearchTask;
 import com.substanceofcode.twitter.tasks.SendPhotoTask;
@@ -39,12 +41,15 @@ import com.substanceofcode.twitter.views.CameraCanvas;
 import com.substanceofcode.twitter.views.FileBrowserCanvas;
 import com.substanceofcode.twitter.views.SettingsForm;
 import com.substanceofcode.twitter.views.MediaCommentForm;
+import com.substanceofcode.twitter.views.MenuAction;
 import com.substanceofcode.twitter.views.SearchTextBox;
 import com.substanceofcode.twitter.views.SplashCanvas;
 import com.substanceofcode.twitter.views.Theme;
 import com.substanceofcode.twitter.views.TimelineCanvas;
 import com.substanceofcode.twitter.views.UpdateStatusTextBox;
 import com.substanceofcode.twitter.views.WaitCanvas;
+import com.substanceofcode.twitter.views.menus.ListsMenu;
+import com.substanceofcode.twitter.views.menus.OpenListMenuAction;
 import com.substanceofcode.twitter.views.menus.PhotoServicesMenu;
 import com.substanceofcode.twitter.views.menus.VideoServicesMenu;
 import com.substanceofcode.utils.Log;
@@ -181,7 +186,12 @@ public class TwitterController {
     public void login() {
         /** Get saved credentials */
         String username = settings.getStringProperty(Settings.USERNAME, "");
+        api.setUsername(username);
         String password = settings.getStringProperty(Settings.PASSWORD, "");
+        api.setPassword(password);
+        String token = settings.getStringProperty(Settings.TOKEN, "");
+        String tokenSecret = settings.getStringProperty(Settings.TOKEN_SECRET, "");
+        api.bypassAuthorization(token, tokenSecret);
         boolean loadTweets = settings.getBooleanProperty(Settings.LOAD_ON_STARTUP, false);
         /** Login */
         login(username, password, loadTweets);
@@ -210,6 +220,7 @@ public class TwitterController {
         }
 
         if(loadTweets) {
+            api.authorize();
             showHomeTimeline( false );
         } else {
             showEmptyTimeline();
@@ -327,6 +338,13 @@ public class TwitterController {
         display.setCurrent(alert, timeline);
     }
 
+    public void showInfo(String info) {
+        Alert alert = new Alert("Info");
+        alert.setString(info);
+        alert.setTimeout(Alert.FOREVER);
+        display.setCurrent(alert, timeline);
+    }
+
     public void showPhotoBrowser() {
         try {
             if(fileBrowser==null) {
@@ -360,39 +378,10 @@ public class TwitterController {
         currentTimeline = FRIENDS_TIMELINE;
         timeline.showDrawNextPageLink(false);
         String state = "";
-        int nullUserCount = 0; // Only for debugging purposes
-        try {
-            if(friends==null) {
-                showError("Friends vector is null");
-                return;
-            }
-            state = "initializing vector";
-            friendsStatuses = new Vector();
-            state = "creating enumeration";
-            Enumeration friendEnum = friends.elements();
-            state = "starting the loop friends";
-            while(friendEnum.hasMoreElements()) {
-                state = "getting user from element";
-                User user = (User) friendEnum.nextElement();
-                if(user==null) {
-                    // why?
-                    nullUserCount++;
-                }
-                state = "getting user's last status";
-                if(user.getLastStatus()!=null) {
-                    state = "adding last status to vector";
-                    friendsStatuses.addElement(user.getLastStatus());
-                }
-            }
-            state = "setting friends timeline";
-            timeline.setTimeline(friendsStatuses);
-            state = "showing timeline";
-            display.setCurrent(timeline);
-        } catch(Exception ex) {
-            this.showError("Error while " + state + ": " + ex.getMessage()
-                    + "\nNull users: " + nullUserCount
-                    + "\nFriends: " + friends.capacity());
-        }
+        state = "setting friends timeline";
+        timeline.setTimeline(friends);
+        state = "showing timeline";
+        display.setCurrent(timeline);
     }
 
     public void showPublicTimeline() {
@@ -602,7 +591,7 @@ public class TwitterController {
     }
 
     /** Show splash screen */
-    void showSplash() {
+    public void showSplash() {
         SplashCanvas splash = new SplashCanvas(this);
         display.setCurrent(splash);
     }
@@ -769,6 +758,47 @@ public class TwitterController {
 
     public Vector getRetweetsOfMeTimeline() {
         return retweetsOfMeTimeline;
+    }
+
+    /** Show user lists */
+    public void showLists(Vector lists) {
+        MenuAction[] actions = new MenuAction[ lists.size() ];
+        String[] names = new String[ lists.size() ];
+        Enumeration elements = lists.elements();
+        int i=0;
+        while(elements.hasMoreElements()) {
+            UserList list = (UserList)elements.nextElement();
+            actions[i] = new OpenListMenuAction(list);
+            names[i] = list.getName();
+            i++;
+        }
+        ListsMenu listsMenu = new ListsMenu( names, actions );
+        display.setCurrent(listsMenu);
+    }
+
+    /** Start loading user lists */
+    public void showLists() {
+        RequestListsTask task = new RequestListsTask(this, this.api);
+        WaitCanvas wait = new WaitCanvas(this, task);
+        wait.setWaitText("Loading your lists...");
+        display.setCurrent(wait);
+    }
+
+    /** Show selected user list content */
+    public void showList(UserList userList) {
+        RequestTimelineTask task = new RequestTimelineTask(
+                this,
+                this.api,
+                userList.getId());
+        WaitCanvas wait = new WaitCanvas(this, task);
+        wait.setWaitText("Loading list of " + userList.getName());
+        display.setCurrent(wait);
+    }
+
+    /** Resets authentication token and secret */
+    public void resetAuthenticationToken() {
+        api.resetToken();
+        showInfo("Authentication token was reset.");
     }
 
 }

@@ -1,7 +1,7 @@
 /*
  * MenuAction.java
  *
- * Copyright (C) 2005-2009 Tommi Laukkanen
+ * Copyright (C) 2005-2010 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,7 @@ package com.substanceofcode.twitter.views;
 
 /**
  *
- * @author tommi
+ * @author Tommi Laukkanen
  */
 public interface MenuAction {
 

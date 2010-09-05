@@ -1,7 +1,7 @@
 /*
- * TwitrPix.java
+ * QueryParameter.java
  *
- * Copyright (C) 2005-2009 Tommi Laukkanen
+ * Copyright (C) 2005-2010 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,17 +17,28 @@
  * limitations under the License.
  */
 
-package com.substanceofcode.twitter.services;
+package com.substanceofcode.twitter;
 
 /**
  *
- * @author Tommi Laukkanen
+ * @author Tommi Laukkanen (tlaukkanen at gmail dot com)
  */
-public class TwitrPix extends GenericUploadAndPostService {
+public class QueryParameter {
 
-    public TwitrPix() {
-        super();
-        this.url = "http://api.twitrpix.com/uploadAndPost";
+    private String name;
+    private String value;
+
+    public QueryParameter(String name, String value) {
+        this.name = name;
+        this.value = value;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public String getValue() {
+        return this.value;
     }
 
 }

@@ -88,8 +88,7 @@ public class HttpUtil extends HttpAbstractUtil {
             hc.setRequestProperty("Content-Length", "0");
             hc.setRequestProperty("Connection", "close");
 
-            Log.add("Posting to URL: ");
-            Log.add(url);
+            Log.add("Posting ("+ requestMethod +") to URL: " + url);
 
             // Cookie: name=SID; domain=.google.com; path=/; expires=1600000000; content=
             if (cookie != null && cookie.length() > 0) {
@@ -181,5 +180,25 @@ public class HttpUtil extends HttpAbstractUtil {
             }
         }
         return response;
+    }
+
+    public static String parseParameter(String url, String parameter) {
+        int parameterIndex = url.indexOf(parameter);
+        if(parameterIndex<0) {
+            // We didn't find parameter
+            return "";
+        }
+        int equalIndex = url.indexOf("=", parameterIndex);
+        if(equalIndex<0) {
+            return "";
+        }
+        String value = "";
+        int nextIndex = url.indexOf("&", equalIndex+1);
+        if(nextIndex<0) {
+            value = url.substring(equalIndex+1);
+        } else {
+            value = url.substring(equalIndex+1, nextIndex);
+        }
+        return value;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * ToggleFavoriteTask.java
+ * RequestListsTask.java
  *
  * Copyright (C) 2005-2010 Tommi Laukkanen
  * http://www.substanceofcode.com
@@ -22,41 +22,33 @@ package com.substanceofcode.twitter.tasks;
 import com.substanceofcode.tasks.AbstractTask;
 import com.substanceofcode.twitter.TwitterApi;
 import com.substanceofcode.twitter.TwitterController;
-import com.substanceofcode.twitter.model.Status;
+import java.util.Vector;
 
 /**
- * Task for marking tweet as favorite.
+ *
  * @author Tommi Laukkanen
  */
-public class ToggleFavoriteTask extends AbstractTask {
+public class RequestListsTask extends AbstractTask {
 
     TwitterController controller;
     TwitterApi api;
-    Status status;
 
-    public ToggleFavoriteTask(
-            TwitterController controller,
-            TwitterApi api,
-            Status status) {
+    public RequestListsTask(TwitterController controller, TwitterApi api) {
         this.controller = controller;
         this.api = api;
-        this.status = status;
     }
 
     public void doTask() {
+        String state = "";
         try {
-            if(status.isFavorite()) {
-                Status unfavoriteStatus = api.markAsUnfavorite(status);
-                controller.removeFavoriteStatus(unfavoriteStatus);
-            } else {
-                Status favoriteStatus = api.markAsFavorite(status);
-                controller.addFavoriteStatus(favoriteStatus);
-            }
-            controller.showPreviousTimeline();
+            state = "requesting lists";
+            Vector lists = api.requestLists();
+            state = "showing lists";
+            controller.showLists( lists );
         } catch(Exception ex) {
-            controller.showError("Error while marking tweet as favorite: " + ex.getMessage());
+            controller.showError("Error while " + state + ": " + ex.getMessage());
+            ex.printStackTrace();
         }
-        
     }
 
 }
